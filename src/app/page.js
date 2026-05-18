@@ -11,22 +11,27 @@ import Image from "next/image";
 const SLIDES = [
   {
     id: 1,
-    imageSrc: "/Fix-Window.jpg", // ← replace with your image path
+    imageSrc: "/crm1.jpg", // ← replace with your image path
     imageAlt: "Explore with Yetti",
+    width: 1200,
     // headline: "EXPLORE.",
     // subtext: "LEARN. GROW.",
   },
   {
     id: 2,
-    imageSrc: "/Fix-Window.jpg", // ← replace with your image path
+    imageSrc: "/crm2.jpg", // ← replace with your image path
     imageAlt: "Learn with Yetti",
+    width: 1200,
+
     // headline: "LEARN.",
     // subtext: "DISCOVER. GROW.",
   },
   {
     id: 3,
-    imageSrc: "/hybride-scaled-1.jpg", // ← replace with your image path
+    imageSrc: "/crm3.jpg", // ← replace with your image path
     imageAlt: "Grow with Yetti",
+    width: 1200,
+
     // headline: "GROW.",
     // subtext: "EXPLORE. SUCCEED.",
   },
@@ -241,9 +246,9 @@ export default function Page() {
       <div className="absolute top-1/3 right-10 w-[300px] h-[300px] bg-gray-200 opacity-30 rounded-full blur-[120px]"></div>
       <div className="absolute bottom-20 left-1/4 w-[300px] h-[300px] bg-green-200 opacity-30 rounded-full blur-[120px]"></div>
       {/* ── NEW: Outer card wrapper — holds carousel + login side by side ─── */}
-      <div className="relative z-10 w-[95%] sm:w-full max-w-3xl flex flex-col md:flex-row overflow-hidden shadow-2xl rounded-xl border border-white/30 min-h-[500px] md:h-[520px]">
+      <div className="relative z-10 w-[100%] sm:w-full max-w-4xl flex flex-col md:flex-row overflow-hidden shadow-2xl rounded-xl border border-white/30 min-h-[500px] md:h-[520px]">
         {/* ── NEW: Left side — Image Carousel (hidden on mobile) ───────────── */}
-        <div className="hidden md:block md:w-[45%] flex-shrink-0 h-full">
+        <div className="hidden md:block md:w-[60%] flex-shrink-0 h-full">
           <div className="relative w-full h-full">
             <ImageCarousel />
           </div>
@@ -261,7 +266,7 @@ export default function Page() {
               {/* Logo */}
               <div className="mb-4 flex flex-col items-center">
                 <Image
-                  src="/venster_logo.png"
+                  src="/DigivaLogo.png"
                   alt="Company Logo"
                   width={80}
                   height={80}
