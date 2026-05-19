@@ -534,8 +534,8 @@ export default function Page() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`px-5 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold transition flex items-center gap-2
-                  ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
+               className={`common-btn px-5 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2
+${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
               >
                 {isSubmitting ? (
                   <svg

@@ -233,7 +233,7 @@ export default function CommonMasterPage({
             <button
               type="button"
               onClick={() => setShowForm(true)}
-              className="w-full sm:w-auto bg-orange-500 text-white px-5 py-2 rounded-sm shadow hover:bg-orange-600 font-bold text-sm"
+              className="common-btn w-full sm:w-auto text-center text-sm"
             >
               + Add {title}
             </button>
@@ -558,9 +558,9 @@ export default function CommonMasterPage({
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-24 flex items-center justify-center bg-orange-500 text-white px-4 py-1.5 rounded-sm
-    ${isSubmitting ? "opacity-70 cursor-not-allowed" : "hover:bg-orange-600"}
-  `}
+                    className={`common-btn w-24 flex items-center justify-center px-4 py-1.5 rounded-sm
+${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}
+`}
                   >
                     {isSubmitting ? (
                       <svg

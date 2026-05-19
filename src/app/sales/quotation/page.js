@@ -1582,45 +1582,37 @@ export default function QuotationPage() {
                 </div>
 
                 <div className="p-4 border-t border-gray-100 bg-gray-50 mt-auto flex gap-3">
-                  <button
-                    onClick={handleQuotationSubmit}
-                    disabled={isSubmitting}
-                    className={`flex-1 text-white rounded-xl py-3 text-sm font-semibold transition-all flex justify-center items-center gap-2
-  ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}
-`}
-                    style={{ background: "#f07400" }}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <svg
-                          className="animate-spin h-4 w-4"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <circle
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="white"
-                            strokeWidth="4"
-                            opacity="0.25"
-                          />
-                          <path
-                            fill="white"
-                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                          />
-                        </svg>
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        <i className="bi bi-floppy2-fill"></i>
-                        {editingId
-                          ? "Update Quotation"
-                          : "Save Quotation Activity"}
-                      </>
-                    )}
-                  </button>
+                 <button
+  onClick={handleQuotationSubmit}
+  disabled={isSubmitting}
+  className={`flex-1 common-btn rounded-xl py-3 text-sm font-semibold transition-all flex justify-center items-center gap-2
+  ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
+>
+  {isSubmitting ? (
+    <>
+      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="white"
+          strokeWidth="4"
+          opacity="0.25"
+        />
+        <path
+          fill="white"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+        />
+      </svg>
+      Processing...
+    </>
+  ) : (
+    <>
+      <i className="bi bi-floppy2-fill"></i>
+      {editingId ? "Update Quotation" : "Save Quotation Activity"}
+    </>
+  )}
+</button>
                   {editingId && (
                     <button
                       onClick={() => {
@@ -1909,7 +1901,7 @@ export default function QuotationPage() {
             <div className="px-6 py-3 bg-white  flex justify-end gap-3 rounded-b-2xl">
               <button
                 onClick={() => setShowFileModal(false)}
-                className="px-5 py-2 rounded-sm text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600  transition-all"
+               className="common-btn px-5 py-2 rounded-sm text-sm font-semibold transition-all"
               >
                 Done
               </button>
@@ -1959,7 +1951,7 @@ export default function QuotationPage() {
               <button
                 onClick={handleDeleteQuotation}
                 disabled={isDeleting}
-                className="px-6 py-2 rounded-sm text-sm font-semibold bg-orange-500 hover:bg-orange-600 text-white shadow-md transition flex items-center gap-2"
+               className="common-btn px-6 py-2 rounded-sm text-sm font-semibold shadow-md flex items-center gap-2"
               >
                 {isDeleting ? (
                   <>

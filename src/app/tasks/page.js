@@ -748,7 +748,7 @@ export default function Page() {
             <button
               type="button"
               onClick={() => setShowForm(true)}
-              className="flex-1 sm:flex-none bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-sm text-sm font-bold shadow-md transition-all text-center"
+              className="common-btn w-full sm:w-auto text-center text-sm"
             >
               + ADD TASK
             </button>
@@ -1639,9 +1639,9 @@ export default function Page() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-28 px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-sm flex items-center justify-center
-      ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}
-    `}
+                   className={`common-btn w-28 px-5 py-2 rounded-sm flex items-center justify-center
+${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}
+`}
                   >
                     {isSubmitting ? (
                       <svg
@@ -1718,13 +1718,13 @@ export default function Page() {
                 >
                   Cancel
                 </button>
-                <button
-                  type="button"
-                  onClick={confirmTaskDelete}
-                  className="flex-1 py-2.5 rounded-md bg-orange-500 text-white hover:bg-orange-600 transition-all text-sm font-bold"
-                >
-                  Delete
-                </button>
+              <button
+  type="button"
+  onClick={confirmTaskDelete}
+  className="common-btn flex-1 py-2.5 rounded-md text-sm font-bold transition-all"
+>
+  Delete
+</button>
               </div>
             </div>
           </div>

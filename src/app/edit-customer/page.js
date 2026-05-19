@@ -823,8 +823,8 @@ export default function AddCustomer() {
                     await handleSubmit();
                     await saveGstDetails();
                   }}
-                  className={`w-40 flex items-center justify-center gap-2 px-6 py-2.5 bg-orange-500 text-white text-sm font-semibold rounded-lg transition-all shadow-sm
-                    ${isSubmitting ? "opacity-70 cursor-not-allowed" : "hover:bg-orange-600 hover:cursor-pointer"}`}
+                  className={`common-btn w-40 flex items-center justify-center gap-2 px-6 py-2.5 text-sm rounded-lg shadow-sm
+${isSubmitting ? "opacity-70 cursor-not-allowed" : "hover:cursor-pointer"}`}
                 >
                   {isSubmitting ? (
                     <svg
@@ -881,7 +881,7 @@ export default function AddCustomer() {
                     setAddressForm({ address_type: "", address: "" });
                     setShowAddressModal(true);
                   }}
-                  className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:cursor-pointer transition-all shadow-sm"
+                 className="common-btn flex items-center gap-2 text-sm px-4 py-2 rounded-lg hover:cursor-pointer shadow-sm"
                 >
                   <i className="bi bi-plus-lg"></i> Add Address
                 </button>
@@ -1021,8 +1021,8 @@ export default function AddCustomer() {
                         type="button"
                         onClick={saveAddress}
                         disabled={isSavingAddress}
-                        className={`w-40 flex items-center justify-center px-5 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg transition-all
-                          ${isSavingAddress ? "opacity-70 cursor-not-allowed" : "hover:bg-orange-600 hover:cursor-pointer"}`}
+                       className={`common-btn w-40 flex items-center justify-center px-5 py-2 text-sm font-semibold rounded-lg transition-all
+${isSavingAddress ? "opacity-70 cursor-not-allowed" : "hover:cursor-pointer"}`}
                       >
                         {isSavingAddress ? (
                           <svg
@@ -1085,7 +1085,7 @@ export default function AddCustomer() {
                     });
                     setShowContactsModal(true);
                   }}
-                  className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:cursor-pointer transition-all shadow-sm"
+                 className="common-btn flex items-center gap-2 text-sm px-4 py-2 rounded-lg hover:cursor-pointer shadow-sm"
                 >
                   <i className="bi bi-plus-lg"></i> Add Contact
                 </button>
@@ -1276,8 +1276,8 @@ export default function AddCustomer() {
                         type="button"
                         onClick={saveContact}
                         disabled={isSavingContact}
-                        className={`w-40 flex items-center justify-center px-5 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg transition-all
-                          ${isSavingContact ? "opacity-70 cursor-not-allowed" : "hover:bg-orange-600 hover:cursor-pointer"}`}
+                        className={`common-btn w-40 flex items-center justify-center text-sm font-semibold transition-all
+${isSavingContact ? "opacity-70 cursor-not-allowed" : "hover:cursor-pointer"}`}
                       >
                         {isSavingContact ? (
                           <svg

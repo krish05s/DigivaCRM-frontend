@@ -1589,16 +1589,14 @@ export default function ProformaPage() {
                   >
                     Cancel
                   </button>
-                  <button
-                    onClick={editing ? handleUpdate : handleSubmitFollowUp}
-                    disabled={afterRemainingPct < 0 && enteredPct > 0}
-                    className={`px-6 py-2 rounded-xl text-sm font-semibold text-white transition-all shadow-md ${afterRemainingPct < 0 && enteredPct > 0
-                      ? "bg-gray-300 cursor-not-allowed shadow-none"
-                      : "bg-orange-500 hover:bg-orange-600 shadow-orange-200"
-                      }`}
-                  >
-                    {editing ? "Update Follow-Up" : "Add Follow-Up"}
-                  </button>
+                 <button
+  onClick={editing ? handleUpdate : handleSubmitFollowUp}
+  disabled={afterRemainingPct < 0 && enteredPct > 0}
+  className={`common-btn px-6 py-2 rounded-xl text-sm font-semibold text-white transition-all shadow-md
+  ${afterRemainingPct < 0 && enteredPct > 0 ? "opacity-50 cursor-not-allowed shadow-none" : ""}`}
+>
+  {editing ? "Update Follow-Up" : "Add Follow-Up"}
+</button>
                 </div>
               </div>
             </div>

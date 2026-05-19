@@ -111,3 +111,32 @@ html, body {
     @apply bg-gray-900;
   }
 }
+
+/* digiva crm global.css changes below */
+/* customer-->customer ( all button css) */
+
+@import "tailwindcss";
+
+/* =========================
+   GLOBAL BUTTON STYLING
+========================= */
+
+@layer components {
+
+  /* Common Button */
+  .common-btn {
+    @apply border border-black bg-black text-white
+    rounded-sm px-4 py-2 font-semibold transition-all;
+  }
+
+  /* Hover Effect */
+  .common-btn:hover {
+    @apply bg-gray-900;
+  }
+
+  /* Focus Effect */
+  .common-btn:focus {
+    @apply outline-none ring-0 border-black;
+  }
+
+}

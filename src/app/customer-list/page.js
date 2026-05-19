@@ -188,7 +188,7 @@ export default function CustomerList() {
               />
               <Link
                 href="/customer"
-                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-sm w-full sm:w-auto text-center font-bold text-sm"
+                className="common-btn w-full sm:w-auto text-center text-sm"
               >
                 + ADD CUSTOMER
               </Link>
@@ -466,7 +466,7 @@ export default function CustomerList() {
                   handleDelete(deleteModal.id);
                   setDeleteModal({ open: false, id: null, name: "" });
                 }}
-                className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-sm transition-colors"
+                className="common-btn flex-1 px-4 py-2 text-sm font-semibold transition-colors hover:cursor-pointer"
               >
                 Delete
               </button>
