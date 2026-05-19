@@ -339,7 +339,7 @@ export default function Page() {
             name="company_name"
             value={filters.company_name}
             onChange={handleFilterCompanyChange}
-            className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2 text-gray-500"
           >
             <option value="">Company</option>
             {companyname.map((item) => (
@@ -353,7 +353,7 @@ export default function Page() {
             name="customer_name"
             value={filters.customer_name}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2 text-gray-500"
           >
             <option value="">Customer</option>
             {filterCustomernames.map((item) =>
@@ -396,7 +396,7 @@ export default function Page() {
             name="contact_designation"
             value={filters.contact_designation}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2 text-gray-500"
           >
             <option value="">Designation</option>
             {designations.map((item) => (

@@ -55,7 +55,6 @@ export default function Page() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-
   const fetchData = async () => {
     try {
       const res = await axios.get(`${APIBase}/read`, {
@@ -84,7 +83,6 @@ export default function Page() {
   useEffect(() => {
     setCurrentPage(1);
   }, [filters, itemsPerPage]);
-
 
   // ✅ Close export menu when clicking outside
   useEffect(() => {
@@ -450,7 +448,6 @@ export default function Page() {
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
 
-
   // Asignee dropdown api calling
   useEffect(() => {
     const fetchAsignee = async () => {
@@ -785,7 +782,7 @@ export default function Page() {
           onChange={(e) =>
             setFilters({ ...filters, task_name: e.target.value })
           }
-          className="p-2 w-full md:w-52 border border-orange-300 md:border text-gray-600 bg-white rounded-sm  transition-all outline-none text-sm"
+          className="filter-input md:w-56 md:mx-2"
         />
 
         {/* Status */}
@@ -793,7 +790,7 @@ export default function Page() {
           name="status"
           value={filters.status || ""}
           onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-          className="p-2 w-full md:w-52 border border-orange-300 md:border text-gray-400 bg-white rounded-sm  transition-all outline-none text-sm"
+          className="filter-input md:w-56 md:mx-2 text-gray-500"
         >
           <option value="">Status</option>
 
@@ -809,7 +806,7 @@ export default function Page() {
           name="priority"
           value={filters.priority || ""}
           onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-          className="p-2 w-full md:w-52 border border-orange-300 md:border text-gray-400 bg-white rounded-sm  transition-all outline-none text-sm"
+          className="filter-input md:w-56 md:mx-2 text-gray-500"
         >
           <option value="">Priority</option>
           <option value="High">High</option>
@@ -822,7 +819,7 @@ export default function Page() {
           name="assignee"
           value={filters.assignee || "-"}
           onChange={(e) => setFilters({ ...filters, assignee: e.target.value })}
-          className="p-2 w-full md:w-52 border border-orange-300 md:border text-gray-400 bg-white rounded-sm  transition-all outline-none text-sm"
+          className="filter-input md:w-56 md:mx-2 text-gray-500"
         >
           <option value="">Assignee</option>
 
@@ -834,8 +831,8 @@ export default function Page() {
         </select>
 
         {/* Start Date Range */}
-        <div className="p-1 w-full md:w-54 border border-orange-300 md:border  text-gray-400 bg-white rounded-sm  transition-all outline-none">
-          <span className="text-[10px] text-gray-400 uppercase font-bold pt-1 mx-2">
+        <div className="filter-date-box w-full md:w-60 col-span-2 md:col-span-1">
+          <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
             Start Date
           </span>
           <input
@@ -844,12 +841,12 @@ export default function Page() {
             onChange={(e) =>
               setFilters({ ...filters, start_date: e.target.value })
             }
-            className="p-1 w-full md:w-32 outline-none text-sm"
+            className="p-1 w-full md:w-35 outline-none bg-transparent"
           />
         </div>
         {/* Due Date Range */}
-        <div className="p-1 w-full md:w-54 border border-orange-300 md:border  text-gray-400 bg-white rounded-sm  transition-all outline-none">
-          <span className="text-[10px] text-gray-400 uppercase font-bold pt-1 mx-2">
+        <div className="filter-date-box w-full md:w-60 col-span-2 md:col-span-1">
+          <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
             Due Date
           </span>
           <input
@@ -858,10 +855,9 @@ export default function Page() {
             onChange={(e) =>
               setFilters({ ...filters, end_date: e.target.value })
             }
-            className="p-1 w-full md:w-32 outline-none text-sm"
+            className="p-1 w-full md:w-35 outline-none bg-transparent"
           />
         </div>
-
 
         {/* Created By - dynamic API */}
         <select
@@ -870,7 +866,7 @@ export default function Page() {
           onChange={(e) =>
             setFilters({ ...filters, created_by_name: e.target.value })
           }
-          className="p-2 w-full md:w-52 border border-orange-300 md:border text-gray-400 bg-white rounded-sm  transition-all outline-none text-sm"
+          className="filter-input md:w-56 md:mx-2 text-gray-500"
         >
           <option value="">Select Created By</option>
 
@@ -882,8 +878,8 @@ export default function Page() {
         </select>
 
         {/* created Date Range */}
-        <div className="p-1 w-full md:w-62 border border-orange-300 md:border  text-gray-400 bg-white rounded-sm  transition-all outline-none">
-          <span className="text-[10px] text-gray-400 uppercase font-bold pt-1 mx-2">
+        <div className="filter-date-box w-full md:w-60 col-span-2 md:col-span-1">
+          <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
             Created Date
           </span>
           <input
@@ -892,7 +888,7 @@ export default function Page() {
             onChange={(e) =>
               setFilters({ ...filters, created_at: e.target.value })
             }
-            className="p-1 w-full md:w-32 outline-none text-sm"
+            className="p-1 w-full md:w-35 outline-none bg-transparent"
           />
         </div>
 
@@ -912,13 +908,13 @@ export default function Page() {
               });
               setShowMobileFilters(false);
             }}
-            className="border border-gray-300 w-full md:w-auto cursor-pointer rounded-sm p-1.5 bg-gray-200 text-gray-700 hover:bg-gray-300 text-md text-center px-6"
+            className="filter-clear-btn w-full md:w-auto"
           >
             Clear
           </button>
           <button
             onClick={() => setShowMobileFilters(false)}
-            className="md:hidden border border-orange-300 w-full cursor-pointer rounded-sm p-1.5 bg-orange-100 text-orange-700 hover:bg-orange-200 text-md text-center px-6"
+            className="filter-apply-btn w-full"
           >
             Apply
           </button>
@@ -1091,14 +1087,15 @@ export default function Page() {
               </select>
             </div>
 
-
             {/* Right side: Navigation buttons (only if totalPages > 1) */}
             {totalPages > 1 && (
               <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
                 {/* Previous Button */}
                 <button
                   type="button"
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
                   disabled={currentPage === 1}
                   className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                 >
@@ -1126,7 +1123,9 @@ export default function Page() {
                 {/* Next Button */}
                 <button
                   type="button"
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
                   disabled={currentPage === totalPages}
                   className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                 >
@@ -1135,7 +1134,6 @@ export default function Page() {
               </div>
             )}
           </div>
-
         </div>
       </form>
 

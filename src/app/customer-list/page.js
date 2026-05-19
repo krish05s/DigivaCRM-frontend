@@ -246,7 +246,7 @@ export default function CustomerList() {
             name="industry"
             value={filters.industry}
             onChange={handleChange}
-            className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2 text-gray-500"
           >
             <option value="">Industry</option>
             {industries.map((item) => (
@@ -268,15 +268,13 @@ export default function CustomerList() {
                 });
                 setShowMobileFilters(false);
               }}
-              className="border border-gray-300 w-full md:w-auto cursor-pointer rounded-sm p-2 bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm text-center font-semibold"
-            >
+className="filter-clear-btn w-full md:w-auto"            >
               Clear
             </button>
             <button
               type="button"
               onClick={() => setShowMobileFilters(false)}
-              className="md:hidden border border-orange-300 w-full cursor-pointer rounded-sm p-2 bg-orange-100 text-orange-700 hover:bg-orange-200 text-sm text-center font-semibold"
-            >
+className="filter-apply-btn w-full"            >
               Apply
             </button>
           </div>
