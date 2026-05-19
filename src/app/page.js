@@ -321,8 +321,8 @@ export default function Page() {
                   type="submit"
                   disabled={loading}
                   className={`p-3 rounded-sm text-white flex items-center justify-center gap-2 transition-all cursor-pointer duration-300 ${loading
-                      ? "bg-black cursor-not-allowed opacity-80"
-                      : "bg-black "
+                    ? "bg-black cursor-not-allowed opacity-80"
+                    : "bg-black "
                     }`}
                 >
                   {loading ? (

@@ -339,7 +339,7 @@ export default function Page() {
             name="company_name"
             value={filters.company_name}
             onChange={handleFilterCompanyChange}
-            className="border bg-white border-orange-300 rounded-sm px-3 py-2 w-full md:w-54 md:mx-2 outline-none text-gray-500 text-sm"
+            className="filter-input md:w-56 md:mx-2"
           >
             <option value="">Company</option>
             {companyname.map((item) => (
@@ -353,7 +353,7 @@ export default function Page() {
             name="customer_name"
             value={filters.customer_name}
             onChange={handleFilterChange}
-            className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:flex-1 md:min-w-0 outline-none text-gray-500 text-sm"
+           className="filter-input md:w-56 md:mx-2"
           >
             <option value="">Customer</option>
             {filterCustomernames.map((item) =>
@@ -369,7 +369,7 @@ export default function Page() {
             type="text"
             name="contact_person"
             placeholder="Person"
-            className="border bg-white border-orange-300 rounded-sm px-3 py-2 w-full md:w-54 md:mx-2 outline-none text-sm"
+            className="filter-input md:w-56 md:mx-2"
             value={filters.contact_person}
             onChange={handleFilterChange}
           />
@@ -378,7 +378,7 @@ export default function Page() {
             type="text"
             name="contact_number"
             placeholder="Number"
-            className="border bg-white border-orange-300 rounded-sm px-3 py-2 w-full md:w-54 md:mx-2 outline-none text-sm"
+             className="filter-input md:w-56 md:mx-2"
             value={filters.contact_number}
             onChange={handleFilterChange}
           />
@@ -387,7 +387,7 @@ export default function Page() {
             type="text"
             name="email"
             placeholder="Email"
-            className="border bg-white border-orange-300 rounded-sm px-3 py-2 w-full md:w-54 md:mx-2 outline-none text-sm"
+             className="filter-input md:w-56 md:mx-2"
             value={filters.email}
             onChange={handleFilterChange}
           />
@@ -396,8 +396,8 @@ export default function Page() {
             name="contact_designation"
             value={filters.contact_designation}
             onChange={handleFilterChange}
-            className="border bg-white border-orange-300 rounded-sm px-3 py-2 w-full md:w-54 md:mx-2 outline-none text-gray-500 text-sm"
-          >
+        className="filter-input md:w-56 md:mx-2"
+        >
             <option value="">Designation</option>
             {designations.map((item) => (
               <option key={item.id} value={item.id}>

@@ -68,3 +68,43 @@ html, body {
   scrollbar-width: thin;
   scrollbar-color: #c1c1c1 transparent;
 }
+
+/* digiva crm global.css changes below */
+/* customer-->customer */
+
+@import "tailwindcss";
+
+@layer components {
+
+  /* All Input Fields */
+  .filter-input {
+   @apply border border-orange-500 bg-white rounded-sm px-3 py-2
+    text-sm outline-none w-full transition-all;
+  }
+
+  /* Focus Effect */
+  .filter-input:focus {
+    @apply border-black ring-0 outline-none;
+  }
+
+  /* Select Box */
+  .filter-select {
+    @apply border border-black bg-white rounded-sm px-3 py-2 
+    text-sm text-black outline-none w-full transition-all;
+  }
+
+  .filter-select:focus {
+    @apply border-black ring-0 outline-none;
+  }
+
+  /* Filter Button */
+  .filter-btn {
+    @apply border border-black bg-black text-white 
+    rounded-sm px-4 py-2 font-semibold transition-all;
+  }
+
+  .filter-btn:hover {
+    @apply bg-gray-900;
+  }
+}
+
