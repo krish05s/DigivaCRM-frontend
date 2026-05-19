@@ -86,7 +86,7 @@ html, body {
   /* All Input Fields */
   .filter-input {
    @apply border border-black bg-white rounded-sm px-3 py-2
-    text-sm outline-none w-full transition-all h-[40px];
+    text-sm outline-none w-[36px] transition-all h-[36px];
   }
 
   /* Focus Effect */
@@ -96,8 +96,8 @@ html, body {
 
   /* Select Box */
   .filter-select {
-    @apply border border-black bg-white rounded-sm px-3 py-2 
-    text-sm text-black outline-none w-full transition-all h-[40px];
+    @apply border border-black bg-white rounded-sm px-3 py-2 w-[36px]
+    text-sm text-black outline-none w-full transition-all h-[36px];
   }
 
   .filter-select:focus {
@@ -117,36 +117,24 @@ html, body {
    /* Date Box Style */
    .filter-date-box {
     @apply flex items-center
-    border border-black
-    bg-white rounded-sm mx-1.5
-    px-2 h-[40px]
+    border border-black 
+    bg-white rounded-sm 
+    px-2 h-[36px]
     text-sm text-gray-500
     ;
-  }
-
-
-  .filter-date-input {
-    @apply w-full bg-transparent
-    outline-none text-sm
-    text-gray-700;
-  }
-
-  .filter-date-label {
-    @apply whitespace-nowrap
-    text-gray-400 mr-2;
   }
 
  /* Clear Button */
   .filter-clear-btn {
     @apply border border-gray-300 rounded-sm p-2
     bg-gray-200 text-gray-700 text-sm font-semibold
-    hover:bg-gray-300 transition-all duration-200 h-[40px];
+    hover:bg-gray-300 transition-all duration-200 h-[36px];
   }
 
   /* Apply Button */
   .filter-apply-btn {
     @apply border border-orange-300 rounded-sm p-2
     bg-orange-100 text-orange-700 text-sm font-semibold
-    hover:bg-orange-200 transition-all duration-200 h-[40px];
+    hover:bg-orange-200 transition-all duration-200 h-[36px];
   }
 }

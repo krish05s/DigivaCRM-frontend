@@ -246,7 +246,7 @@ export default function Page() {
       <div className="absolute top-1/3 right-10 w-[300px] h-[300px] bg-gray-200 opacity-30 rounded-full blur-[120px]"></div>
       <div className="absolute bottom-20 left-1/4 w-[300px] h-[300px] bg-green-200 opacity-30 rounded-full blur-[120px]"></div>
       {/* ── NEW: Outer card wrapper — holds carousel + login side by side ─── */}
-      <div className="relative z-10 w-[100%] sm:w-full max-w-4xl flex flex-col md:flex-row overflow-hidden shadow-2xl rounded-xl border border-white/30 min-h-[500px] md:h-[520px]">
+      <div className="relative z-10 w-[100%] sm:w-full max-w-4xl flex flex-col md:flex-row overflow-hidden shadow-2xl rounded-xl  min-h-[500px] md:h-[520px]">
         {/* ── NEW: Left side — Image Carousel (hidden on mobile) ───────────── */}
         <div className="hidden md:block md:w-[60%] flex-shrink-0 h-full">
           <div className="relative w-full h-full">

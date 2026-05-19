@@ -55,7 +55,6 @@ export default function Page() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-
   const fetchData = async () => {
     try {
       const res = await axios.get(`${APIBase}/read`, {
@@ -84,7 +83,6 @@ export default function Page() {
   useEffect(() => {
     setCurrentPage(1);
   }, [filters, itemsPerPage]);
-
 
   // ✅ Close export menu when clicking outside
   useEffect(() => {
@@ -450,7 +448,6 @@ export default function Page() {
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
 
-
   // Asignee dropdown api calling
   useEffect(() => {
     const fetchAsignee = async () => {
@@ -785,14 +782,16 @@ export default function Page() {
           onChange={(e) =>
             setFilters({ ...filters, task_name: e.target.value })
           }
-className="filter-input md:w-56 md:mx-2"        />
+          className="filter-input md:w-56 md:mx-2"
+        />
 
         {/* Status */}
         <select
           name="status"
           value={filters.status || ""}
           onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-className="filter-input md:w-56 md:mx-2"        >
+          className="filter-input md:w-56 md:mx-2"
+        >
           <option value="">Status</option>
 
           {status.map((item) => (
@@ -807,7 +806,8 @@ className="filter-input md:w-56 md:mx-2"        >
           name="priority"
           value={filters.priority || ""}
           onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-className="filter-input md:w-56 md:mx-2"        >
+          className="filter-input md:w-56 md:mx-2"
+        >
           <option value="">Priority</option>
           <option value="High">High</option>
           <option value="Medium">Medium</option>
@@ -819,7 +819,8 @@ className="filter-input md:w-56 md:mx-2"        >
           name="assignee"
           value={filters.assignee || "-"}
           onChange={(e) => setFilters({ ...filters, assignee: e.target.value })}
-className="filter-input md:w-56 md:mx-2"        >
+          className="filter-input md:w-56 md:mx-2"
+        >
           <option value="">Assignee</option>
 
           {asignee.map((item) => (
@@ -830,8 +831,9 @@ className="filter-input md:w-56 md:mx-2"        >
         </select>
 
         {/* Start Date Range */}
-     <div className="filter-date-box">
-  <span className="filter-date-label">Start Date
+        <div className="filter-date-box w-full md:w-60 col-span-2 md:col-span-1">
+          <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
+            Start Date
           </span>
           <input
             type="date"
@@ -839,12 +841,13 @@ className="filter-input md:w-56 md:mx-2"        >
             onChange={(e) =>
               setFilters({ ...filters, start_date: e.target.value })
             }
-    className="filter-date-input"
+            className="p-1 w-full md:w-35 outline-none bg-transparent"
           />
         </div>
         {/* Due Date Range */}
-  <div className="filter-date-box">
-  <span className="filter-date-label"> Due Date
+        <div className="filter-date-box w-full md:w-60 col-span-2 md:col-span-1">
+          <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
+            Due Date
           </span>
           <input
             type="date"
@@ -852,10 +855,9 @@ className="filter-input md:w-56 md:mx-2"        >
             onChange={(e) =>
               setFilters({ ...filters, end_date: e.target.value })
             }
-    className="filter-date-input"
+            className="p-1 w-full md:w-35 outline-none bg-transparent"
           />
         </div>
-
 
         {/* Created By - dynamic API */}
         <select
@@ -864,7 +866,8 @@ className="filter-input md:w-56 md:mx-2"        >
           onChange={(e) =>
             setFilters({ ...filters, created_by_name: e.target.value })
           }
-className="filter-input md:w-56 md:mx-2"        >
+          className="filter-input md:w-56 md:mx-2"
+        >
           <option value="">Select Created By</option>
 
           {users.map((item) => (
@@ -875,9 +878,8 @@ className="filter-input md:w-56 md:mx-2"        >
         </select>
 
         {/* created Date Range */}
-<div className="filter-date-box">         
-   <span className="filter-date-label">
-
+        <div className="filter-date-box w-full md:w-60 col-span-2 md:col-span-1">
+          <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
             Created Date
           </span>
           <input
@@ -886,7 +888,7 @@ className="filter-input md:w-56 md:mx-2"        >
             onChange={(e) =>
               setFilters({ ...filters, created_at: e.target.value })
             }
-    className="filter-date-input"
+            className="p-1 w-full md:w-35 outline-none bg-transparent"
           />
         </div>
 
@@ -906,12 +908,14 @@ className="filter-input md:w-56 md:mx-2"        >
               });
               setShowMobileFilters(false);
             }}
-className="filter-clear-btn w-full md:w-auto"          >
+            className="filter-clear-btn w-full md:w-auto"
+          >
             Clear
           </button>
           <button
             onClick={() => setShowMobileFilters(false)}
-className="filter-apply-btn w-full"          >
+            className="filter-apply-btn w-full"
+          >
             Apply
           </button>
         </div>
@@ -1083,14 +1087,15 @@ className="filter-apply-btn w-full"          >
               </select>
             </div>
 
-
             {/* Right side: Navigation buttons (only if totalPages > 1) */}
             {totalPages > 1 && (
               <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
                 {/* Previous Button */}
                 <button
                   type="button"
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
                   disabled={currentPage === 1}
                   className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                 >
@@ -1118,7 +1123,9 @@ className="filter-apply-btn w-full"          >
                 {/* Next Button */}
                 <button
                   type="button"
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
                   disabled={currentPage === totalPages}
                   className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                 >
@@ -1127,7 +1134,6 @@ className="filter-apply-btn w-full"          >
               </div>
             )}
           </div>
-
         </div>
       </form>
 

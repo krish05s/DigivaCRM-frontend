@@ -949,8 +949,7 @@ export default function Page() {
             ))}
           </select>
 
-          <div
-className="filter-date-box w-full md:w-58 col-span-2 md:col-span-1"           >
+          <div className="filter-date-box w-full md:w-58 col-span-2 md:col-span-1">
             <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
               From Next
             </span>
@@ -959,7 +958,7 @@ className="filter-date-box w-full md:w-58 col-span-2 md:col-span-1"           >
               name="from_followup"
               value={filters.from_followup}
               onChange={handleFilterChange}
-              className="p-1 w-full md:w-35 outline-none bg-transparent"
+              className="p-1 w-full md:w-35 outline-none bg-transparent  "
             />
           </div>
 
@@ -1001,15 +1000,13 @@ className="filter-date-box w-full md:w-58 col-span-2 md:col-span-1"           >
           </div>
 
           <div className="filter-date-box w-full md:w-58 col-span-2 md:col-span-1">
-            <span className="filter-date-label">
-              To Create
-            </span>
+            <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">To Create</span>
             <input
               type="date"
               name="to_created"
               value={filters.to_created}
               onChange={handleFilterChange}
-            className="filter-date-input"
+              className="p-1 w-full md:w-35 outline-none bg-transparent"
             />
           </div>
 
@@ -1019,12 +1016,14 @@ className="filter-date-box w-full md:w-58 col-span-2 md:col-span-1"           >
                 resetFilters();
                 setShowMobileFilters(false);
               }}
-className="filter-clear-btn w-full md:w-auto"            >
+              className="filter-clear-btn w-full md:w-auto"
+            >
               Clear
             </button>
             <button
               onClick={() => setShowMobileFilters(false)}
-className="filter-apply-btn w-full"            >
+              className="filter-apply-btn w-full"
+            >
               Apply
             </button>
           </div>

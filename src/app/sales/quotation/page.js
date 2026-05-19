@@ -695,7 +695,10 @@ export default function QuotationPage() {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const paginatedQuotations = filteredQuotations.slice(indexOfFirstItem, indexOfLastItem);
+  const paginatedQuotations = filteredQuotations.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
   const totalPages = Math.ceil(filteredQuotations.length / itemsPerPage);
 
   const getSlidingPages = () => {
@@ -715,7 +718,6 @@ export default function QuotationPage() {
     }
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
-
 
   const [asignee, setAsignee] = useState([]);
   useEffect(() => {
@@ -838,32 +840,34 @@ export default function QuotationPage() {
           className={`
           ${showMobileFilters ? "absolute left-6 right-6 top-50 bg-white p-5 shadow-2xl border border-gray-100 z-50 rounded-lg grid grid-cols-2 gap-3 mt-1" : "hidden"} 
           md:mx-6 md:flex md:flex-wrap md:items-center md:gap-x-2.5 md:gap-y-2 md:mt-3 md:mb-5 md:relative md:bg-transparent md:p-0 md:shadow-none md:border-none md:z-auto
-        `}>
+        `}
+        >
           <input
             name="company_name"
             value={filters.company_name}
             onChange={handleFilterChange}
             placeholder="Company"
-className="filter-input md:w-56 md:mx-2"          />
+            className="filter-input md:w-56 md:mx-2"
+          />
           <input
             name="customer_name"
             value={filters.customer_name}
             onChange={handleFilterChange}
             placeholder="Customer"
-           className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2"
           />
           <input
             name="lead_title"
             value={filters.lead_title}
             onChange={handleFilterChange}
             placeholder="Lead Title"
-           className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2"
           />
           <select
             name="assignee"
             value={filters.assignee}
             onChange={handleFilterChange}
-          className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2"
           >
             <option value="">Assignee</option>
             {asignee.map((item) => (
@@ -876,31 +880,33 @@ className="filter-input md:w-56 md:mx-2"          />
             name="quotation_status"
             value={filters.quotation_status}
             onChange={handleFilterChange}
-className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2"
           >
             <option value="">Status</option>
             <option value="Won">Won</option>
             <option value="Lost">Lost</option>
           </select>
 
-          <div className="filter-date-box">
-            <span  className="filter-date-label">From Date</span>
+          <div className="filter-date-box w-full md:w-58 col-span-2 md:col-span-1">
+            <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">From Date</span>
             <input
               type="date"
               name="from_date"
               value={filters.from_date}
               onChange={handleFilterChange}
-className="filter-date-input"            />
+              className="p-1 w-full md:w-35 outline-none bg-transparent"
+            />
           </div>
 
-          <div className="filter-date-box">
-            <span  className="filter-date-label">To Date</span>
+          <div className="filter-date-box w-full md:w-58 col-span-2 md:col-span-1">
+            <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">To Date</span>
             <input
               type="date"
               name="to_date"
               value={filters.to_date}
               onChange={handleFilterChange}
-className="filter-date-input"            />
+              className="p-1 w-full md:w-35 outline-none bg-transparent"
+            />
           </div>
 
           <div className="flex gap-2 col-span-2">
@@ -909,12 +915,14 @@ className="filter-date-input"            />
                 resetFilters();
                 setShowMobileFilters(false);
               }}
-className="filter-clear-btn w-full md:w-auto"            >
+              className="filter-clear-btn w-full md:w-auto"
+            >
               Clear
             </button>
             <button
               onClick={() => setShowMobileFilters(false)}
-className="filter-apply-btn w-full"            >
+              className="filter-apply-btn w-full"
+            >
               Apply
             </button>
           </div>
@@ -1285,14 +1293,15 @@ className="filter-apply-btn w-full"            >
                     </select>
                   </div>
 
-
                   {/* Right side: Navigation buttons (only if totalPages > 1) */}
                   {totalPages > 1 && (
                     <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
                       {/* Previous Button */}
                       <button
                         type="button"
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
                         disabled={currentPage === 1}
                         className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                       >
@@ -1320,7 +1329,11 @@ className="filter-apply-btn w-full"            >
                       {/* Next Button */}
                       <button
                         type="button"
-                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages),
+                          )
+                        }
                         disabled={currentPage === totalPages}
                         className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                       >
@@ -1329,7 +1342,6 @@ className="filter-apply-btn w-full"            >
                     </div>
                   )}
                 </div>
-
               </div>
             )}
           </div>
@@ -2053,13 +2065,9 @@ className="filter-apply-btn w-full"            >
         <div className="fixed inset-0 z-[80] flex items-center justify-center bg-gray-900/30 ">
           <div className="bg-white w-[480px] rounded-sm shadow-xl overflow-hidden ">
             {/* Header */}
-            <div
-              className="flex justify-between items-center px-6 py-4  from-orange-100 to-white bg-gradient-to-r"
-            >
+            <div className="flex justify-between items-center px-6 py-4  from-orange-100 to-white bg-gradient-to-r">
               <div className="flex items-center gap-3">
-                <div
-                  className="w-9 h-9 rounded-full flex items-center justify-center"
-                >
+                <div className="w-9 h-9 rounded-full flex items-center justify-center">
                   <i
                     className="bi bi-file-earmark-arrow-up text-lg"
                     style={{ color: "#f07400" }}

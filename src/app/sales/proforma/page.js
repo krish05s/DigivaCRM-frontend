@@ -1000,24 +1000,26 @@ export default function ProformaPage() {
             <option value="partial">Pending</option>
             <option value="paid">Won</option>
           </select>
-          <div  className="filter-date-box">
-            <span  className="filter-date-label">From</span>
+          <div className="filter-date-box w-full md:w-60 col-span-2 md:col-span-1">
+            <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
+              From
+            </span>
             <input
               type="date"
               name="from_date"
               value={filters.from_date}
               onChange={handleFilterChange}
-               className="filter-date-input"
+              className="p-1 w-full md:w-35 outline-none bg-transparent"
             />
           </div>
-          <div  className="filter-date-box">
-            <span  className="filter-date-label">To</span>
+          <div className="filter-date-box w-full md:w-60 col-span-2 md:col-span-1">
+            <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">To</span>
             <input
               type="date"
               name="to_date"
               value={filters.to_date}
               onChange={handleFilterChange}
-              className="filter-date-input"
+              className="p-1 w-full md:w-35 outline-none bg-transparent"
             />
           </div>
           <input
@@ -1062,12 +1064,14 @@ export default function ProformaPage() {
                 resetFilters();
                 setShowMobileFilters(false);
               }}
-className="filter-clear-btn w-full md:w-auto"            >
+              className="filter-clear-btn w-full md:w-auto"
+            >
               Clear
             </button>
             <button
               onClick={() => setShowMobileFilters(false)}
-className="filter-apply-btn w-full"            >
+              className="filter-apply-btn w-full"
+            >
               Apply
             </button>
           </div>
