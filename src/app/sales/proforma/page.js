@@ -89,8 +89,6 @@ export default function ProformaPage() {
     return () => clearTimeout(debounceRef.current);
   }, [filters]);
 
- 
-
   // ── RESET FILTERS ─────────────────────────────────────────
   const resetFilters = () => {
     setFilters({
@@ -448,7 +446,9 @@ export default function ProformaPage() {
       doc.setTextColor(...white);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(8);
-      doc.text("WON / PAID", badgeX + badgeW / 2, badgeY + 5.3, { align: "center" });
+      doc.text("WON / PAID", badgeX + badgeW / 2, badgeY + 5.3, {
+        align: "center",
+      });
 
       // ════════════════════════════════════════════════════════════════
       // 3. COMPANY INFO + ORDER DETAILS (two-column card)
@@ -487,9 +487,12 @@ export default function ProformaPage() {
         ["Customer:", item.customer_name || "N/A"],
         ["Assignee:", item.assignee || "N/A"],
         ["Quotation:", item.quotation_no || "N/A"],
-        ["Created:", item.created_at
-          ? new Date(item.created_at).toLocaleDateString("en-IN")
-          : "N/A"],
+        [
+          "Created:",
+          item.created_at
+            ? new Date(item.created_at).toLocaleDateString("en-IN")
+            : "N/A",
+        ],
       ];
 
       let cy = cardTop + 19;
@@ -521,8 +524,14 @@ export default function ProformaPage() {
       const orderRows = [
         ["PI Number:", piNumber],
         ["PI Date:", piDateStr],
-        ["Grand Total:", `Rs. ${Number(grandTotal).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`],
-        ["Total Paid %:", `${parseFloat(Number(item.proforma_percentage).toFixed(2))}%`],
+        [
+          "Grand Total:",
+          `Rs. ${Number(grandTotal).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`,
+        ],
+        [
+          "Total Paid %:",
+          `${parseFloat(Number(item.proforma_percentage).toFixed(2))}%`,
+        ],
       ];
 
       let oy = cardTop + 19;
@@ -555,9 +564,10 @@ export default function ProformaPage() {
       const tableRows = [];
 
       const basePct = Number(item.proforma_percentage) || 0;
-      const baseAmt = followUps.length === 0
-        ? Number(item.total || 0)
-        : (grandTotal * basePct) / 100;
+      const baseAmt =
+        followUps.length === 0
+          ? Number(item.total || 0)
+          : (grandTotal * basePct) / 100;
 
       if (basePct > 0) {
         tableRows.push([
@@ -621,7 +631,12 @@ export default function ProformaPage() {
           2: { cellWidth: "auto", halign: "left" },
           3: { cellWidth: 18, halign: "center" },
           4: { cellWidth: 42, halign: "right" },
-          5: { cellWidth: 22, halign: "center", textColor: green, fontStyle: "bold" },
+          5: {
+            cellWidth: 22,
+            halign: "center",
+            textColor: green,
+            fontStyle: "bold",
+          },
         },
         margin: { left: 14, right: 14 },
       });
@@ -652,8 +667,14 @@ export default function ProformaPage() {
       const paidAmt = (grandTotal * Number(item.proforma_percentage)) / 100;
 
       const summaryItems = [
-        ["Grand Total", `Rs. ${Number(grandTotal).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`],
-        ["Total Paid", `Rs. ${Number(paidAmt).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`],
+        [
+          "Grand Total",
+          `Rs. ${Number(grandTotal).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`,
+        ],
+        [
+          "Total Paid",
+          `Rs. ${Number(paidAmt).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`,
+        ],
         ["Follow-ups", `${followUps.length} record(s)`],
       ];
 
@@ -713,7 +734,7 @@ export default function ProformaPage() {
         `© ${new Date().getFullYear()} Venster Pvt. Ltd. — All rights reserved.   |   Generated: ${new Date().toLocaleDateString("en-IN")}`,
         pageW - 14,
         pageH - 4.5,
-        { align: "right" }
+        { align: "right" },
       );
 
       // ════════════════════════════════════════════════════════════════
@@ -724,7 +745,6 @@ export default function ProformaPage() {
         .slice(0, 30);
 
       doc.save(`${piNumber}_${safeName}.pdf`);
-
     } catch (error) {
       console.error(error);
       toast.error("Failed to generate PDF");
@@ -817,7 +837,6 @@ export default function ProformaPage() {
     setPercentage(item.proforma_percentage);
   };
 
-
   // ================= PAGINATION =================
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -850,7 +869,6 @@ export default function ProformaPage() {
     }
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
-
 
   return (
     <>
@@ -936,9 +954,10 @@ export default function ProformaPage() {
 
         <div
           className={`
-            ${showMobileFilters
-              ? "absolute left-6 right-6 top-[170px] bg-white p-5 shadow-2xl rounded-lg grid grid-cols-2 gap-3 mt-1 z-[999] ring-2 ring-orange-300"
-              : "hidden"
+            ${
+              showMobileFilters
+                ? "absolute left-6 right-6 top-[170px] bg-white p-5 shadow-2xl rounded-lg grid grid-cols-2 gap-3 mt-1 z-[999] ring-2 ring-orange-300"
+                : "hidden"
             }
             md:mx-6 md:flex md:flex-wrap md:items-center md:gap-x-3 md:gap-y-2 md:mt-3 md:mb-5 md:relative md:bg-transparent md:p-0 md:shadow-none md:ring-0
           `}
@@ -948,20 +967,20 @@ export default function ProformaPage() {
             value={filters.customer_name}
             onChange={handleFilterChange}
             placeholder="Customer"
-            className="p-2 w-full md:w-45 bg-white border border-orange-300 md:border rounded-sm focus:outline-none text-gray-600 text-sm"
+            className="filter-input md:w-56 md:mx-2"
           />
           <input
             name="quotation_no"
             value={filters.quotation_no}
             onChange={handleFilterChange}
             placeholder="Quotation No"
-            className="p-2 w-full md:w-45 bg-white border border-orange-300 md:border rounded-sm focus:outline-none text-gray-600 text-sm"
+            className="filter-input md:w-56 md:mx-2"
           />
           <select
             name="assignee"
             value={filters.assignee}
             onChange={handleFilterChange}
-            className="p-2 w-full md:w-45 bg-white border border-orange-300 md:border rounded-sm focus:outline-none text-gray-400 text-sm"
+            className="filter-input md:w-56 md:mx-2"
           >
             <option value="">Assignee</option>
             {assigneeList.map((item) => (
@@ -974,31 +993,31 @@ export default function ProformaPage() {
             name="status"
             value={filters.status}
             onChange={handleFilterChange}
-            className="p-2 w-full md:w-45 bg-white border border-orange-300 md:border rounded-sm focus:outline-none text-gray-400 text-sm"
+            className="filter-input md:w-56 md:mx-2"
           >
             <option value="">Status</option>
             <option value="draft">Draft</option>
             <option value="partial">Pending</option>
             <option value="paid">Won</option>
           </select>
-          <div className="flex items-center px-2 w-full md:w-58 bg-white border border-orange-300 md:border rounded-sm text-gray-400 text-sm col-span-2 md:col-span-1">
-            <span className="mx-1 text-gray-400 whitespace-nowrap">From</span>
+          <div  className="filter-date-box">
+            <span  className="filter-date-label">From</span>
             <input
               type="date"
               name="from_date"
               value={filters.from_date}
               onChange={handleFilterChange}
-              className="p-2 w-full md:w-35 outline-none"
+               className="filter-date-input"
             />
           </div>
-          <div className="flex items-center px-2 w-full md:w-53 bg-white border border-orange-300 md:border rounded-sm text-gray-400 text-sm col-span-2 md:col-span-1">
-            <span className="mx-1 text-gray-400 whitespace-nowrap">To</span>
+          <div  className="filter-date-box">
+            <span  className="filter-date-label">To</span>
             <input
               type="date"
               name="to_date"
               value={filters.to_date}
               onChange={handleFilterChange}
-              className="p-2 w-full md:w-35 outline-none"
+              className="filter-date-input"
             />
           </div>
           <input
@@ -1009,7 +1028,7 @@ export default function ProformaPage() {
             placeholder="Min %"
             min="0"
             max="100"
-            className="p-2 w-full md:w-24 bg-white border border-orange-300 md:border rounded-sm focus:outline-none text-gray-600 text-sm"
+            className="filter-input md:w-56 md:mx-2"
           />
           <input
             type="number"
@@ -1019,7 +1038,7 @@ export default function ProformaPage() {
             placeholder="Max %"
             min="0"
             max="100"
-            className="p-2 w-full md:w-24 bg-white border border-orange-300 md:border rounded-sm focus:outline-none text-gray-600 text-sm"
+            className="filter-input md:w-56 md:mx-2"
           />
           <input
             type="number"
@@ -1027,7 +1046,7 @@ export default function ProformaPage() {
             value={filters.min_total}
             onChange={handleFilterChange}
             placeholder="Min Rs."
-            className="p-2 w-full md:w-32 bg-white border border-orange-300 md:border rounded-sm focus:outline-none text-gray-600 text-sm"
+            className="filter-input md:w-56 md:mx-2"
           />
           <input
             type="number"
@@ -1035,7 +1054,7 @@ export default function ProformaPage() {
             value={filters.max_total}
             onChange={handleFilterChange}
             placeholder="Max Rs."
-            className="p-2 w-full md:w-32 bg-white border border-orange-300 md:border rounded-sm focus:outline-none text-gray-600 text-sm"
+            className="filter-input md:w-56 md:mx-2"
           />
           <div className="flex gap-2 col-span-2 md:col-span-1">
             <button
@@ -1043,14 +1062,12 @@ export default function ProformaPage() {
                 resetFilters();
                 setShowMobileFilters(false);
               }}
-              className="border border-gray-300 w-full md:w-auto cursor-pointer rounded-sm p-2 bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm font-semibold text-center px-6"
-            >
+className="filter-clear-btn w-full md:w-auto"            >
               Clear
             </button>
             <button
               onClick={() => setShowMobileFilters(false)}
-              className="md:hidden border border-orange-300 w-full cursor-pointer rounded-sm p-2 bg-orange-100 text-orange-700 hover:bg-orange-200 text-sm font-semibold text-center px-6"
-            >
+className="filter-apply-btn w-full"            >
               Apply
             </button>
           </div>
@@ -1069,18 +1086,42 @@ export default function ProformaPage() {
                 <table className="w-full text-sm whitespace-nowrap">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-100">
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">#</th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">PI No</th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">PI Date</th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Customer Name</th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Quotation No</th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Assignee</th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Total</th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">PI %</th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
-                      <th className="py-3 px-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Follow-Up</th>
-                      <th className="py-3 px-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Download</th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Created</th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        #
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        PI No
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        PI Date
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Customer Name
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Quotation No
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Assignee
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Total
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        PI %
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="py-3 px-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Follow-Up
+                      </th>
+                      <th className="py-3 px-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Download
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Created
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1099,7 +1140,9 @@ export default function ProformaPage() {
                             </td>
                             <td className="py-3 px-3 text-gray-500">
                               {item.pi_date
-                                ? new Date(item.pi_date).toLocaleDateString("en-IN")
+                                ? new Date(item.pi_date).toLocaleDateString(
+                                    "en-IN",
+                                  )
                                 : "-"}
                             </td>
                             <td className="py-3 px-3 text-orange-500">
@@ -1186,7 +1229,9 @@ export default function ProformaPage() {
                             <td className="py-3 px-3 text-center">
                               {isWon ? (
                                 <button
-                                  onClick={() => downloadPIPdf(item, globalIndex)}
+                                  onClick={() =>
+                                    downloadPIPdf(item, globalIndex)
+                                  }
                                   title="Download PI PDF"
                                   className="group relative w-9 h-9 rounded-full border border-green-200 bg-green-50 flex items-center justify-center mx-auto hover:bg-green-500 hover:border-green-500 transition-all cursor-pointer"
                                 >
@@ -1202,7 +1247,9 @@ export default function ProformaPage() {
 
                             <td className="py-3 px-3 text-gray-500">
                               {item.created_at
-                                ? new Date(item.created_at).toLocaleDateString("en-IN")
+                                ? new Date(item.created_at).toLocaleDateString(
+                                    "en-IN",
+                                  )
                                 : "-"}
                             </td>
                           </tr>
@@ -1210,7 +1257,10 @@ export default function ProformaPage() {
                       })
                     ) : (
                       <tr>
-                        <td colSpan="12" className="text-center py-10 text-gray-400">
+                        <td
+                          colSpan="12"
+                          className="text-center py-10 text-gray-400"
+                        >
                           No Data Found
                         </td>
                       </tr>
@@ -1242,13 +1292,14 @@ export default function ProformaPage() {
                     </select>
                   </div>
 
-
                   {/* Right side: Navigation buttons (only if totalPages > 1) */}
                   {totalPages > 1 && (
                     <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
                       {/* Previous Button */}
                       <button
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
                         disabled={currentPage === 1}
                         className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                       >
@@ -1261,10 +1312,11 @@ export default function ProformaPage() {
                           <button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${currentPage === page
-                              ? "bg-[#212121] text-white shadow-md shadow-black/10"
-                              : "border border-slate-200 text-slate-600 hover:bg-slate-50"
-                              }`}
+                            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
+                              currentPage === page
+                                ? "bg-[#212121] text-white shadow-md shadow-black/10"
+                                : "border border-slate-200 text-slate-600 hover:bg-slate-50"
+                            }`}
                           >
                             {page}
                           </button>
@@ -1273,7 +1325,11 @@ export default function ProformaPage() {
 
                       {/* Next Button */}
                       <button
-                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages),
+                          )
+                        }
                         disabled={currentPage === totalPages}
                         className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                       >
@@ -1295,10 +1351,12 @@ export default function ProformaPage() {
           const grandTotal = getGrandTotal(selectedPI);
           const basePaidPercentage = editing
             ? (selectedPI.follow_ups || []).reduce(
-              (sum, f) =>
-                f.id === editing.id ? sum : sum + Number(f.proforma_percentage),
-              0,
-            )
+                (sum, f) =>
+                  f.id === editing.id
+                    ? sum
+                    : sum + Number(f.proforma_percentage),
+                0,
+              )
             : Number(selectedPI.proforma_percentage) || 0;
           const basePaidAmount = (grandTotal * basePaidPercentage) / 100;
           const baseRemainingPercentage = 100 - basePaidPercentage;
@@ -1344,17 +1402,30 @@ export default function ProformaPage() {
                     </p>
                     <div className="space-y-1 text-sm mb-4">
                       <div className="flex justify-between py-1.5 border-b border-gray-50">
-                        <span className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Customer</span>
-                        <span className="font-medium text-gray-700">{selectedPI.customer_name}</span>
+                        <span className="text-gray-400 text-xs font-semibold uppercase tracking-wide">
+                          Customer
+                        </span>
+                        <span className="font-medium text-gray-700">
+                          {selectedPI.customer_name}
+                        </span>
                       </div>
                       <div className="flex justify-between py-1.5 border-b border-gray-50">
-                        <span className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Quotation</span>
-                        <span className="font-medium text-gray-700">{selectedPI.quotation_no}</span>
+                        <span className="text-gray-400 text-xs font-semibold uppercase tracking-wide">
+                          Quotation
+                        </span>
+                        <span className="font-medium text-gray-700">
+                          {selectedPI.quotation_no}
+                        </span>
                       </div>
                       <div className="flex justify-between py-1.5 border-b border-gray-50">
-                        <span className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Grand Total</span>
+                        <span className="text-gray-400 text-xs font-semibold uppercase tracking-wide">
+                          Grand Total
+                        </span>
                         <span className="font-semibold text-gray-800">
-                          Rs.{Number(grandTotal).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                          Rs.
+                          {Number(grandTotal).toLocaleString("en-IN", {
+                            maximumFractionDigits: 2,
+                          })}
                         </span>
                       </div>
                       <div className="flex justify-between py-1.5">
@@ -1363,19 +1434,23 @@ export default function ProformaPage() {
                         </span>
                         <span className="font-semibold text-orange-500">
                           {parseFloat(paidPercentage.toFixed(2))}% &nbsp;|&nbsp;
-                          Rs.{Number(basePaidAmount).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                          Rs.
+                          {Number(basePaidAmount).toLocaleString("en-IN", {
+                            maximumFractionDigits: 2,
+                          })}
                         </span>
                       </div>
                     </div>
 
                     {/* Remaining Card */}
                     <div
-                      className={`rounded-xl p-3 mb-4 border transition-all ${afterRemainingPct < 0
-                        ? "bg-red-50 border-red-200"
-                        : afterRemainingPct === 0 && enteredPct > 0
-                          ? "bg-green-50 border-green-200"
-                          : "bg-blue-50 border-blue-100"
-                        }`}
+                      className={`rounded-xl p-3 mb-4 border transition-all ${
+                        afterRemainingPct < 0
+                          ? "bg-red-50 border-red-200"
+                          : afterRemainingPct === 0 && enteredPct > 0
+                            ? "bg-green-50 border-green-200"
+                            : "bg-blue-50 border-blue-100"
+                      }`}
                     >
                       <p className="text-xs font-bold uppercase tracking-wider mb-2 text-gray-500">
                         Remaining After This Entry
@@ -1383,12 +1458,13 @@ export default function ProformaPage() {
                       <div className="flex justify-between items-center">
                         <div className="text-center">
                           <p
-                            className={`text-xl font-bold ${afterRemainingPct < 0
-                              ? "text-red-600"
-                              : afterRemainingPct === 0 && enteredPct > 0
-                                ? "text-green-600"
-                                : "text-blue-600"
-                              }`}
+                            className={`text-xl font-bold ${
+                              afterRemainingPct < 0
+                                ? "text-red-600"
+                                : afterRemainingPct === 0 && enteredPct > 0
+                                  ? "text-green-600"
+                                  : "text-blue-600"
+                            }`}
                           >
                             {enteredPct > 0
                               ? afterRemainingPct < 0
@@ -1401,12 +1477,13 @@ export default function ProformaPage() {
                         <div className="w-px h-10 bg-gray-200"></div>
                         <div className="text-center">
                           <p
-                            className={`text-xl font-bold ${afterRemainingPct < 0
-                              ? "text-red-600"
-                              : afterRemainingPct === 0 && enteredPct > 0
-                                ? "text-green-600"
-                                : "text-blue-600"
-                              }`}
+                            className={`text-xl font-bold ${
+                              afterRemainingPct < 0
+                                ? "text-red-600"
+                                : afterRemainingPct === 0 && enteredPct > 0
+                                  ? "text-green-600"
+                                  : "text-blue-600"
+                            }`}
                           >
                             {enteredPct > 0
                               ? afterRemainingPct < 0
@@ -1420,19 +1497,24 @@ export default function ProformaPage() {
                       <div className="mt-3">
                         <div className="w-full bg-white rounded-full h-2 border border-gray-200 overflow-hidden">
                           <div
-                            className={`h-2 rounded-full transition-all duration-300 ${afterRemainingPct < 0
-                              ? "bg-red-500"
-                              : paidPercentage + enteredPct >= 100
-                                ? "bg-green-500"
-                                : "bg-orange-400"
-                              }`}
-                            style={{ width: `${Math.min(paidPercentage + enteredPct, 100)}%` }}
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              afterRemainingPct < 0
+                                ? "bg-red-500"
+                                : paidPercentage + enteredPct >= 100
+                                  ? "bg-green-500"
+                                  : "bg-orange-400"
+                            }`}
+                            style={{
+                              width: `${Math.min(paidPercentage + enteredPct, 100)}%`,
+                            }}
                           ></div>
                         </div>
                         <div className="flex justify-between mt-1">
                           <span className="text-xs text-gray-400">
-                            {editing ? "Others" : "Paid"}: {parseFloat(paidPercentage.toFixed(2))}%
-                            {enteredPct > 0 && ` + ${parseFloat(enteredPct.toFixed(2))}% ${editing ? "edited" : "new"}`}
+                            {editing ? "Others" : "Paid"}:{" "}
+                            {parseFloat(paidPercentage.toFixed(2))}%
+                            {enteredPct > 0 &&
+                              ` + ${parseFloat(enteredPct.toFixed(2))}% ${editing ? "edited" : "new"}`}
                           </span>
                           <span className="text-xs text-gray-400">100%</span>
                         </div>
@@ -1453,14 +1535,20 @@ export default function ProformaPage() {
                             value={percentage}
                             onChange={(e) => {
                               const val = e.target.value;
-                              if (val === "") { handlePercentageChange(""); return; }
+                              if (val === "") {
+                                handlePercentageChange("");
+                                return;
+                              }
                               const num = Number(val);
-                              if (num >= 0 && num <= 100) handlePercentageChange(num);
+                              if (num >= 0 && num <= 100)
+                                handlePercentageChange(num);
                             }}
                             className="w-full border border-gray-200 rounded-xl pl-3 pr-8 py-2 text-sm focus:ring-1 focus:ring-orange-300 focus:border-transparent outline-none bg-gray-50 transition-all"
                             placeholder="0"
                           />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">%</span>
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">
+                            %
+                          </span>
                         </div>
                       </div>
                       <div className="flex-1">
@@ -1468,14 +1556,19 @@ export default function ProformaPage() {
                           Amount <span className="text-orange-500">*</span>
                         </label>
                         <div className="relative mt-1.5">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">Rs.</span>
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">
+                            Rs.
+                          </span>
                           <input
                             type="number"
                             min="0"
                             value={rupees}
                             onChange={(e) => {
                               const val = e.target.value;
-                              if (val === "") { handleRupeesChange(""); return; }
+                              if (val === "") {
+                                handleRupeesChange("");
+                                return;
+                              }
                               handleRupeesChange(Number(val));
                             }}
                             className="w-full border border-gray-200 rounded-xl pl-9 pr-3 py-2 text-sm focus:ring-1 focus:ring-orange-300 focus:border-transparent outline-none bg-gray-50 transition-all"
@@ -1486,7 +1579,8 @@ export default function ProformaPage() {
                     </div>
                     {afterRemainingPct < 0 && enteredPct > 0 && (
                       <p className="text-xs text-red-500 mt-2 font-medium">
-                        ⚠ Exceeds remaining by {parseFloat(Math.abs(afterRemainingPct).toFixed(2))}%
+                        ⚠ Exceeds remaining by{" "}
+                        {parseFloat(Math.abs(afterRemainingPct).toFixed(2))}%
                       </p>
                     )}
                   </div>
@@ -1494,13 +1588,16 @@ export default function ProformaPage() {
                   {/* RIGHT - History */}
                   <div className="w-full md:w-1/2 px-6 py-5 flex flex-col bg-gray-50/50">
                     <div className="flex justify-between items-center mb-4">
-                      <p className="text-xs font-bold text-gray-600 uppercase tracking-widest">Follow-Up History</p>
+                      <p className="text-xs font-bold text-gray-600 uppercase tracking-widest">
+                        Follow-Up History
+                      </p>
                       <span className="text-xs bg-orange-50 text-orange-500 px-2.5 py-1 rounded-full font-semibold border border-orange-100">
                         {selectedPI.follow_ups?.length || 0} record(s)
                       </span>
                     </div>
                     <div className="space-y-2 overflow-y-auto max-h-80">
-                      {!selectedPI.follow_ups || selectedPI.follow_ups.length === 0 ? (
+                      {!selectedPI.follow_ups ||
+                      selectedPI.follow_ups.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-8 text-gray-300">
                           <i className="bi bi-clock-history text-3xl mb-2"></i>
                           <p className="text-sm">No history found</p>
@@ -1511,57 +1608,93 @@ export default function ProformaPage() {
                           return (
                             <div key={h.id}>
                               <div
-                                onClick={() => setActiveIndex(index === activeIndex ? null : index)}
-                                className={`border rounded-xl p-3 cursor-pointer transition-all select-none ${isLatest
-                                  ? "border-orange-400 bg-orange-50 shadow-sm"
-                                  : "hover:bg-gray-50 border-gray-200"
-                                  }`}
+                                onClick={() =>
+                                  setActiveIndex(
+                                    index === activeIndex ? null : index,
+                                  )
+                                }
+                                className={`border rounded-xl p-3 cursor-pointer transition-all select-none ${
+                                  isLatest
+                                    ? "border-orange-400 bg-orange-50 shadow-sm"
+                                    : "hover:bg-gray-50 border-gray-200"
+                                }`}
                               >
                                 <div className="flex justify-between items-center">
                                   <div className="flex items-center gap-2">
                                     {isLatest && (
-                                      <span className="text-xs bg-orange-100 text-orange-500 px-2 py-0.5 rounded-full font-semibold">Latest</span>
+                                      <span className="text-xs bg-orange-100 text-orange-500 px-2 py-0.5 rounded-full font-semibold">
+                                        Latest
+                                      </span>
                                     )}
                                     <p className="font-semibold text-sm text-gray-700">
-                                      {h.proforma_percentage}% → Rs.{Number(h.total).toLocaleString()}
+                                      {h.proforma_percentage}% → Rs.
+                                      {Number(h.total).toLocaleString()}
                                     </p>
                                   </div>
                                   <div className="flex items-center gap-2">
                                     <span className="text-xs text-gray-400">
-                                      {new Date(h.created_at).toLocaleDateString("en-IN")}
+                                      {new Date(
+                                        h.created_at,
+                                      ).toLocaleDateString("en-IN")}
                                     </span>
                                     {isLatest && (
                                       <button
-                                        onClick={(e) => { e.stopPropagation(); handleEdit(h); }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleEdit(h);
+                                        }}
                                         className="text-gray-400 hover:text-orange-500 transition-all"
                                       >
                                         <i className="bi bi-pencil-square text-xs"></i>
                                       </button>
                                     )}
-                                    <i className={`bi ${activeIndex === index ? "bi-chevron-up" : "bi-chevron-down"} text-gray-400 text-xs`}></i>
+                                    <i
+                                      className={`bi ${activeIndex === index ? "bi-chevron-up" : "bi-chevron-down"} text-gray-400 text-xs`}
+                                    ></i>
                                   </div>
                                 </div>
-                                <p className="text-xs text-gray-400 mt-1 truncate">NA</p>
+                                <p className="text-xs text-gray-400 mt-1 truncate">
+                                  NA
+                                </p>
                               </div>
                               {activeIndex === index && (
                                 <div className="mt-2 border border-orange-200 rounded-xl bg-gradient-to-br from-orange-50 to-white p-4 text-sm shadow-sm">
                                   <div className="flex justify-between items-center mb-3">
-                                    <p className="font-bold text-orange-500 text-xs uppercase tracking-wide">Details</p>
-                                    <button onClick={() => setActiveIndex(null)} className="text-gray-400 hover:text-gray-600 text-xs">✕ Close</button>
+                                    <p className="font-bold text-orange-500 text-xs uppercase tracking-wide">
+                                      Details
+                                    </p>
+                                    <button
+                                      onClick={() => setActiveIndex(null)}
+                                      className="text-gray-400 hover:text-gray-600 text-xs"
+                                    >
+                                      ✕ Close
+                                    </button>
                                   </div>
                                   <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
                                     <div>
-                                      <p className="text-xs text-gray-400 font-medium">Percentage</p>
-                                      <p className="font-semibold text-gray-700 text-sm mt-0.5">{h.proforma_percentage}%</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-xs text-gray-400 font-medium">Amount</p>
-                                      <p className="font-semibold text-gray-700 text-sm mt-0.5">Rs.{Number(h.total).toLocaleString()}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-xs text-gray-400 font-medium">Date</p>
+                                      <p className="text-xs text-gray-400 font-medium">
+                                        Percentage
+                                      </p>
                                       <p className="font-semibold text-gray-700 text-sm mt-0.5">
-                                        {new Date(h.created_at).toLocaleDateString("en-IN")}
+                                        {h.proforma_percentage}%
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-gray-400 font-medium">
+                                        Amount
+                                      </p>
+                                      <p className="font-semibold text-gray-700 text-sm mt-0.5">
+                                        Rs.{Number(h.total).toLocaleString()}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-gray-400 font-medium">
+                                        Date
+                                      </p>
+                                      <p className="font-semibold text-gray-700 text-sm mt-0.5">
+                                        {new Date(
+                                          h.created_at,
+                                        ).toLocaleDateString("en-IN")}
                                       </p>
                                     </div>
                                   </div>
@@ -1592,10 +1725,11 @@ export default function ProformaPage() {
                   <button
                     onClick={editing ? handleUpdate : handleSubmitFollowUp}
                     disabled={afterRemainingPct < 0 && enteredPct > 0}
-                    className={`px-6 py-2 rounded-xl text-sm font-semibold text-white transition-all shadow-md ${afterRemainingPct < 0 && enteredPct > 0
-                      ? "bg-gray-300 cursor-not-allowed shadow-none"
-                      : "bg-orange-500 hover:bg-orange-600 shadow-orange-200"
-                      }`}
+                    className={`px-6 py-2 rounded-xl text-sm font-semibold text-white transition-all shadow-md ${
+                      afterRemainingPct < 0 && enteredPct > 0
+                        ? "bg-gray-300 cursor-not-allowed shadow-none"
+                        : "bg-orange-500 hover:bg-orange-600 shadow-orange-200"
+                    }`}
                   >
                     {editing ? "Update Follow-Up" : "Add Follow-Up"}
                   </button>

@@ -844,27 +844,26 @@ export default function QuotationPage() {
             value={filters.company_name}
             onChange={handleFilterChange}
             placeholder="Company"
-            className="p-2 w-full md:w-48 bg-white border border-orange-300 md:border rounded-sm focus:outline-none  text-gray-600 text-sm"
-          />
+className="filter-input md:w-56 md:mx-2"          />
           <input
             name="customer_name"
             value={filters.customer_name}
             onChange={handleFilterChange}
             placeholder="Customer"
-            className="p-2 w-full md:w-48 bg-white border border-orange-300 md:border rounded-sm focus:outline-none  text-gray-600 text-sm"
+           className="filter-input md:w-56 md:mx-2"
           />
           <input
             name="lead_title"
             value={filters.lead_title}
             onChange={handleFilterChange}
             placeholder="Lead Title"
-            className="p-2 w-full md:w-48 bg-white border border-orange-300 md:border rounded-sm focus:outline-none  text-gray-600 text-sm"
+           className="filter-input md:w-56 md:mx-2"
           />
           <select
             name="assignee"
             value={filters.assignee}
             onChange={handleFilterChange}
-            className="p-2 w-full md:w-36 bg-white border border-orange-300 md:border rounded-sm focus:outline-none  text-gray-400 text-sm"
+          className="filter-input md:w-56 md:mx-2"
           >
             <option value="">Assignee</option>
             {asignee.map((item) => (
@@ -877,33 +876,31 @@ export default function QuotationPage() {
             name="quotation_status"
             value={filters.quotation_status}
             onChange={handleFilterChange}
-            className="p-2 w-full md:w-45 bg-white border border-orange-300 md:border rounded-sm focus:outline-none  text-gray-400 text-sm"
+className="filter-input md:w-56 md:mx-2"
           >
             <option value="">Status</option>
             <option value="Won">Won</option>
             <option value="Lost">Lost</option>
           </select>
 
-          <div className="p-1 w-full md:w-58 border border-orange-300 md:border  text-gray-400 bg-white rounded-sm  transition-all outline-none">
-            <span className="text-[10px] text-gray-400 uppercase font-bold mx-2 pt-1">From Date</span>
+          <div className="filter-date-box">
+            <span  className="filter-date-label">From Date</span>
             <input
               type="date"
               name="from_date"
               value={filters.from_date}
               onChange={handleFilterChange}
-              className="p-1 w-full md:w-35 outline-none text-sm"
-            />
+className="filter-date-input"            />
           </div>
 
-          <div className="p-1 w-full md:w-58 border border-orange-300 md:border  text-gray-400 bg-white rounded-sm  transition-all outline-none">
-            <span className="text-[10px] text-gray-400 uppercase font-bold pt-1 mx-2">To Date</span>
+          <div className="filter-date-box">
+            <span  className="filter-date-label">To Date</span>
             <input
               type="date"
               name="to_date"
               value={filters.to_date}
               onChange={handleFilterChange}
-              className="p-1 w-full md:w-35 outline-none text-sm"
-            />
+className="filter-date-input"            />
           </div>
 
           <div className="flex gap-2 col-span-2">
@@ -912,14 +909,12 @@ export default function QuotationPage() {
                 resetFilters();
                 setShowMobileFilters(false);
               }}
-              className="border border-gray-300 w-full md:w-auto cursor-pointer rounded-sm p-2 bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm text-center font-semibold"
-            >
+className="filter-clear-btn w-full md:w-auto"            >
               Clear
             </button>
             <button
               onClick={() => setShowMobileFilters(false)}
-              className="md:hidden border border-orange-300 w-full cursor-pointer rounded-sm p-2 bg-orange-100 text-orange-700 hover:bg-orange-200 text-sm text-center font-semibold"
-            >
+className="filter-apply-btn w-full"            >
               Apply
             </button>
           </div>

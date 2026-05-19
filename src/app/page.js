@@ -289,7 +289,7 @@ export default function Page() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="p-3 border border-gray-300 rounded-sm"
+                  className="p-3 border border-black focus:outline-none rounded-sm"
                   required
                 />
 
@@ -300,7 +300,7 @@ export default function Page() {
                     placeholder="Password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="p-3 border border-gray-300 rounded-sm w-full"
+                    className="p-3 border border-black focus:outline-none rounded-sm w-full"
                   />
                   <span
                     onClick={() => setShowPassword(!showPassword)}
@@ -321,8 +321,8 @@ export default function Page() {
                   type="submit"
                   disabled={loading}
                   className={`p-3 rounded-sm text-white flex items-center justify-center gap-2 transition-all cursor-pointer duration-300 ${loading
-                      ? "bg-orange-400 cursor-not-allowed opacity-80"
-                      : "bg-orange-500 hover:bg-orange-600"
+                      ? "bg-black cursor-not-allowed opacity-80"
+                      : "bg-black "
                     }`}
                 >
                   {loading ? (
@@ -350,11 +350,11 @@ export default function Page() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="p-3 border rounded-sm"
+                  className="p-3 border border-black focus:outline-none rounded-sm"
                   required
                 />
 
-                <button className="p-3 bg-orange-500 text-white rounded-sm">
+                <button className="p-3 bg-black text-white rounded-sm">
                   Send OTP
                 </button>
               </form>
@@ -383,10 +383,10 @@ export default function Page() {
                   inputMode="numeric"
                   name="otp"
                   maxLength={6}
-                  className="p-3 border rounded-sm text-center text-lg tracking-widest"
+                  className="p-3 border border-black focus:outline-none rounded-sm text-center text-lg tracking-widest"
                 />
 
-                <button className="p-3 bg-orange-500 text-white rounded-sm">
+                <button className="p-3 bg-black  text-white rounded-sm">
                   Verify OTP
                 </button>
               </form>
@@ -397,7 +397,7 @@ export default function Page() {
                 ) : (
                   <button
                     onClick={handleForgotPassword}
-                    className="text-orange-500 hover:underline"
+                    className="text-black hover:underline"
                   >
                     Resend OTP
                   </button>
@@ -417,7 +417,7 @@ export default function Page() {
                   name="password"
                   placeholder="New Password"
                   onChange={handleChange}
-                  className="p-3 border rounded-sm"
+                  className="p-3 border border-black focus:outline-none rounded-sm"
                 />
 
                 <input
@@ -428,7 +428,7 @@ export default function Page() {
                   className="p-3 border rounded-sm"
                 />
 
-                <button className="p-3 bg-orange-500 text-white rounded-sm">
+                <button className="p-3 bg-black text-white rounded-sm">
                   Update Password
                 </button>
               </form>
@@ -436,7 +436,7 @@ export default function Page() {
           )}
 
           {message && (
-            <p className="mt-6 text-red-500 font-medium">{message}</p>
+            <p className="mt-6 text-black font-medium">{message}</p>
           )}
         </div>
         {/* ── END right side ─────────────────────────────────────────────────── */}

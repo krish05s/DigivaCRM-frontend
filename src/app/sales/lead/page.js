@@ -527,14 +527,17 @@ export default function Page() {
 
   const confirmStatusChange = async () => {
     try {
-      await axios.put(`${API_BASE}/api/lead/update-status/${selectedLead}`, {
-        status: selectedStatus,
-      },
+      await axios.put(
+        `${API_BASE}/api/lead/update-status/${selectedLead}`,
+        {
+          status: selectedStatus,
+        },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        });
+        },
+      );
 
       setLeads((prev) =>
         prev.map((lead) =>
@@ -652,11 +655,11 @@ export default function Page() {
   const filteredLeads = hasActiveFilters
     ? leads
     : leads.filter((l) => {
-      if (activeTab === "Pending") {
-        return l.status !== "Won" && l.status !== "Lost";
-      }
-      return l.status === activeTab;
-    });
+        if (activeTab === "Pending") {
+          return l.status !== "Won" && l.status !== "Lost";
+        }
+        return l.status === activeTab;
+      });
 
   const pendingCount = leads.filter((l) => l.status === "Pending").length;
   const wonCount = leads.filter((l) => l.status === "Won").length;
@@ -694,7 +697,6 @@ export default function Page() {
     }
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
-
 
   // Dynamic Dropdowns
 
@@ -738,7 +740,7 @@ export default function Page() {
           { params: { status: 1 } },
         );
         setLeadSource(res.data);
-      } catch { }
+      } catch {}
     };
 
     fetchSource();
@@ -752,7 +754,7 @@ export default function Page() {
           { params: { status: 1 } },
         );
         setLeadCategory(res.data);
-      } catch { }
+      } catch {}
     };
 
     fetchCategory();
@@ -765,7 +767,7 @@ export default function Page() {
           params: { status: 1 },
         });
         setCategory(res.data);
-      } catch { }
+      } catch {}
     };
 
     fetchProductCategory();
@@ -815,8 +817,9 @@ export default function Page() {
                 <i className="bi bi-download text-base"></i>
                 Export
                 <i
-                  className={`bi bi-chevron-down text-xs transition-transform duration-200 ${showExportMenu ? "rotate-180" : ""
-                    }`}
+                  className={`bi bi-chevron-down text-xs transition-transform duration-200 ${
+                    showExportMenu ? "rotate-180" : ""
+                  }`}
                 ></i>
               </button>
 
@@ -885,7 +888,7 @@ export default function Page() {
             onChange={handleFilterChange}
             ref={companyRef}
             placeholder="Company Name"
-            className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-45  text-gray-600 text-sm outline-none"
+            className="filter-input md:w-56 md:mx-2"
           />
 
           <input
@@ -893,7 +896,7 @@ export default function Page() {
             value={filters.customer_name}
             onChange={handleFilterChange}
             placeholder="Customer Name"
-            className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-45  text-gray-600 text-sm outline-none"
+            className="filter-input md:w-56 md:mx-2"
           />
 
           <input
@@ -901,14 +904,14 @@ export default function Page() {
             value={filters.lead_title}
             onChange={handleFilterChange}
             placeholder="Enter Lead Title"
-            className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-45  outline-none  text-gray-600 text-sm"
+            className="filter-input md:w-56 md:mx-2"
           />
 
           <select
             name="product_category"
             value={filters.product_category}
             onChange={handleFilterChange}
-            className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-48  outline-none  text-gray-400 text-sm"
+            className="filter-input md:w-56 md:mx-2"
           >
             <option value="">Select Product Category</option>
             {category.map((item) => (
@@ -922,7 +925,7 @@ export default function Page() {
             name="source"
             value={filters.source}
             onChange={handleFilterChange}
-            className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-45  outline-none  text-gray-400 text-sm"
+            className="filter-input md:w-56 md:mx-2"
           >
             <option value="">Select Source</option>
             {leadSource.map((item) => (
@@ -936,7 +939,7 @@ export default function Page() {
             name="assignee"
             value={filters.assignee}
             onChange={handleFilterChange}
-            className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-45  outline-none  text-gray-400 text-sm"
+            className="filter-input md:w-56 md:mx-2"
           >
             <option value="">Select Assignee</option>
             {assignee.map((item) => (
@@ -946,7 +949,8 @@ export default function Page() {
             ))}
           </select>
 
-          <div className="flex p-1 items-center px-2 border bg-white border-orange-300 rounded-sm w-full md:w-58  outline-none  text-gray-400 text-sm col-span-2 md:col-span-1">
+          <div
+className="filter-date-box w-full md:w-58 col-span-2 md:col-span-1"           >
             <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
               From Next
             </span>
@@ -959,7 +963,7 @@ export default function Page() {
             />
           </div>
 
-          <div className="flex p-1 items-center px-2 border bg-white border-orange-300 rounded-sm w-full md:w-53  outline-none  text-gray-400 text-sm col-span-2 md:col-span-1">
+          <div className="filter-date-box w-full md:w-58 col-span-2 md:col-span-1">
             <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
               To Next
             </span>
@@ -976,14 +980,14 @@ export default function Page() {
             name="status"
             value={filters.status}
             onChange={handleFilterChange}
-            className="border p-1 bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-45  outline-none  text-gray-400 text-sm"
+            className="filter-input md:w-56 md:mx-2"
           >
             <option value="">Pending</option>
             <option value="Won">Won</option>
             <option value="Lost">Lost</option>
           </select>
 
-          <div className="flex p-1 items-center px-2 border bg-white border-orange-300 rounded-sm w-full md:w-60  outline-none  text-gray-400 text-sm col-span-2 md:col-span-1">
+          <div className="filter-date-box w-full md:w-60 col-span-2 md:col-span-1">
             <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
               From Create
             </span>
@@ -996,8 +1000,8 @@ export default function Page() {
             />
           </div>
 
-          <div className="flex p-1 items-center px-2 border bg-white border-orange-300 rounded-sm w-full md:w-58  outline-none  text-gray-400 text-sm col-span-2 md:col-span-1">
-            <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
+          <div className="filter-date-box w-full md:w-58 col-span-2 md:col-span-1">
+            <span className="filter-date-label">
               To Create
             </span>
             <input
@@ -1005,7 +1009,7 @@ export default function Page() {
               name="to_created"
               value={filters.to_created}
               onChange={handleFilterChange}
-              className="p-1 w-full md:w-35 outline-none bg-transparent"
+            className="filter-date-input"
             />
           </div>
 
@@ -1015,14 +1019,12 @@ export default function Page() {
                 resetFilters();
                 setShowMobileFilters(false);
               }}
-              className="border border-gray-300 w-full md:w-auto cursor-pointer rounded-sm p-2 bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm text-center font-semibold"
-            >
+className="filter-clear-btn w-full md:w-auto"            >
               Clear
             </button>
             <button
               onClick={() => setShowMobileFilters(false)}
-              className="md:hidden border border-orange-300 w-full cursor-pointer rounded-sm p-2 bg-orange-100 text-orange-700 hover:bg-orange-200 text-sm text-center font-semibold"
-            >
+className="filter-apply-btn w-full"            >
               Apply
             </button>
           </div>
@@ -1034,10 +1036,11 @@ export default function Page() {
           <div className="flex items-center gap-8 px-6 pt-4 border-b border-gray-100">
             <button
               onClick={() => setActiveTab("Pending")}
-              className={`pb-3 px-3 text-sm font-medium relative cursor-pointer transition-all ${activeTab === "Pending"
-                ? "text-blue-600"
-                : "text-gray-400 hover:text-gray-600"
-                }`}
+              className={`pb-3 px-3 text-sm font-medium relative cursor-pointer transition-all ${
+                activeTab === "Pending"
+                  ? "text-blue-600"
+                  : "text-gray-400 hover:text-gray-600"
+              }`}
             >
               Pending
               <span className="ml-2 bg-blue-100 text-blue-600 cursor-pointer text-xs px-2 py-0.5 rounded-full">
@@ -1050,8 +1053,9 @@ export default function Page() {
 
             <button
               onClick={() => setActiveTab("Won")}
-              className={`pb-3 text-sm font-medium cursor-pointer relative ${activeTab === "Won" ? "text-green-600" : "text-gray-500"
-                }`}
+              className={`pb-3 text-sm font-medium cursor-pointer relative ${
+                activeTab === "Won" ? "text-green-600" : "text-gray-500"
+              }`}
             >
               Won
               <span className="ml-2 bg-green-100 text-green-600 text-xs px-2 py-0.5 rounded-full">
@@ -1064,8 +1068,9 @@ export default function Page() {
 
             <button
               onClick={() => setActiveTab("Lost")}
-              className={`pb-3 text-sm font-medium relative ${activeTab === "Lost" ? "text-red-600" : "text-gray-500"
-                }`}
+              className={`pb-3 text-sm font-medium relative ${
+                activeTab === "Lost" ? "text-red-600" : "text-gray-500"
+              }`}
             >
               Lost
               <span className="ml-2 bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full">
@@ -1165,23 +1170,23 @@ export default function Page() {
                           >
                             {lead.assignee
                               ? String(lead.assignee)
-                                .split(",")
-                                .map((name, index) => {
-                                  const letter = name
-                                    .trim()
-                                    .charAt(0)
-                                    .toUpperCase();
+                                  .split(",")
+                                  .map((name, index) => {
+                                    const letter = name
+                                      .trim()
+                                      .charAt(0)
+                                      .toUpperCase();
 
-                                  return (
-                                    <div
-                                      key={index}
-                                      title={name.trim()}
-                                      className="px-3 py-1.5 bg-blue-800 text-white rounded-full font-semibold text-sm flex justify-center items-center min-w-[28px] text-center select-none"
-                                    >
-                                      {letter}
-                                    </div>
-                                  );
-                                })
+                                    return (
+                                      <div
+                                        key={index}
+                                        title={name.trim()}
+                                        className="px-3 py-1.5 bg-blue-800 text-white rounded-full font-semibold text-sm flex justify-center items-center min-w-[28px] text-center select-none"
+                                      >
+                                        {letter}
+                                      </div>
+                                    );
+                                  })
                               : "-"}
                           </td>
 
@@ -1193,10 +1198,11 @@ export default function Page() {
                                     openUpdateModal(lead);
                                   }
                                 }}
-                                className={`${lead.status === "Pending"
-                                  ? "cursor-pointer text-blue-800"
-                                  : "text-gray-400 cursor-not-allowed"
-                                  }`}
+                                className={`${
+                                  lead.status === "Pending"
+                                    ? "cursor-pointer text-blue-800"
+                                    : "text-gray-400 cursor-not-allowed"
+                                }`}
                               >
                                 {new Date(
                                   lead.next_follow_up_date,
@@ -1221,9 +1227,10 @@ export default function Page() {
                                   setShowModal(true);
                                 }}
                                 className={`w-9 h-9 rounded-full border flex items-center justify-center mx-auto
-                                  ${lead.status === "Pending"
-                                    ? "hover:bg-gray-100 cursor-pointer"
-                                    : "bg-gray-100 cursor-not-allowed opacity-60"
+                                  ${
+                                    lead.status === "Pending"
+                                      ? "hover:bg-gray-100 cursor-pointer"
+                                      : "bg-gray-100 cursor-not-allowed opacity-60"
                                   }`}
                               >
                                 <i className="bi bi-plus text-lg"></i>
@@ -1296,14 +1303,16 @@ export default function Page() {
                                 </>
                               ) : (
                                 <div className="w-full flex justify-center">
-                                  <span className="text-gray-300 cursor-not-allowed bg-gray-50 p-1.5 rounded-full border border-gray-100" title="Lead locked">
+                                  <span
+                                    className="text-gray-300 cursor-not-allowed bg-gray-50 p-1.5 rounded-full border border-gray-100"
+                                    title="Lead locked"
+                                  >
                                     <i className="bi bi-lock text-sm"></i>
                                   </span>
                                 </div>
                               )}
                             </div>
                           </td>
-
                         </tr>
                       ))
                     ) : (
@@ -1342,13 +1351,14 @@ export default function Page() {
                     </select>
                   </div>
 
-
                   {/* Right side: Navigation buttons (only if totalPages > 1) */}
                   {totalPages > 1 && (
                     <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
                       {/* Previous Button */}
                       <button
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
                         disabled={currentPage === 1}
                         className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                       >
@@ -1361,10 +1371,11 @@ export default function Page() {
                           <button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${currentPage === page
-                              ? "bg-[#212121] text-white shadow-md shadow-black/10"
-                              : "border border-slate-200 text-slate-600 hover:bg-slate-50"
-                              }`}
+                            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
+                              currentPage === page
+                                ? "bg-[#212121] text-white shadow-md shadow-black/10"
+                                : "border border-slate-200 text-slate-600 hover:bg-slate-50"
+                            }`}
                           >
                             {page}
                           </button>
@@ -1373,7 +1384,11 @@ export default function Page() {
 
                       {/* Next Button */}
                       <button
-                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages),
+                          )
+                        }
                         disabled={currentPage === totalPages}
                         className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                       >
@@ -1382,7 +1397,6 @@ export default function Page() {
                     </div>
                   )}
                 </div>
-
               </div>
             )}
           </div>
@@ -1877,8 +1891,8 @@ export default function Page() {
                             <span className="text-xs text-gray-400">
                               {item.follow_up_date
                                 ? new Date(
-                                  item.follow_up_date,
-                                ).toLocaleDateString()
+                                    item.follow_up_date,
+                                  ).toLocaleDateString()
                                 : "—"}
                             </span>
                             <i
@@ -1916,8 +1930,8 @@ export default function Page() {
                           label: "Follow-Up Date",
                           value: previewFollowUp.follow_up_date
                             ? new Date(
-                              previewFollowUp.follow_up_date,
-                            ).toLocaleDateString()
+                                previewFollowUp.follow_up_date,
+                              ).toLocaleDateString()
                             : "—",
                         },
                         {
