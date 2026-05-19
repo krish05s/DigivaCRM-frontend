@@ -271,13 +271,13 @@ export default function CommonMasterPage({
           <input
             type="text"
             placeholder={`Enter ${title}`}
-            className="filter-input md:w-56 md:mx-2"
+            className="p-2 w-full md:w-50 mb-0 md:mb-3 border text-gray-400 bg-white border-orange-300 rounded-sm outline-none text-sm"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
 
           <select
-             className="filter-input md:w-56 md:mx-2"
+            className="w-full md:w-48 md:mx-3 md:mb-3 p-2 border text-gray-400 bg-white rounded-sm border-orange-300 outline-none text-sm"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
