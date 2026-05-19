@@ -22,7 +22,11 @@ export default function CustomerList() {
   const [industries, setIndustries] = useState([]);
 
   const [viewModal, setViewModal] = useState({ open: false, data: null });
-  const [deleteModal, setDeleteModal] = useState({ open: false, id: null, name: "" });
+  const [deleteModal, setDeleteModal] = useState({
+    open: false,
+    id: null,
+    name: "",
+  });
 
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [filters, setFilters] = useState({
@@ -35,7 +39,6 @@ export default function CustomerList() {
 
   const [data, setData] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: "id", direction: "ASC" });
-
 
   // Store offset for each scrollable column
   const [columnOffsets, setColumnOffsets] = useState({
@@ -59,7 +62,9 @@ export default function CustomerList() {
         ...filters,
       }).toString();
 
-      const res = await axios.get(`${API_BASE}/api/customers/get-customers?${query}`);
+      const res = await axios.get(
+        `${API_BASE}/api/customers/get-customers?${query}`,
+      );
       const result = res.data;
 
       if (result.success) {
@@ -71,7 +76,6 @@ export default function CustomerList() {
       console.error("Error fetching customers:", error);
     }
   };
-
 
   // Fetching Active Industries
   useEffect(() => {
@@ -106,7 +110,6 @@ export default function CustomerList() {
     setCurrentPage(1);
   }, [filters, search, itemsPerPage]);
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
@@ -135,7 +138,6 @@ export default function CustomerList() {
     }
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
-
 
   const handleDelete = async (id) => {
     try {
@@ -167,47 +169,62 @@ export default function CustomerList() {
       <Header />
       <div className="bg-gray-100">
         {/* Header bar */}
-        <div className="bg-white w-full rounded-sm shadow-lg p-3 mt-1 mb-5">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
-            <p className="flex items-center flex-wrap">
-              <Link href="/dashboard" className="mx-3 text-xl text-gray-400 hover:text-indigo-600">
-                <i className="bi bi-house"></i>
-              </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>
-              <Link href="/customer-list" className="mx-3 text-md text-gray-700 hover:text-orange-500 font-semibold">
-                Customer List
-              </Link>
-            </p>
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-              <input
-                type="text"
-                placeholder="🔍 Search..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="border w-full sm:w-64 border-gray-300 text-gray-700 placeholder-gray-400 p-2 sm:p-1 px-3 rounded-sm focus:ring-1 outline-none focus:ring-orange-200 transition-all text-sm"
-              />
-              <Link
-                href="/customer"
-                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-sm w-full sm:w-auto text-center font-bold text-sm"
-              >
-                + ADD CUSTOMER
-              </Link>
-            </div>
-          </div>
-        </div>
+    <div className="breadcrumb-container">
 
+  <div className="breadcrumb-left flex justify-between items-center w-full">
+
+    <p className="breadcrumb-path">
+      <Link href="/dashboard" className="breadcrumb-home">
+        <i className="bi bi-house"></i>
+      </Link>
+
+      <i className="bi bi-chevron-right text-[10px]"></i>{" "}
+
+      <Link href="/customer-list" className="breadcrumb-link">
+        Customer List
+      </Link>
+    </p>
+
+    <div className="flex flex-col sm:flex-row items-center gap-3 ml-auto">
+
+      <input
+        type="text"
+        placeholder="🔍 Search..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="search-input"
+      />
+
+      <Link href="/customer" className="add-btn">
+        + ADD CUSTOMER
+      </Link>
+
+    </div>
+
+  </div>
+
+</div>
         {/* Filters */}
         <div className="mx-4 mb-2 md:hidden mt-3 relative z-40">
-          <button onClick={() => setShowMobileFilters(!showMobileFilters)} className="w-full flex items-center justify-between text-orange-500 font-semibold bg-orange-50 px-4 py-2 rounded-sm border border-orange-200 shadow-sm transition-all">
-             <span className="flex items-center gap-2"><i className="bi bi-funnel"></i> Filters</span>
-             <i className={`bi bi-chevron-down transition-transform ${showMobileFilters ? "rotate-180" : ""}`}></i>
+          <button
+            onClick={() => setShowMobileFilters(!showMobileFilters)}
+            className="w-full flex items-center justify-between text-orange-500 font-semibold bg-orange-50 px-4 py-2 rounded-sm border border-orange-200 shadow-sm transition-all"
+          >
+            <span className="flex items-center gap-2">
+              <i className="bi bi-funnel"></i> Filters
+            </span>
+            <i
+              className={`bi bi-chevron-down transition-transform ${showMobileFilters ? "rotate-180" : ""}`}
+            ></i>
           </button>
         </div>
 
-        <div className={`
+        <div
+          className={`
           ${showMobileFilters ? "absolute left-4 right-4 top-50 bg-white p-5 shadow-2xl border border-gray-100 z-50 rounded-lg grid grid-cols-2 gap-3 mt-1" : "hidden"} 
           md:mx-4 md:mb-2 md:flex md:flex-wrap md:gap-2 md:relative md:bg-transparent md:p-0 md:shadow-none md:border-none md:z-auto
-        `}>
+        `}
+        >
           <input
             type="text"
             name="customer_name"
@@ -226,7 +243,8 @@ export default function CustomerList() {
             onChange={(e) => {
               const val = e.target.value;
               if (!/^\d*$/.test(val)) return;
-              if (val.length === 1 && !["6", "7", "8", "9"].includes(val)) return;
+              if (val.length === 1 && !["6", "7", "8", "9"].includes(val))
+                return;
               if (val.length > 10) return;
               setFilters((p) => ({ ...p, mobile: val }));
             }}
@@ -268,13 +286,15 @@ export default function CustomerList() {
                 });
                 setShowMobileFilters(false);
               }}
-className="filter-clear-btn w-full md:w-auto"            >
+              className="filter-clear-btn w-full md:w-auto"
+            >
               Clear
             </button>
             <button
               type="button"
               onClick={() => setShowMobileFilters(false)}
-className="filter-apply-btn w-full"            >
+              className="filter-apply-btn w-full"
+            >
               Apply
             </button>
           </div>
@@ -283,7 +303,10 @@ className="filter-apply-btn w-full"            >
         {/* Table */}
         <form className="p-2 w-8xl mx-3">
           <div className="bg-white shadow rounded-sm p-6">
-            <div className="overflow-x-auto overflow-y-scroll max-h-[380px] custom-scroll" style={{ overflowX: "scroll" }}>
+            <div
+              className="overflow-x-auto overflow-y-scroll max-h-[380px] custom-scroll"
+              style={{ overflowX: "scroll" }}
+            >
               <table className="w-full text-sm border border-gray-200 text-left whitespace-nowrap">
                 <thead className="bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                   <tr>
@@ -301,10 +324,17 @@ className="filter-apply-btn w-full"            >
                 <tbody>
                   {currentData.length > 0 ? (
                     currentData.map((row, index) => (
-                      <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                        <td className="px-3 py-2">{indexOfFirstItem + index + 1}</td>
+                      <tr
+                        key={index}
+                        className="border-b border-gray-100 hover:bg-gray-50"
+                      >
+                        <td className="px-3 py-2">
+                          {indexOfFirstItem + index + 1}
+                        </td>
                         <td className="px-4 py-2">{row.company_name}</td>
-                        <td className="px-4 py-2 text-orange-500">{row.customer_name}</td>
+                        <td className="px-4 py-2 text-orange-500">
+                          {row.customer_name}
+                        </td>
                         <td className="px-4 py-2">{row.email}</td>
                         <td className="px-4 py-2">{row.mobile}</td>
                         <td className="px-4 py-2">{row.customer_type}</td>
@@ -313,7 +343,9 @@ className="filter-apply-btn w-full"            >
                         <td className="py-2 px-4 text-lg">
                           <button
                             type="button"
-                            onClick={() => setViewModal({ open: true, data: row })}
+                            onClick={() =>
+                              setViewModal({ open: true, data: row })
+                            }
                             className="text-gray-400 hover:text-green-600 cursor-pointer"
                           >
                             <i className="bi bi-eye text-xl"></i>
@@ -321,7 +353,10 @@ className="filter-apply-btn w-full"            >
                           <button
                             type="button"
                             onClick={() => {
-                              localStorage.setItem("customer_edit_id", JSON.stringify(row.id));
+                              localStorage.setItem(
+                                "customer_edit_id",
+                                JSON.stringify(row.id),
+                              );
                               router.push("/edit-customer");
                             }}
                             className="text-gray-400 hover:text-blue-700 mx-2 cursor-pointer"
@@ -330,7 +365,13 @@ className="filter-apply-btn w-full"            >
                           </button>
                           <button
                             type="button"
-                            onClick={() => setDeleteModal({ open: true, id: row.id, name: row.customer_name })}
+                            onClick={() =>
+                              setDeleteModal({
+                                open: true,
+                                id: row.id,
+                                name: row.customer_name,
+                              })
+                            }
                             className="text-gray-400 hover:text-red-600 cursor-pointer"
                           >
                             <i className="bi bi-trash3"></i>
@@ -340,7 +381,10 @@ className="filter-apply-btn w-full"            >
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="9" className="text-center py-4 text-gray-500">
+                      <td
+                        colSpan="9"
+                        className="text-center py-4 text-gray-500"
+                      >
                         No data found
                       </td>
                     </tr>
@@ -373,14 +417,15 @@ className="filter-apply-btn w-full"            >
                 </select>
               </div>
 
-
               {/* Right side: Navigation buttons (only if totalPages > 1) */}
               {totalPages > 1 && (
                 <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
                   {/* Previous Button */}
                   <button
                     type="button"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                     className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
@@ -408,7 +453,9 @@ className="filter-apply-btn w-full"            >
                   {/* Next Button */}
                   <button
                     type="button"
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
                     disabled={currentPage === totalPages}
                     className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
@@ -417,7 +464,6 @@ className="filter-apply-btn w-full"            >
                 </div>
               )}
             </div>
-
           </div>
         </form>
       </div>
@@ -434,7 +480,9 @@ className="filter-apply-btn w-full"            >
                 </span>
               </div>
               <button
-                onClick={() => setDeleteModal({ open: false, id: null, name: "" })}
+                onClick={() =>
+                  setDeleteModal({ open: false, id: null, name: "" })
+                }
                 className="w-7 h-7 flex items-center justify-center text-orange-500 text-md"
               >
                 ✕
@@ -442,19 +490,31 @@ className="filter-apply-btn w-full"            >
             </div>
             <div className="p-6 text-center">
               <div className="w-16 h-16 rounded-full bg-orange-50 flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                <svg
+                  className="w-8 h-8 text-orange-400"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.8}
+                  viewBox="0 0 24 24"
+                >
                   <polyline points="3 6 5 6 21 6" />
                   <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
                   <path d="M10 11v6M14 11v6" />
                   <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
                 </svg>
               </div>
-              <p className="font-semibold text-gray-800 text-base mb-1">{deleteModal.name}</p>
-              <p className="text-sm text-gray-400">This action cannot be undone. Are you sure?</p>
+              <p className="font-semibold text-gray-800 text-base mb-1">
+                {deleteModal.name}
+              </p>
+              <p className="text-sm text-gray-400">
+                This action cannot be undone. Are you sure?
+              </p>
             </div>
             <div className="flex gap-3 px-5 pb-5">
               <button
-                onClick={() => setDeleteModal({ open: false, id: null, name: "" })}
+                onClick={() =>
+                  setDeleteModal({ open: false, id: null, name: "" })
+                }
                 className="flex-1 px-4 py-2 text-sm text-gray-500 border border-gray-200 rounded-sm hover:bg-gray-50 transition-colors"
               >
                 Cancel
@@ -486,7 +546,9 @@ className="filter-apply-btn w-full"            >
                   <p className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
                     {viewModal.data.customer_name}
                   </p>
-                  <p className="text-gray-400 text-md">{viewModal.data.customer_type}</p>
+                  <p className="text-gray-400 text-md">
+                    {viewModal.data.customer_type}
+                  </p>
                 </div>
               </div>
               <button
@@ -500,50 +562,78 @@ className="filter-apply-btn w-full"            >
               <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
                 <i className="bi bi-building text-orange-400 text-lg"></i>
                 <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide">Company</p>
-                  <p className="text-sm font-semibold text-gray-700">{viewModal.data.company_name || "—"}</p>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide">
+                    Company
+                  </p>
+                  <p className="text-sm font-semibold text-gray-700">
+                    {viewModal.data.company_name || "—"}
+                  </p>
                 </div>
               </div>
               <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
                 <i className="bi bi-person-circle text-orange-400 text-lg"></i>
                 <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide">Customer Name</p>
-                  <p className="text-sm font-semibold text-gray-700">{viewModal.data.customer_name || "—"}</p>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide">
+                    Customer Name
+                  </p>
+                  <p className="text-sm font-semibold text-gray-700">
+                    {viewModal.data.customer_name || "—"}
+                  </p>
                 </div>
               </div>
               <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
                 <i className="bi bi-envelope text-orange-400 text-lg"></i>
                 <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide">Email</p>
-                  <p className="text-sm font-semibold text-gray-700 break-all">{viewModal.data.email || "—"}</p>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide">
+                    Email
+                  </p>
+                  <p className="text-sm font-semibold text-gray-700 break-all">
+                    {viewModal.data.email || "—"}
+                  </p>
                 </div>
               </div>
               <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
                 <i className="bi bi-telephone text-orange-400 text-lg"></i>
                 <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide">Mobile</p>
-                  <p className="text-sm font-semibold text-gray-700">{viewModal.data.mobile || "—"}</p>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide">
+                    Mobile
+                  </p>
+                  <p className="text-sm font-semibold text-gray-700">
+                    {viewModal.data.mobile || "—"}
+                  </p>
                 </div>
               </div>
               <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
                 <i className="bi bi-tag text-orange-400 text-lg"></i>
                 <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide">Customer Type</p>
-                  <p className="text-sm font-semibold text-gray-700">{viewModal.data.customer_type || "—"}</p>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide">
+                    Customer Type
+                  </p>
+                  <p className="text-sm font-semibold text-gray-700">
+                    {viewModal.data.customer_type || "—"}
+                  </p>
                 </div>
               </div>
               <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
                 <i className="bi bi-globe text-orange-400 text-lg"></i>
                 <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide">Website</p>
-                  <p className="text-sm font-semibold text-gray-700">{viewModal.data.website || "—"}</p>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide">
+                    Website
+                  </p>
+                  <p className="text-sm font-semibold text-gray-700">
+                    {viewModal.data.website || "—"}
+                  </p>
                 </div>
               </div>
               <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
                 <i className="bi bi-briefcase text-orange-400 text-lg"></i>
                 <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide">Industry</p>
-                  <p className="text-sm font-semibold text-gray-700">{viewModal.data.industry_name || "—"}</p>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide">
+                    Industry
+                  </p>
+                  <p className="text-sm font-semibold text-gray-700">
+                    {viewModal.data.industry_name || "—"}
+                  </p>
                 </div>
               </div>
             </div>

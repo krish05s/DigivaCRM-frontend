@@ -876,37 +876,37 @@ export default function ProformaPage() {
 
       <div className="bg-gray-100 min-h-screen">
         {/* ── BREADCRUMB + EXPORT ─────────────────────────── */}
-        <div className="bg-white w-full border-gray-100 p-3 mt-1 mb-5 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
-          <div className="hidden sm:flex items-center text-gray-700 w-full sm:w-auto">
-            <p className="flex items-center flex-wrap">
+
+        <div className="breadcrumb-container">
+          <div className="breadcrumb-left">
+            <p className="breadcrumb-path">
               <Link
                 href="/dashboard"
-                className="mx-2 text-xl text-gray-400 hover:text-indigo-600"
-              >
+ className="breadcrumb-home"              >
                 <i className="bi bi-house"></i>
               </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>
+              <i className="bi bi-chevron-right text-[10px]"></i>{" "}
               <Link
                 href="#"
-                className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
+                className="breadcrumb-link"
               >
                 Sales
               </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>
+              <i className="bi bi-chevron-right text-[10px]"></i>{" "}
               <Link
                 href="/sales/proforma"
-                className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
+                className="breadcrumb-link"
               >
                 Proforma
               </Link>
             </p>
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-            <div className="relative w-full sm:w-auto" ref={exportRef}>
+          <div className="breadcrumb-actions">
+            <div className="relative " ref={exportRef}>
               <button
                 onClick={() => setShowExportMenu((prev) => !prev)}
-                className="w-full flex items-center justify-center gap-2 bg-orange-50 text-orange-500 px-4 py-2 rounded-sm text-sm font-bold tracking-wide transition-all shadow-sm border border-orange-100"
+                className="export-btn"
               >
                 <i className="bi bi-download text-base"></i>
                 Export
@@ -915,19 +915,17 @@ export default function ProformaPage() {
                 ></i>
               </button>
               {showExportMenu && (
-                <div className="absolute right-0 top-full mt-1.5 w-44 bg-white rounded-sm shadow-lg border border-gray-100 overflow-hidden z-50">
+                <div className="export-dropdown ">
                   <button
                     onClick={exportToExcel}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-all text-left"
-                  >
+className="export-item"                  >
                     <i className="bi bi-file-earmark-excel text-green-600 text-base"></i>
                     Export Excel
                   </button>
                   <div className="h-px bg-gray-100 mx-3"></div>
                   <button
                     onClick={exportToPDF}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 transition-all text-left"
-                  >
+className="export-item"                  >
                     <i className="bi bi-file-earmark-pdf text-red-600 text-base"></i>
                     Export PDF
                   </button>

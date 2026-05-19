@@ -198,27 +198,27 @@ export default function CommonMasterPage({
     <>
       <div className="bg-gray-100">
         {/* Header */}
-        <div className="bg-white w-full shadow-lg p-3 mt-1 mb-5 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
-          <div className="hidden sm:flex items-center text-gray-700 w-full sm:w-auto">
-            <p className="flex items-center flex-wrap">
+         <div className="breadcrumb-container">
+          <div className="breadcrumb-left">
+            <p className="breadcrumb-path">
               <Link
                 href="/dashboard"
-                className="mx-2 text-xl text-gray-400 hover:text-indigo-600"
+                className="breadcrumb-home"
               >
                 <i className="bi bi-house"></i>
               </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>
+              <i className="bi bi-chevron-right text-[10px]"></i>{" "}
               <Link
                 href="/setup"
-                className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
+                className="breadcrumb-link"
               >
                 Setup
               </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>
+              <i className="bi bi-chevron-right text-[10px]"></i>{" "}
               {breadcrumbs.map((b, i) => (
                 <span
                   key={i}
-                  className="flex items-center text-gray-700 hover:text-orange-500 font-semibold"
+                className="breadcrumb-link"
                 >
                   <span className="mx-2">{b}</span>
                   {i < breadcrumbs.length - 1 && (
@@ -233,8 +233,7 @@ export default function CommonMasterPage({
             <button
               type="button"
               onClick={() => setShowForm(true)}
-              className="w-full sm:w-auto bg-orange-500 text-white px-5 py-2 rounded-sm shadow hover:bg-orange-600 font-bold text-sm"
-            >
+className="add-btn "            >
               + Add {title}
             </button>
           </div>

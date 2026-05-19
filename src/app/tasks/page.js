@@ -667,27 +667,22 @@ export default function Page() {
     <div className="bg-gray-100">
       <Header />
       {/* Breadcrumb */}
-      <div className="bg-white w-full shadow-lg p-3 mt-1 mb-5 flex flex-col lg:flex-row justify-between items-center gap-4 lg:gap-0">
-        <div className="hidden sm:flex items-center text-gray-700 w-full lg:w-auto">
-          <p className="flex items-center flex-wrap">
-            <Link
-              href="/dashboard"
-              className="mx-2 text-xl text-gray-400 hover:text-indigo-600"
-            >
-              <i className="bi bi-house"></i>
-            </Link>
-            <i className="bi bi-chevron-right text-[10px]"></i>
+      <div className="breadcrumb-container">
+          <div className="breadcrumb-left">
+            <p className="breadcrumb-path">
+              <Link href="/dashboard" className="breadcrumb-home">
+                <i className="bi bi-house"></i>
+              </Link>
+            <i className="bi bi-chevron-right text-[10px]"></i>{" "}
             <Link
               href="#"
-              className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
-            >
+ className="breadcrumb-link"            >
               Tasks
             </Link>
-            <i className="bi bi-chevron-right text-[10px]"></i>
+            <i className="bi bi-chevron-right text-[10px]"></i>{" "}
             <Link
               href="#"
-              className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
-            >
+ className="breadcrumb-link"            >
               Tasks List
             </Link>
           </p>
@@ -699,15 +694,15 @@ export default function Page() {
             placeholder="🔍 Search..."
             value={filters.search || ""}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            className="border w-full sm:w-64 p-2 px-3 border-gray-300 text-gray-700 placeholder-gray-400 rounded-sm focus:ring-1 outline-none focus:ring-orange-200 transition-all text-sm"
+            className="search-input"
           />
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="breadcrumb-actions">
             {/* Export Button */}
             <div className="relative flex-1 sm:flex-none" ref={exportRef}>
               <button
                 onClick={() => setShowExportMenu((prev) => !prev)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-sm bg-orange-50 text-orange-500 text-sm font-bold tracking-wide transition-all shadow-sm border border-orange-100"
+                className="export-btn"
               >
                 <i className="bi bi-download text-base"></i>
                 Export
@@ -719,11 +714,10 @@ export default function Page() {
               </button>
 
               {showExportMenu && (
-                <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-sm shadow-xl border border-gray-100 overflow-hidden z-50">
+                <div className="export-dropdown ">
                   <button
                     onClick={exportToExcel}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-all text-left"
-                  >
+className="export-item"                  >
                     <i className="bi bi-file-earmark-excel text-green-600 text-base"></i>
                     Export Excel
                   </button>
@@ -732,8 +726,7 @@ export default function Page() {
 
                   <button
                     onClick={exportToPDF}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 transition-all text-left"
-                  >
+className="export-item"                  >
                     <i className="bi bi-file-earmark-pdf text-red-600 text-base"></i>
                     Export PDF
                   </button>
@@ -745,7 +738,7 @@ export default function Page() {
             <button
               type="button"
               onClick={() => setShowForm(true)}
-              className="flex-1 sm:flex-none bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-sm text-sm font-bold shadow-md transition-all text-center"
+              className="add-btn"
             >
               + ADD TASK
             </button>

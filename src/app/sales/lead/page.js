@@ -782,37 +782,28 @@ export default function Page() {
       <div className="bg-gray-100 ">
         {/* breadcrumb */}
 
-        <div className="bg-white w-full shadow-lg p-3 mt-1 mb-5 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
-          <div className="hidden sm:flex items-center text-gray-700 w-full sm:w-auto">
-            <p className="flex items-center flex-wrap">
-              <Link
-                href="/dashboard"
-                className="mx-2 text-xl text-gray-400 hover:text-indigo-600"
-              >
+        <div className="breadcrumb-container">
+          <div className="breadcrumb-left">
+            <p className="breadcrumb-path">
+              <Link href="/dashboard" className="breadcrumb-home">
                 <i className="bi bi-house"></i>
               </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>
-              <Link
-                href="#"
-                className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
-              >
+              <i className="bi bi-chevron-right text-[10px]"></i>{" "}
+              <Link href="#" className="breadcrumb-link">
                 Sales
               </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>
-              <Link
-                href="/sales/lead"
-                className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
-              >
+              <i className="bi bi-chevron-right text-[10px]"></i>{" "}
+              <Link href="/sales/lead" className="breadcrumb-link">
                 Lead
               </Link>
             </p>
           </div>
           {/* Export Button */}
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-end">
+          <div className="breadcrumb-actions">
             <div className="relative" ref={exportRef}>
               <button
                 onClick={() => setShowExportMenu((prev) => !prev)}
-                className="flex items-center gap-2  bg-orange-50 text-orange-500 px-4 py-2 rounded-sm text-sm font-semibold tracking-wide transition-all shadow-sm"
+                className="export-btn"
               >
                 <i className="bi bi-download text-base"></i>
                 Export
@@ -824,11 +815,8 @@ export default function Page() {
               </button>
 
               {showExportMenu && (
-                <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-sm shadow-xl border border-gray-100 overflow-hidden z-50">
-                  <button
-                    onClick={exportToExcel}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-all"
-                  >
+                <div className="export-dropdown ">
+                  <button onClick={exportToExcel} className="export-item">
                     <div className="w-7 h-7 rounded-sm  flex items-center justify-center">
                       <i className="bi bi-file-earmark-excel text-green-600 text-sm"></i>
                     </div>
@@ -837,10 +825,7 @@ export default function Page() {
 
                   <div className="h-px bg-gray-100 mx-3"></div>
 
-                  <button
-                    onClick={exportToPDF}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 transition-all"
-                  >
+                  <button onClick={exportToPDF} className="export-item">
                     <div className="w-7 h-7 rounded-sm  flex items-center justify-center">
                       <i className="bi bi-file-earmark-pdf text-red-600 text-sm"></i>
                     </div>
@@ -851,10 +836,7 @@ export default function Page() {
             </div>
 
             {/* Add Lead Button */}
-            <Link
-              href="/sales/lead/add-lead"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-sm text-sm font-semibold shadow-md transition-all"
-            >
+            <Link href="/sales/lead/add-lead" className="add-btn ">
               + ADD LEAD
             </Link>
           </div>
@@ -1000,7 +982,9 @@ export default function Page() {
           </div>
 
           <div className="filter-date-box w-full md:w-58 col-span-2 md:col-span-1">
-            <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">To Create</span>
+            <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
+              To Create
+            </span>
             <input
               type="date"
               name="to_created"

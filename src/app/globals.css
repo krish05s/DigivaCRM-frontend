@@ -80,8 +80,96 @@ html, body {
 
 @layer components {
 
+ /* Breadcrumb Main Wrapper */
+  .breadcrumb-container {
+    @apply bg-white w-full shadow-lg
+    p-3 mt-1 mb-5
+    flex flex-col sm:flex-row
+    justify-between items-center
+    gap-4 sm:gap-0;
+  }
 
+  /* Left Breadcrumb Section */
+  .breadcrumb-left {
+    @apply hidden sm:flex items-center
+    text-gray-700
+    w-full sm:w-auto;
+  }
 
+  /* Breadcrumb Text Wrapper */
+  .breadcrumb-path {
+    @apply flex items-center flex-wrap;
+  }
+
+  /* Home Icon */
+  .breadcrumb-home {
+    @apply mx-2 text-xl text-gray-400
+    hover:text-black transition-all duration-200;
+  }
+
+  /* Breadcrumb Links */
+  .breadcrumb-link {
+    @apply mx-2 text-base text-gray-700
+    hover:text-black font-semibold
+    transition-all duration-200;
+  }
+
+  /* Right Action Section */
+  .breadcrumb-actions {
+    @apply flex items-center gap-3
+    w-full sm:w-auto
+    justify-center sm:justify-end;
+  }
+
+  /* Export Button */
+  .export-btn {
+    @apply flex items-center gap-2
+    bg-black text-white
+    px-4 py-2 rounded-sm
+    text-sm font-semibold
+    tracking-wide shadow-sm
+   
+    transition-all duration-200;
+  }
+
+  /* Export Dropdown */
+  .export-dropdown {
+    @apply absolute right-0 top-full mt-2
+    w-36 bg-white rounded-sm
+    shadow-xl border border-gray-200
+    overflow-hidden z-50;
+  }
+
+  /* Export Items */
+  .export-item {
+    @apply w-full flex items-center gap-3
+    px-1 py-2 text-sm text-gray-700
+    hover:bg-gray-100 hover:text-black
+    transition-all duration-200;
+  }
+
+  /* Add all Button */
+  .add-btn {
+    @apply bg-black
+    text-white px-5 py-2.5
+    rounded-sm text-sm
+    font-semibold shadow-md
+    transition-all duration-200;
+  }
+/* global search component  */
+
+  .search-input {
+    @apply 
+    w-full sm:w-64
+    border border-black
+    text-gray-700
+    placeholder-gray-400
+    px-3 py-2
+    rounded-sm
+    text-sm
+    outline-none
+    transition-all duration-200;
+  }
 
   /* All Input Fields */
   .filter-input {
