@@ -536,7 +536,7 @@ export default function AddCustomer() {
                 <button
                   type="button"
                   onClick={() => setActiveTab("contact")}
-                  className="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-lg transition-all shadow-sm cursor-pointer"
+                  className="common-btn px-6 py-2.5 text-sm rounded-lg shadow-sm cursor-pointer"
                 >
                   Next
                 </button>
@@ -625,7 +625,7 @@ export default function AddCustomer() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-lg transition-all shadow-sm cursor-pointer flex items-center gap-2"
+                  className="common-btn px-6 py-2.5 text-sm rounded-lg shadow-sm cursor-pointer"
                 >
                   <i className="bi bi-check2"></i> Save
                 </button>

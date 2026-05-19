@@ -1487,14 +1487,14 @@ export default function Page() {
               >
                 Cancel
               </button>
-              <button
-                onClick={handleDelete}
-                disabled={deleteLoading}
-                className="flex-1 py-3 rounded-xl text-white text-[15px] font-semibold hover:opacity-90 transition"
-                style={{ background: "#f07400" }}
-              >
-                {deleteLoading ? "Deleting..." : "Delete"}
-              </button>
+             <button
+  onClick={handleDelete}
+  disabled={deleteLoading}
+  className={`common-btn flex-1 py-3 rounded-xl text-[15px] font-semibold hover:opacity-90 transition
+  ${deleteLoading ? "opacity-70 cursor-not-allowed" : ""}`}
+>
+  {deleteLoading ? "Deleting..." : "Delete"}
+</button>
             </div>
           </div>
         </div>
@@ -1971,38 +1971,38 @@ export default function Page() {
               >
                 Cancel
               </button>
-              <button
-                onClick={handleUpdate}
-                disabled={updateLoading}
-                className={`px-6 py-2 rounded-sm text-sm font-semibold text-white transition-all shadow-md shadow-orange-200 flex items-center gap-2
-                ${updateLoading ? "bg-orange-400 cursor-not-allowed" : "bg-orange-500 hover:bg-orange-600"}`}
-              >
-                {updateLoading ? (
-                  <>
-                    <svg
-                      className="animate-spin h-4 w-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="white"
-                        strokeWidth="4"
-                        opacity="0.25"
-                      />
-                      <path
-                        fill="white"
-                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                      />
-                    </svg>
-                    Add Follow-Up
-                  </>
-                ) : (
-                  "Add Follow-Up"
-                )}
-              </button>
+             <button
+  onClick={handleUpdate}
+  disabled={updateLoading}
+  className={`common-btn text-sm font-semibold flex items-center gap-2 shadow-md transition-all
+  ${updateLoading ? "opacity-70 cursor-not-allowed" : ""}`}
+>
+  {updateLoading ? (
+    <>
+      <svg
+        className="animate-spin h-4 w-4"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="white"
+          strokeWidth="4"
+          opacity="0.25"
+        />
+        <path
+          fill="white"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+        />
+      </svg>
+      Add Follow-Up
+    </>
+  ) : (
+    "Add Follow-Up"
+  )}
+</button>
             </div>
           </div>
         </div>

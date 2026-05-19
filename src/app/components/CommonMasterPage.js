@@ -555,9 +555,9 @@ className="filter-apply-btn w-full"            >
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-24 flex items-center justify-center bg-orange-500 text-white px-4 py-1.5 rounded-sm
-    ${isSubmitting ? "opacity-70 cursor-not-allowed" : "hover:bg-orange-600"}
-  `}
+                    className={`common-btn w-24 flex items-center justify-center px-4 py-1.5 rounded-sm
+${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}
+`}
                   >
                     {isSubmitting ? (
                       <svg

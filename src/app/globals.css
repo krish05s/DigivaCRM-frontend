@@ -201,28 +201,33 @@ html, body {
   .filter-btn:hover {
     @apply bg-gray-900;
   }
+}
 
-   /* Date Box Style */
-   .filter-date-box {
-    @apply flex items-center
-    border border-black 
-    bg-white rounded-sm 
-    px-2 h-[36px]
-    text-sm text-gray-500
-    ;
+/* digiva crm global.css changes below */
+/* customer-->customer ( all button css) */
+
+@import "tailwindcss";
+
+/* =========================
+   GLOBAL BUTTON STYLING
+========================= */
+
+@layer components {
+
+  /* Common Button */
+  .common-btn {
+    @apply border border-black bg-black text-white
+    rounded-sm px-4 py-2 font-semibold transition-all;
   }
 
- /* Clear Button */
-  .filter-clear-btn {
-    @apply border border-gray-300 rounded-sm p-2
-    bg-gray-200 text-gray-700 text-sm font-semibold
-    hover:bg-gray-300 transition-all duration-200 h-[36px];
+  /* Hover Effect */
+  .common-btn:hover {
+    @apply bg-gray-900;
   }
 
-  /* Apply Button */
-  .filter-apply-btn {
-    @apply border border-orange-300 rounded-sm p-2
-    bg-orange-100 text-orange-700 text-sm font-semibold
-    hover:bg-orange-200 transition-all duration-200 h-[36px];
+  /* Focus Effect */
+  .common-btn:focus {
+    @apply outline-none ring-0 border-black;
   }
+
 }

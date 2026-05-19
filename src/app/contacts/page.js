@@ -699,7 +699,7 @@ className="add-btn "            >
                   </button>
                   <button
                     type="submit"
-                    className="bg-orange-500  hover:bg-orange-600 text-white px-4 py-1.5 rounded-sm"
+                    className="common-btn w-full sm:w-auto text-center text-sm"
                   >
                     Save
                   </button>
@@ -761,7 +761,7 @@ className="add-btn "            >
                 <button
                   type="button"
                   onClick={handleDeleteConfirm}
-                  className="flex-1 py-2.5  rounded-md bg-orange-500 text-white hover:bg-orange-600 transition-all text-sm font-medium"
+                  className="common-btn flex-1 px-4 py-2 text-sm font-semibold transition-colors hover:cursor-pointer"
                 >
                   Delete
                 </button>
