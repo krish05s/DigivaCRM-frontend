@@ -785,16 +785,14 @@ export default function Page() {
           onChange={(e) =>
             setFilters({ ...filters, task_name: e.target.value })
           }
-          className="p-2 w-full md:w-52 border border-orange-300 md:border text-gray-600 bg-white rounded-sm  transition-all outline-none text-sm"
-        />
+className="filter-input md:w-56 md:mx-2"        />
 
         {/* Status */}
         <select
           name="status"
           value={filters.status || ""}
           onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-          className="p-2 w-full md:w-52 border border-orange-300 md:border text-gray-400 bg-white rounded-sm  transition-all outline-none text-sm"
-        >
+className="filter-input md:w-56 md:mx-2"        >
           <option value="">Status</option>
 
           {status.map((item) => (
@@ -809,8 +807,7 @@ export default function Page() {
           name="priority"
           value={filters.priority || ""}
           onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-          className="p-2 w-full md:w-52 border border-orange-300 md:border text-gray-400 bg-white rounded-sm  transition-all outline-none text-sm"
-        >
+className="filter-input md:w-56 md:mx-2"        >
           <option value="">Priority</option>
           <option value="High">High</option>
           <option value="Medium">Medium</option>
@@ -822,8 +819,7 @@ export default function Page() {
           name="assignee"
           value={filters.assignee || "-"}
           onChange={(e) => setFilters({ ...filters, assignee: e.target.value })}
-          className="p-2 w-full md:w-52 border border-orange-300 md:border text-gray-400 bg-white rounded-sm  transition-all outline-none text-sm"
-        >
+className="filter-input md:w-56 md:mx-2"        >
           <option value="">Assignee</option>
 
           {asignee.map((item) => (
@@ -834,9 +830,8 @@ export default function Page() {
         </select>
 
         {/* Start Date Range */}
-        <div className="p-1 w-full md:w-54 border border-orange-300 md:border  text-gray-400 bg-white rounded-sm  transition-all outline-none">
-          <span className="text-[10px] text-gray-400 uppercase font-bold pt-1 mx-2">
-            Start Date
+     <div className="filter-date-box">
+  <span className="filter-date-label">Start Date
           </span>
           <input
             type="date"
@@ -844,13 +839,12 @@ export default function Page() {
             onChange={(e) =>
               setFilters({ ...filters, start_date: e.target.value })
             }
-            className="p-1 w-full md:w-32 outline-none text-sm"
+    className="filter-date-input"
           />
         </div>
         {/* Due Date Range */}
-        <div className="p-1 w-full md:w-54 border border-orange-300 md:border  text-gray-400 bg-white rounded-sm  transition-all outline-none">
-          <span className="text-[10px] text-gray-400 uppercase font-bold pt-1 mx-2">
-            Due Date
+  <div className="filter-date-box">
+  <span className="filter-date-label"> Due Date
           </span>
           <input
             type="date"
@@ -858,7 +852,7 @@ export default function Page() {
             onChange={(e) =>
               setFilters({ ...filters, end_date: e.target.value })
             }
-            className="p-1 w-full md:w-32 outline-none text-sm"
+    className="filter-date-input"
           />
         </div>
 
@@ -870,8 +864,7 @@ export default function Page() {
           onChange={(e) =>
             setFilters({ ...filters, created_by_name: e.target.value })
           }
-          className="p-2 w-full md:w-52 border border-orange-300 md:border text-gray-400 bg-white rounded-sm  transition-all outline-none text-sm"
-        >
+className="filter-input md:w-56 md:mx-2"        >
           <option value="">Select Created By</option>
 
           {users.map((item) => (
@@ -882,8 +875,9 @@ export default function Page() {
         </select>
 
         {/* created Date Range */}
-        <div className="p-1 w-full md:w-62 border border-orange-300 md:border  text-gray-400 bg-white rounded-sm  transition-all outline-none">
-          <span className="text-[10px] text-gray-400 uppercase font-bold pt-1 mx-2">
+<div className="filter-date-box">         
+   <span className="filter-date-label">
+
             Created Date
           </span>
           <input
@@ -892,7 +886,7 @@ export default function Page() {
             onChange={(e) =>
               setFilters({ ...filters, created_at: e.target.value })
             }
-            className="p-1 w-full md:w-32 outline-none text-sm"
+    className="filter-date-input"
           />
         </div>
 
@@ -912,14 +906,12 @@ export default function Page() {
               });
               setShowMobileFilters(false);
             }}
-            className="border border-gray-300 w-full md:w-auto cursor-pointer rounded-sm p-1.5 bg-gray-200 text-gray-700 hover:bg-gray-300 text-md text-center px-6"
-          >
+className="filter-clear-btn w-full md:w-auto"          >
             Clear
           </button>
           <button
             onClick={() => setShowMobileFilters(false)}
-            className="md:hidden border border-orange-300 w-full cursor-pointer rounded-sm p-1.5 bg-orange-100 text-orange-700 hover:bg-orange-200 text-md text-center px-6"
-          >
+className="filter-apply-btn w-full"          >
             Apply
           </button>
         </div>

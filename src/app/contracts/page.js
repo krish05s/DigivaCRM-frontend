@@ -393,10 +393,12 @@ export default function Page() {
                                 created_at: "",
                             });
                             setShowMobileFilters(false);
-                        }} className="border border-gray-300 w-full md:w-auto cursor-pointer rounded-md p-2 bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm text-center font-semibold">
+                        }} 
+                        className="filter-clear-btn w-full md:w-auto"
+                        >
                             Clear
                         </button>
-                        <button onClick={() => setShowMobileFilters(false)} className="md:hidden border border-orange-300 w-full cursor-pointer rounded-sm p-2 bg-orange-100 text-orange-700 hover:bg-orange-200 text-sm text-center font-semibold">
+                        <button onClick={() => setShowMobileFilters(false)} className="filter-apply-btn w-full">
                             Apply
                         </button>
                     </div>

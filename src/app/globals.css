@@ -86,7 +86,7 @@ html, body {
   /* All Input Fields */
   .filter-input {
    @apply border border-black bg-white rounded-sm px-3 py-2
-    text-sm outline-none w-full transition-all;
+    text-sm outline-none w-full transition-all h-[40px];
   }
 
   /* Focus Effect */
@@ -97,7 +97,7 @@ html, body {
   /* Select Box */
   .filter-select {
     @apply border border-black bg-white rounded-sm px-3 py-2 
-    text-sm text-black outline-none w-full transition-all;
+    text-sm text-black outline-none w-full transition-all h-[40px];
   }
 
   .filter-select:focus {
@@ -140,13 +140,13 @@ html, body {
   .filter-clear-btn {
     @apply border border-gray-300 rounded-sm p-2
     bg-gray-200 text-gray-700 text-sm font-semibold
-    hover:bg-gray-300 transition-all duration-200;
+    hover:bg-gray-300 transition-all duration-200 h-[40px];
   }
 
   /* Apply Button */
   .filter-apply-btn {
     @apply border border-orange-300 rounded-sm p-2
     bg-orange-100 text-orange-700 text-sm font-semibold
-    hover:bg-orange-200 transition-all duration-200;
+    hover:bg-orange-200 transition-all duration-200 h-[40px];
   }
 }
