@@ -214,14 +214,14 @@ export default function CustomerList() {
             value={filters.customer_name}
             onChange={handleChange}
             placeholder="Enter Name"
-            className="border bg-white border-orange-300 rounded-sm px-3 py-2 w-full md:w-56 md:mx-2 text-sm outline-none"
+            className="filter-input md:w-56 md:mx-2"
           />
 
           <input
             type="text"
             name="mobile"
             placeholder="Contact No."
-            className="border bg-white border-orange-300 rounded-sm px-3 py-2 w-full md:w-56 md:mx-2 text-sm outline-none"
+            className="filter-input md:w-56 md:mx-2"
             value={filters.mobile || ""}
             onChange={(e) => {
               const val = e.target.value;
@@ -239,14 +239,14 @@ export default function CustomerList() {
             value={filters.email}
             onChange={handleChange}
             placeholder="Enter Email"
-            className="border bg-white border-orange-300 rounded-sm px-3 py-2 w-full md:w-56 md:mx-2 text-sm outline-none"
+            className="filter-input md:w-56 md:mx-2"
           />
 
           <select
             name="industry"
             value={filters.industry}
             onChange={handleChange}
-            className="border bg-white border-orange-300 rounded-sm px-3 py-2 w-full md:w-56 md:mx-2 text-gray-500 text-sm outline-none"
+            className="filter-input md:w-56 md:mx-2"
           >
             <option value="">Industry</option>
             {industries.map((item) => (

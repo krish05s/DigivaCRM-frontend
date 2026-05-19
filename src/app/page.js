@@ -246,7 +246,7 @@ export default function Page() {
       <div className="absolute top-1/3 right-10 w-[300px] h-[300px] bg-gray-200 opacity-30 rounded-full blur-[120px]"></div>
       <div className="absolute bottom-20 left-1/4 w-[300px] h-[300px] bg-green-200 opacity-30 rounded-full blur-[120px]"></div>
       {/* ── NEW: Outer card wrapper — holds carousel + login side by side ─── */}
-      <div className="relative z-10 w-[100%] sm:w-full max-w-4xl flex flex-col md:flex-row overflow-hidden shadow-2xl rounded-xl   min-h-[500px] md:h-[520px]">
+      <div className="relative z-10 w-[100%] sm:w-full max-w-4xl flex flex-col md:flex-row overflow-hidden shadow-2xl rounded-xl border border-white/30 min-h-[500px] md:h-[520px]">
         {/* ── NEW: Left side — Image Carousel (hidden on mobile) ───────────── */}
         <div className="hidden md:block md:w-[60%] flex-shrink-0 h-full">
           <div className="relative w-full h-full">
@@ -289,7 +289,7 @@ export default function Page() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="p-3 border border-black rounded-sm focus:outline-none"
+                  className="p-3 border border-gray-300 rounded-sm"
                   required
                 />
 
@@ -300,7 +300,7 @@ export default function Page() {
                     placeholder="Password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="p-3 border border-black rounded-sm focus:outline-none w-full"
+                    className="p-3 border border-gray-300 rounded-sm w-full"
                   />
                   <span
                     onClick={() => setShowPassword(!showPassword)}
@@ -321,8 +321,8 @@ export default function Page() {
                   type="submit"
                   disabled={loading}
                   className={`p-3 rounded-sm text-white flex items-center justify-center gap-2 transition-all cursor-pointer duration-300 ${loading
-                      ? "bg-black cursor-not-allowed opacity-80"
-                      : "bg-black "
+                      ? "bg-orange-400 cursor-not-allowed opacity-80"
+                      : "bg-orange-500 hover:bg-orange-600"
                     }`}
                 >
                   {loading ? (
@@ -350,18 +350,18 @@ export default function Page() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="p-3 border  border-black rounded-sm focus:outline-none"
+                  className="p-3 border rounded-sm"
                   required
                 />
 
-                <button className="p-3 bg-black text-white rounded-sm">
+                <button className="p-3 bg-orange-500 text-white rounded-sm">
                   Send OTP
                 </button>
               </form>
 
               <button
                 onClick={() => setStep("login")}
-                className="mt-4 text-black hover:underline"
+                className="mt-4 text-gray-500 hover:underline"
               >
                 Back to Login
               </button>
@@ -386,7 +386,7 @@ export default function Page() {
                   className="p-3 border rounded-sm text-center text-lg tracking-widest"
                 />
 
-                <button className="p-3 bg-black text-white rounded-sm">
+                <button className="p-3 bg-orange-500 text-white rounded-sm">
                   Verify OTP
                 </button>
               </form>
@@ -397,7 +397,7 @@ export default function Page() {
                 ) : (
                   <button
                     onClick={handleForgotPassword}
-                    className="text-black hover:underline"
+                    className="text-orange-500 hover:underline"
                   >
                     Resend OTP
                   </button>
@@ -428,7 +428,7 @@ export default function Page() {
                   className="p-3 border rounded-sm"
                 />
 
-                <button className="p-3 bg-black text-white rounded-sm">
+                <button className="p-3 bg-orange-500 text-white rounded-sm">
                   Update Password
                 </button>
               </form>
