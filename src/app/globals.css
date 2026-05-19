@@ -85,7 +85,7 @@ html, body {
 
   /* All Input Fields */
   .filter-input {
-   @apply border border-black bg-white rounded-sm px-3 py-2
+   @apply border border-black bg-white rounded-sm px-3 py-2 
     text-sm outline-none w-[36px] transition-all h-[36px];
   }
 
@@ -97,11 +97,11 @@ html, body {
   /* Select Box */
   .filter-select {
     @apply border border-black bg-white rounded-sm px-3 py-2 w-[36px]
-    text-sm text-black outline-none w-full transition-all h-[36px];
+    text-sm text-gray-400 outline-none  transition-all h-[36px];
   }
 
   .filter-select:focus {
-    @apply border-black ring-0 outline-none;
+    @apply border-black text-gray-400 ring-0 outline-none;
   }
 
   /* Filter Button */

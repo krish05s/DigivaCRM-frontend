@@ -980,7 +980,7 @@ export default function ProformaPage() {
             name="assignee"
             value={filters.assignee}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2 text-gray-500"
           >
             <option value="">Assignee</option>
             {assigneeList.map((item) => (
@@ -993,7 +993,7 @@ export default function ProformaPage() {
             name="status"
             value={filters.status}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2 text-gray-500"
           >
             <option value="">Status</option>
             <option value="draft">Draft</option>

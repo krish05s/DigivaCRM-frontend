@@ -246,7 +246,7 @@ export default function CustomerList() {
             name="industry"
             value={filters.industry}
             onChange={handleChange}
-            className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2 text-gray-500"
           >
             <option value="">Industry</option>
             {industries.map((item) => (

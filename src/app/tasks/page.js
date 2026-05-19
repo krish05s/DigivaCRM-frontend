@@ -790,7 +790,7 @@ export default function Page() {
           name="status"
           value={filters.status || ""}
           onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-          className="filter-input md:w-56 md:mx-2"
+          className="filter-input md:w-56 md:mx-2 text-gray-500"
         >
           <option value="">Status</option>
 
@@ -806,7 +806,7 @@ export default function Page() {
           name="priority"
           value={filters.priority || ""}
           onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-          className="filter-input md:w-56 md:mx-2"
+          className="filter-input md:w-56 md:mx-2 text-gray-500"
         >
           <option value="">Priority</option>
           <option value="High">High</option>
@@ -819,7 +819,7 @@ export default function Page() {
           name="assignee"
           value={filters.assignee || "-"}
           onChange={(e) => setFilters({ ...filters, assignee: e.target.value })}
-          className="filter-input md:w-56 md:mx-2"
+          className="filter-input md:w-56 md:mx-2 text-gray-500"
         >
           <option value="">Assignee</option>
 
@@ -866,7 +866,7 @@ export default function Page() {
           onChange={(e) =>
             setFilters({ ...filters, created_by_name: e.target.value })
           }
-          className="filter-input md:w-56 md:mx-2"
+          className="filter-input md:w-56 md:mx-2 text-gray-500"
         >
           <option value="">Select Created By</option>
 

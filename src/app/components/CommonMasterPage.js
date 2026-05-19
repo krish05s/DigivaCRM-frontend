@@ -277,7 +277,7 @@ export default function CommonMasterPage({
           />
 
           <select
-            className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2 text-gray-500"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >

@@ -867,7 +867,7 @@ export default function QuotationPage() {
             name="assignee"
             value={filters.assignee}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2 text-gray-500"
           >
             <option value="">Assignee</option>
             {asignee.map((item) => (
@@ -880,7 +880,7 @@ export default function QuotationPage() {
             name="quotation_status"
             value={filters.quotation_status}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2 text-gray-500"
           >
             <option value="">Status</option>
             <option value="Won">Won</option>

@@ -911,7 +911,7 @@ export default function Page() {
             name="product_category"
             value={filters.product_category}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2 text-gray-500"
           >
             <option value="">Select Product Category</option>
             {category.map((item) => (
@@ -925,7 +925,7 @@ export default function Page() {
             name="source"
             value={filters.source}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2 text-gray-500"
           >
             <option value="">Select Source</option>
             {leadSource.map((item) => (
@@ -939,7 +939,7 @@ export default function Page() {
             name="assignee"
             value={filters.assignee}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2 text-gray-500 "
           >
             <option value="">Select Assignee</option>
             {assignee.map((item) => (
@@ -979,7 +979,7 @@ export default function Page() {
             name="status"
             value={filters.status}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2"
+            className="filter-input md:w-56 md:mx-2 text-gray-500"
           >
             <option value="">Pending</option>
             <option value="Won">Won</option>
