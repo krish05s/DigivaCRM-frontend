@@ -566,4 +566,322 @@ transition-all duration-300;  }
     @apply border border-black rounded-sm p-2
     bg-black text-white text-sm font-semibold transition-all duration-200 h-[36px];
   }
+
+
+/* --------------- */
+/* ----TABLE----- */
+/* -------------- */
+ 
+/* tabs */
+ /* Table Tabs Wrapper */
+  .table-tabs {
+    @apply flex items-center
+    gap-8
+    px-6 pt-4
+    border-b border-gray-100;
+  }
+
+  /* Common Tab Button */
+  .table-tab-btn {
+    @apply pb-3 px-2
+    text-sm font-medium
+    relative cursor-pointer
+    transition-all duration-200;
+  }
+
+  /* Active Pending Tab */
+  .table-tab-pending-active {
+    @apply text-blue-600;
+  }
+
+  /* Active Won Tab */
+  .table-tab-won-active {
+    @apply text-green-600;
+  }
+
+  /* Active Lost Tab */
+  .table-tab-lost-active {
+    @apply text-red-600;
+  }
+
+  /* Inactive Tab */
+  .table-tab-inactive {
+    @apply text-gray-400
+    hover:text-gray-600;
+  }
+
+  /* Count Badge */
+  .table-tab-badge {
+    @apply ml-2
+    text-xs
+    px-2 py-0.5
+    rounded-full
+    font-medium;
+  }
+
+  /* Pending Badge */
+  .table-tab-badge-pending {
+    @apply bg-blue-100 text-blue-600;
+  }
+
+  /* Won Badge */
+  .table-tab-badge-won {
+    @apply bg-green-100 text-green-600;
+  }
+
+  /* Lost Badge */
+  .table-tab-badge-lost {
+    @apply bg-red-100 text-red-600;
+  }
+
+  /* Active Bottom Line */
+  .table-tab-line {
+    @apply absolute bottom-0 left-0
+    w-full h-0.5;
+  }
+
+  /* Pending Line */
+  .table-tab-line-pending {
+    @apply bg-blue-600;
+  }
+
+  /* Won Line */
+  .table-tab-line-won {
+    @apply bg-green-600;
+  }
+
+  /* Lost Line */
+  .table-tab-line-lost {
+    @apply bg-red-600;
+  }
+  /* Table Main Wrapper */
+ .table-wrapper {
+  @apply bg-white rounded-sm
+  border border-gray-100
+  mx-4 py-1;
+}
+
+  /* Table Scroll Area */
+.table-scroll {
+  @apply overflow-x-auto
+  overflow-y-auto
+  max-h-[500px];
+}
+
+/* scrollbar */
+.table-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 transparent;
+}
+
+.table-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 10px;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+  /* Main Table */
+  .custom-table {
+  @apply w-full text-sm whitespace-nowrap;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+  /* Table Header Row */
+  .table-head-row {
+    @apply bg-gray-50
+    border-b border-gray-100;
+  }
+
+  /* Table Header */
+  .table-head {
+  @apply py-2 px-4
+  text-left text-[11px]
+  font-semibold
+  text-gray-500
+  uppercase tracking-wider
+  whitespace-nowrap;
+}
+
+  /* Table Body Row */
+.table-row {
+  @apply border-b border-gray-100
+  hover:bg-gray-50
+  transition-colors duration-150;
+}
+  /* Table Cell */
+  .table-cell {
+  @apply py-2 px-4 text-gray-600 align-middle text-sm;
+}
+
+  /* Table Bold Cell */
+  .table-cell-bold {
+    @apply py-2 px-3
+    font-medium text-gray-800 text-sm;
+  }
+
+  /* Customer Name */
+.table-customer {
+  @apply py-2 px-3
+  text-black
+  font-medium
+  text-sm;
+}
+
+  /* Assignee Wrapper */
+  .table-assignee {
+    @apply flex gap-1 items-center;
+  }
+
+  /* Assignee Badge */
+ .table-assignee-badge {
+  @apply w-10 h-10
+  bg-black text-white
+  rounded-full
+  font-semibold text-sm
+  flex justify-center items-center;
+}
+
+  /* Progress Wrapper */
+  .table-progress-wrapper {
+    @apply flex items-center gap-2;
+  }
+
+  /* Progress Background */
+  .table-progress-bg {
+    @apply w-16 bg-gray-200
+    rounded-full h-1.5;
+  }
+
+  /* Progress Text */
+  .table-progress-text {
+    @apply font-semibold
+    text-gray-800 text-xs;
+  }
+
+  /* Status Badge */
+ .table-status {
+  @apply border border-gray-200
+  rounded-sm
+  px-2 py-1
+  text-xs font-medium
+  bg-white
+  outline-none;
+}
+  /* custom-table */
+  .custom-table {
+  @apply w-full text-sm whitespace-nowrap;
+  min-width: 1400px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+  /* Action Button */
+  .table-action-btn {
+  @apply w-8 h-8 rounded-full
+  border border-gray-200
+  flex items-center justify-center
+  mx-auto
+  hover:bg-gray-100
+  cursor-pointer
+  transition-all duration-150;
+}
+  /* Download Button */
+  .table-download-btn {
+  @apply relative
+  w-9 h-9 rounded-full
+  border border-black
+  bg-black
+  flex items-center justify-center
+  mx-auto
+  transition-all duration-200
+  cursor-pointer;
+}
+
+  /* Download Icon */
+  .table-download-icon {
+    @apply text-white text-base;
+  }
+
+  /* Tooltip */
+  .table-tooltip {
+    @apply absolute -top-8 left-1/2
+    -translate-x-1/2
+    bg-gray-800 text-white
+    text-[10px]
+    px-2 py-0.5
+    rounded whitespace-nowrap
+    opacity-0
+    group-hover:opacity-100
+    transition-opacity
+    pointer-events-none;
+  }
+
+  /* Empty Text */
+  .table-empty {
+    @apply text-center py-10 text-gray-400;
+  }
+
+  /* Pagination Wrapper */
+  .pagination-wrapper {
+    @apply flex flex-col md:flex-row
+    items-center justify-between
+    gap-4 px-6 py-4
+    border-t border-gray-200
+    bg-white;
+  }
+
+  /* Pagination Left */
+  .pagination-left {
+    @apply flex items-center gap-3;
+  }
+
+  /* Pagination Label */
+  .pagination-label {
+    @apply text-sm text-gray-500 font-medium;
+  }
+
+  /* Pagination Select */
+  .pagination-select {
+    @apply border border-gray-200
+    rounded-lg px-3 py-1.5
+    text-sm text-gray-700
+    bg-white
+    outline-none
+    transition-all duration-200
+    cursor-pointer font-medium;
+  }
+
+  /* Pagination Right */
+  .pagination-right {
+    @apply flex items-center gap-2
+    overflow-x-auto pb-2 md:pb-0;
+  }
+
+  /* Pagination Button */
+  .pagination-btn {
+    @apply w-9 h-9
+    flex items-center justify-center
+    rounded-lg
+    border border-gray-200
+    text-gray-600
+    hover:bg-gray-100
+    transition-all duration-200;
+  }
+
+  /* Active Pagination */
+  .pagination-btn-active {
+    @apply w-9 h-9
+    flex items-center justify-center
+    rounded-lg
+    bg-black text-white
+    text-sm font-semibold;
+  }
 }

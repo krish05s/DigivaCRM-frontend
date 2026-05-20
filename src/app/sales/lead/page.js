@@ -1015,52 +1015,52 @@ export default function Page() {
 
         {/* tabs */}
 
-        <div className="bg-white rounded-sm border border-gray-100  py-2 mx-7">
-          <div className="flex items-center gap-8 px-6 pt-4 border-b border-gray-100">
+        <div className="table-wrapper">
+          <div className="table-tabs">
             <button
               onClick={() => setActiveTab("Pending")}
-              className={`pb-3 px-3 text-sm font-medium relative cursor-pointer transition-all ${
+              className={`table-tab-btn ${
                 activeTab === "Pending"
-                  ? "text-blue-600"
-                  : "text-gray-400 hover:text-gray-600"
+                  ? "table-tab-pending-active"
+                  : "table-tab-inactive"
               }`}
             >
               Pending
-              <span className="ml-2 bg-blue-100 text-blue-600 cursor-pointer text-xs px-2 py-0.5 rounded-full">
+              <span className=" table-tab-badge-pending cursor-pointer table-tab-badge">
                 {pendingCount}
               </span>
               {activeTab === "Pending" && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"></div>
+                <div className="table-tab-line table-tab-line-pending "></div>
               )}
             </button>
 
             <button
               onClick={() => setActiveTab("Won")}
               className={`pb-3 text-sm font-medium cursor-pointer relative ${
-                activeTab === "Won" ? "text-green-600" : "text-gray-500"
+                activeTab === "Won" ? "table-tab-won-active" : "table-tab-inactive"
               }`}
             >
               Won
-              <span className="ml-2 bg-green-100 text-green-600 text-xs px-2 py-0.5 rounded-full">
+              <span className=" table-tab-badge-won  cursor-pointer table-tab-badge">
                 {wonCount}
               </span>
               {activeTab === "Won" && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-green-600"></div>
+                <div className="table-tab-line table-tab-line-won "></div>
               )}
             </button>
 
             <button
               onClick={() => setActiveTab("Lost")}
               className={`pb-3 text-sm font-medium relative ${
-                activeTab === "Lost" ? "text-red-600" : "text-gray-500"
+                activeTab === "Lost" ? "table-tab-lost-active" : "table-tab-inactive"
               }`}
             >
               Lost
-              <span className="ml-2 bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full">
+              <span className=" table-tab-badge-lost  cursor-pointer table-tab-badge">
                 {lostCount}
               </span>
               {activeTab === "Lost" && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-red-600"></div>
+                <div className="table-tab-line table-tab-line-lost"></div>
               )}
             </button>
           </div>
@@ -1071,44 +1071,25 @@ export default function Page() {
             {loading ? (
               <div className="text-center py-10 text-gray-400">Loading...</div>
             ) : (
-              <div
-                className="overflow-x-auto overflow-y-scroll max-h-[600px] custom-scroll "
-                style={{ overflowX: "scroll" }}
-              >
-                <table className="w-full text-sm ">
+              <div className="table-scroll" style={{ overflowX: "scroll" }}>
+                <table className="custom-table">
                   <thead>
-                    <tr className="bg-gray-50 border-b border-gray-100">
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        #
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Company Name
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Customer Name
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider ">
-                        Lead Title
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Product Category
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Source
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Assignee
-                      </th>
-                      <th className="py-3 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Next Follow Up
-                      </th>
-                      <th className="py-3 px-3 text-left  text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    <tr className="table-head-row">
+                      <th className="table-head">#</th>
+                      <th className="table-head">Company Name</th>
+                      <th className="table-head">Customer Name</th>
+                      <th className="table-head">Lead Title</th>
+                      <th className="table-head">Product Category</th>
+                      <th className="table-head">Source</th>
+                      <th className="table-head">Assignee</th>
+                      <th className="table-head text-left">Next Follow Up</th>
+                      <th className="table-head text-left  text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Created
                       </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      <th className="table-head text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      <th className="table-head text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Action
                       </th>
                     </tr>
@@ -1117,31 +1098,30 @@ export default function Page() {
                   <tbody>
                     {filteredLeads.length > 0 ? (
                       paginatedLeads.map((lead, index) => (
-                        <tr
-                          key={lead.lead_id}
-                          className="border-b border-gray-50 hover:bg-indigo-50/30 transition-colors"
-                        >
-                          <td className="py-3 px-2">
+                        <tr key={lead.lead_id} className="table-row">
+                          <td className="table-cell">
                             {(currentPage - 1) * itemsPerPage + index + 1}
                           </td>
 
-                          <td className="font-medium px-2">
+                          <td className="table-cell-bold">
                             {lead.company_name}
                           </td>
 
-                          <td className="text-orange-500 cursor-pointer px-3">
+                          <td className="table-customer cursor-pointer">
                             {lead.customer_name}
                           </td>
 
-                          <td className="py-3 px-2 w-46 max-w-46 truncate">
+                          <td className="table-cell w-46 max-w-46 truncate">
                             {lead.lead_title}
                           </td>
 
-                          <td className="text-gray-500 px-3">
+                          <td className="table-cell">
                             {lead.product_category || "-"}
                           </td>
 
-                          <td className="px-3">{lead.source}</td>
+                          <td className="table-cell  w-46 max-w-46 truncate">
+                            {lead.source}
+                          </td>
 
                           <td
                             style={{
@@ -1149,7 +1129,7 @@ export default function Page() {
                               gap: "1px",
                               alignItems: "center",
                             }}
-                            className="py-2 px-4"
+                            className="table-cell"
                           >
                             {lead.assignee
                               ? String(lead.assignee)
@@ -1164,7 +1144,7 @@ export default function Page() {
                                       <div
                                         key={index}
                                         title={name.trim()}
-                                        className="px-3 py-1.5 bg-blue-800 text-white rounded-full font-semibold text-sm flex justify-center items-center min-w-[28px] text-center select-none"
+                                        className="table-assignee-badge"
                                       >
                                         {letter}
                                       </div>
@@ -1209,19 +1189,18 @@ export default function Page() {
                                   });
                                   setShowModal(true);
                                 }}
-                                className={`w-9 h-9 rounded-full border flex items-center justify-center mx-auto
-                                  ${
-                                    lead.status === "Pending"
-                                      ? "hover:bg-gray-100 cursor-pointer"
-                                      : "bg-gray-100 cursor-not-allowed opacity-60"
-                                  }`}
+                                className={`table-action-btn                                  ${
+                                  lead.status === "Pending"
+                                    ? "hover:bg-gray-100 cursor-pointer"
+                                    : "bg-gray-100 cursor-not-allowed opacity-60"
+                                }`}
                               >
                                 <i className="bi bi-plus text-lg"></i>
                               </button>
                             )}
                           </td>
 
-                          <td className="text-gray-500 px-2">
+                          <td className="table-cell">
                             {new Date(lead.created_at).toLocaleDateString()}
                           </td>
 
@@ -1244,8 +1223,8 @@ export default function Page() {
                                   e.target.value,
                                 );
                               }}
-                              className={`border rounded-sm px-3 py-1 text-xs font-semibold outline-none cursor-pointer
-                                ${lead.status === "Pending" ? "border-gray-200 bg-gray-50 text-gray-700 cursor-pointer" : ""}
+                              className={`table-status
+                                  ${lead.status === "Pending" ? "border-gray-200 bg-gray-50 text-gray-700 cursor-pointer" : ""}
                                 ${lead.status === "Won" ? "border-green-200 bg-green-50 text-green-700 cursor-pointer" : ""}
                                 ${lead.status === "Lost" ? "border-red-200 bg-red-50 text-red-700 cursor-pointer" : ""}
                               `}
@@ -1256,7 +1235,7 @@ export default function Page() {
                             </select>
                           </td>
 
-                          <td className="px-3 py-3">
+                          <td className="table-cell">
                             <div className="flex items-center gap-4">
                               {lead.status === "Pending" ? (
                                 <>
@@ -1300,10 +1279,7 @@ export default function Page() {
                       ))
                     ) : (
                       <tr>
-                        <td
-                          colSpan="11"
-                          className="text-center py-10 text-gray-400"
-                        >
+                        <td colSpan="11" className="table-empty">
                           No Data Found
                         </td>
                       </tr>
@@ -1312,19 +1288,17 @@ export default function Page() {
                 </table>
 
                 {/* ✅ STANDARDIZED MICARA IMS PAGINATION */}
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-200 bg-white">
+                <div className="pagination-wrapper">
                   {/* Left side: Rows per page selector */}
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm text-slate-500 font-medium">
-                      Rows per page:
-                    </span>
+                  <div className="pagination-left">
+                    <span className="pagination-label">Rows per page:</span>
                     <select
                       value={itemsPerPage}
                       onChange={(e) => {
                         setItemsPerPage(Number(e.target.value));
                         setCurrentPage(1);
                       }}
-                      className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-slate-100 transition-all cursor-pointer font-medium"
+                      className="pagination-select"
                     >
                       {[10, 20, 100, 200].map((size) => (
                         <option key={size} value={size}>
@@ -1336,14 +1310,14 @@ export default function Page() {
 
                   {/* Right side: Navigation buttons (only if totalPages > 1) */}
                   {totalPages > 1 && (
-                    <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
+                    <div className="pagination-right">
                       {/* Previous Button */}
                       <button
                         onClick={() =>
                           setCurrentPage((prev) => Math.max(prev - 1, 1))
                         }
                         disabled={currentPage === 1}
-                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="pagination-btn disabled:opacity-30 disabled:cursor-not-allowed"
                       >
                         <i className="bi bi-chevron-left text-sm"></i>
                       </button>
@@ -1354,10 +1328,10 @@ export default function Page() {
                           <button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
+                            className={`pagination-btn ${
                               currentPage === page
-                                ? "bg-[#212121] text-white shadow-md shadow-black/10"
-                                : "border border-slate-200 text-slate-600 hover:bg-slate-50"
+                                ? "pagination-btn-active"
+                                : "pagination-btn"
                             }`}
                           >
                             {page}
@@ -1487,14 +1461,14 @@ export default function Page() {
               >
                 Cancel
               </button>
-             <button
-  onClick={handleDelete}
-  disabled={deleteLoading}
-  className={`common-btn flex-1 py-3 rounded-xl text-[15px] font-semibold hover:opacity-90 transition
+              <button
+                onClick={handleDelete}
+                disabled={deleteLoading}
+                className={`common-btn flex-1 py-3 rounded-xl text-[15px] font-semibold hover:opacity-90 transition
   ${deleteLoading ? "opacity-70 cursor-not-allowed" : ""}`}
->
-  {deleteLoading ? "Deleting..." : "Delete"}
-</button>
+              >
+                {deleteLoading ? "Deleting..." : "Delete"}
+              </button>
             </div>
           </div>
         </div>
@@ -1971,38 +1945,38 @@ export default function Page() {
               >
                 Cancel
               </button>
-             <button
-  onClick={handleUpdate}
-  disabled={updateLoading}
-  className={`common-btn text-sm font-semibold flex items-center gap-2 shadow-md transition-all
+              <button
+                onClick={handleUpdate}
+                disabled={updateLoading}
+                className={`common-btn text-sm font-semibold flex items-center gap-2 shadow-md transition-all
   ${updateLoading ? "opacity-70 cursor-not-allowed" : ""}`}
->
-  {updateLoading ? (
-    <>
-      <svg
-        className="animate-spin h-4 w-4"
-        viewBox="0 0 24 24"
-        fill="none"
-      >
-        <circle
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="white"
-          strokeWidth="4"
-          opacity="0.25"
-        />
-        <path
-          fill="white"
-          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-        />
-      </svg>
-      Add Follow-Up
-    </>
-  ) : (
-    "Add Follow-Up"
-  )}
-</button>
+              >
+                {updateLoading ? (
+                  <>
+                    <svg
+                      className="animate-spin h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="white"
+                        strokeWidth="4"
+                        opacity="0.25"
+                      />
+                      <path
+                        fill="white"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      />
+                    </svg>
+                    Add Follow-Up
+                  </>
+                ) : (
+                  "Add Follow-Up"
+                )}
+              </button>
             </div>
           </div>
         </div>

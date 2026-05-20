@@ -1076,52 +1076,52 @@ className="export-item"                  >
         </div>
 
         {/* ── TABLE ────────────────────────────────────────── */}
-        <div className="bg-white rounded-sm border border-gray-100 mx-7 py-2">
+        <div className="table-wrapper">
           <div className="py-1">
             {loading ? (
               <div className="text-center py-10 text-gray-400">Loading...</div>
             ) : (
               <div
-                className="overflow-x-auto overflow-y-scroll max-h-[500px] custom-scroll"
+                className="table-scroll"
                 style={{ overflowX: "scroll" }}
               >
-                <table className="w-full text-sm whitespace-nowrap">
+                <table className="custom-table min-w-[1400px]">
                   <thead>
-                    <tr className="bg-gray-50 border-b border-gray-100">
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    <tr className="table-head-row">
+                      <th className="table-head">
                         #
                       </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        PI No
+                        <th className="table-head">
+                          PI No
                       </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      <th className="table-head">
                         PI Date
                       </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      <th className="table-head">
                         Customer Name
                       </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      <th className="table-head">
                         Quotation No
                       </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      <th className="table-head">
                         Assignee
                       </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      <th className="table-head">
                         Total
                       </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      <th className="table-head">
                         PI %
                       </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      <th className="table-head">
                         Status
                       </th>
-                      <th className="py-3 px-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      <th className="table-head">
                         Follow-Up
                       </th>
-                      <th className="py-3 px-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      <th className="table-head">
                         Download
                       </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      <th className="table-head">
                         Created
                       </th>
                     </tr>
@@ -1134,35 +1134,35 @@ className="export-item"                  >
                         return (
                           <tr
                             key={item.pi_id}
-                            className="border-b border-gray-50 hover:bg-indigo-50/30 transition-colors"
+                            className="table-row"
                           >
-                            <td className="py-3 px-3">{globalIndex + 1}</td>
-                            <td className="py-3 px-3 font-medium text-gray-800">
+                            <td className="table-cell">{globalIndex + 1}</td>
+                            <td className="table-cell-bold ">
                               {formatPINumber(globalIndex)}
                             </td>
-                            <td className="py-3 px-3 text-gray-500">
+                            <td className="table-cell">
                               {item.pi_date
                                 ? new Date(item.pi_date).toLocaleDateString(
                                     "en-IN",
                                   )
                                 : "-"}
                             </td>
-                            <td className="py-3 px-3 text-orange-500">
+                            <td className="table-customer ">
                               {item.customer_name || "-"}
                             </td>
-                            <td className="py-3 px-3 text-gray-600">
+                            <td className="table-cell">
                               {item.quotation_no || "-"}
                             </td>
                             <td className="py-3 px-3">
                               {item.assignee ? (
-                                <div className="flex gap-1 items-center">
+                                <div className="table-assignee ">
                                   {String(item.assignee)
                                     .split(",")
                                     .map((name, i) => (
                                       <div
                                         key={i}
                                         title={name.trim()}
-                                        className="px-3 py-1.5 bg-blue-800 text-white rounded-full font-semibold text-sm flex justify-center items-center min-w-[28px] text-center select-none"
+                                        className="table-assignee-badge"
                                       >
                                         {name.trim().charAt(0).toUpperCase()}
                                       </div>
@@ -1172,12 +1172,12 @@ className="export-item"                  >
                                 "-"
                               )}
                             </td>
-                            <td className="py-3 px-3 font-medium text-gray-800">
+                            <td className="table-cell-bold ">
                               Rs.{Number(item.total).toLocaleString()}
                             </td>
                             <td className="py-3 px-3">
-                              <div className="flex items-center gap-2">
-                                <div className="w-16 bg-gray-100 rounded-full h-1.5">
+                              <div className="table-progress-wrapper">
+                                <div className="table-progress-bg">
                                   <div
                                     className={`h-1.5 rounded-full transition-all ${Number(item.proforma_percentage) >= 100 ? "bg-green-500" : Number(item.proforma_percentage) >= 50 ? "bg-orange-400" : "bg-blue-400"}`}
                                     style={{
@@ -1185,14 +1185,14 @@ className="export-item"                  >
                                     }}
                                   ></div>
                                 </div>
-                                <span className="font-semibold text-gray-800 text-xs">
+                                <span className="table-progress-text">
                                   {item.proforma_percentage}%
                                 </span>
                               </div>
                             </td>
                             <td className="py-3 px-3">
                               <span
-                                className={`border rounded-sm px-3 py-1 text-xs font-semibold
+                                className={`table-status
                                   ${item.status === "paid" ? "border-green-200 bg-green-50 text-green-700" : ""}
                                   ${item.status === "partial" ? "border-orange-200 bg-orange-50 text-orange-700" : ""}
                                   ${item.status === "draft" ? "border-gray-200 bg-gray-50 text-gray-700" : ""}
@@ -1221,7 +1221,7 @@ className="export-item"                  >
                                   setActiveIndex(null);
                                   setShowModal(true);
                                 }}
-                                className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center mx-auto hover:bg-gray-100 cursor-pointer"
+                                className="table-action-btn "
                               >
                                 <i className="bi bi-plus text-lg"></i>
                               </button>
@@ -1235,10 +1235,10 @@ className="export-item"                  >
                                     downloadPIPdf(item, globalIndex)
                                   }
                                   title="Download PI PDF"
-                                  className="group relative w-9 h-9 rounded-full border border-green-200 bg-green-50 flex items-center justify-center mx-auto hover:bg-green-500 hover:border-green-500 transition-all cursor-pointer"
+                                  className="table-download-btn "
                                 >
-                                  <i className="bi bi-file-earmark-pdf text-green-600 group-hover:text-white text-base transition-all"></i>
-                                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-2 py-0.5 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                  <i className="bi bi-file-earmark-pdf text-green-600 group-hover:table-download-icon transition-all"></i>
+                                  <span className="table-tooltip">
                                     Download PDF
                                   </span>
                                 </button>
@@ -1247,7 +1247,7 @@ className="export-item"                  >
                               )}
                             </td>
 
-                            <td className="py-3 px-3 text-gray-500">
+                            <td className="table-cell">
                               {item.created_at
                                 ? new Date(item.created_at).toLocaleDateString(
                                     "en-IN",
@@ -1261,7 +1261,7 @@ className="export-item"                  >
                       <tr>
                         <td
                           colSpan="12"
-                          className="text-center py-10 text-gray-400"
+                          className="table-empty"
                         >
                           No Data Found
                         </td>
@@ -1272,10 +1272,10 @@ className="export-item"                  >
 
                 {/* ── PAGINATION BAR ────────────────────────── */}
                 {/* ✅ STANDARDIZED MICARA IMS PAGINATION */}
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-200 bg-white">
+                <div className="pagination-wrapper">
                   {/* Left side: Rows per page selector */}
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm text-slate-500 font-medium">
+                  <div className="pagination-left ">
+                    <span className="pagination-label ">
                       Rows per page:
                     </span>
                     <select
@@ -1284,7 +1284,7 @@ className="export-item"                  >
                         setItemsPerPage(Number(e.target.value));
                         setCurrentPage(1);
                       }}
-                      className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-slate-100 transition-all cursor-pointer font-medium"
+                      className="pagination-select"
                     >
                       {[10, 20, 100, 200].map((size) => (
                         <option key={size} value={size}>
@@ -1296,14 +1296,14 @@ className="export-item"                  >
 
                   {/* Right side: Navigation buttons (only if totalPages > 1) */}
                   {totalPages > 1 && (
-                    <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
+                    <div className="pagination-right ">
                       {/* Previous Button */}
                       <button
                         onClick={() =>
                           setCurrentPage((prev) => Math.max(prev - 1, 1))
                         }
                         disabled={currentPage === 1}
-                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="pagination-btn "
                       >
                         <i className="bi bi-chevron-left text-sm"></i>
                       </button>
@@ -1314,7 +1314,7 @@ className="export-item"                  >
                           <button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
+                            className={`pagination-btn-active ${
                               currentPage === page
                                 ? "bg-[#212121] text-white shadow-md shadow-black/10"
                                 : "border border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -1333,7 +1333,7 @@ className="export-item"                  >
                           )
                         }
                         disabled={currentPage === totalPages}
-                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="pagination-btn "
                       >
                         <i className="bi bi-chevron-right text-sm"></i>
                       </button>
