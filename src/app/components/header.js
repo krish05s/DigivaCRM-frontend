@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -9,10 +8,8 @@ import axios from "redaxios";
 import { Bell, Activity, Clock } from "lucide-react";
 
 export default function Header() {
-
   const [activities, setActivities] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
-
 
   const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -37,7 +34,6 @@ export default function Header() {
   const salesRef = useRef(null);
   const customerRef = useRef(null);
   const notificationRef = useRef(null);
-
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -70,8 +66,7 @@ export default function Header() {
     router.push("/");
   };
 
-
-  // Lead Notification 
+  // Lead Notification
 
   const handleMarkAsRead = async (id) => {
     try {
@@ -105,7 +100,6 @@ export default function Header() {
   //   fetchData();
   // }, [fetchData]);
 
-
   useEffect(() => {
     const fetchActivities = async () => {
       try {
@@ -119,10 +113,7 @@ export default function Header() {
           },
         };
 
-        const res = await axios.get(
-          `${API_BASE}/api/activities/read`,
-          config
-        );
+        const res = await axios.get(`${API_BASE}/api/activities/read`, config);
 
         setActivities(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
@@ -132,7 +123,6 @@ export default function Header() {
 
     fetchActivities();
   }, []);
-
 
   return (
     <header className="sticky top-0 z-50 flex flex-col md:flex-row items-center justify-between px-4 sm:px-8 py-4 shadow-sm bg-white">
@@ -150,49 +140,48 @@ export default function Header() {
 
         {/* Hamburger Icon (Mobile) */}
         <div className="md:hidden flex items-center gap-2">
-
           {/* Mobile Notification */}
-          <div className="relative" ref={notificationRef}>
+          <div className="mobile-notification-wrapper" ref={notificationRef}>
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="relative p-2 text-gray-700"
+              className="mobile-notification-btn"
             >
-              <Bell className="w-6 h-6" />
+              <Bell className="mobile-notification-icon" />
 
               {activities.some((a) => !a.is_read) && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                <span className="mobile-notification-badge">
                   {activities.filter((a) => !a.is_read).length}
                 </span>
               )}
             </button>
 
             {showNotifications && (
-              <div className="fixed top-20 left-1/2 -translate-x-1/2 w-[95%] max-w-sm bg-white rounded-2xl shadow-2xl border border-gray-100 z-[9999] overflow-hidden">
-
-                <div className="p-4 bg-orange-500 flex justify-between items-center">
-                  <h3 className="font-bold text-white flex items-center gap-2">
+              <div className="mobile-notification-popup">
+                <div className="mobile-notification-header">
+                  <h3 className="mobile-notification-title">
                     <Bell size={18} />
                     Notifications
                   </h3>
 
                   <button
                     onClick={handleMarkAllRead}
-                    className="text-xs text-white font-semibold"
+                    className="mobile-notification-markall"
                   >
                     Mark all
                   </button>
                 </div>
 
-                <div className="max-h-[400px] overflow-y-auto p-2 bg-gray-50">
+                <div className="mobile-notification-body">
                   {activities.map((activity) => (
                     <div
                       key={activity.id}
-                      className={`p-3 rounded-xl mb-2 ${activity.is_read
-                        ? "bg-white opacity-70"
-                        : "bg-orange-50 border border-orange-100"
-                        }`}
+                      className={`p-3 rounded-xl mb-2 ${
+                        activity.is_read
+                          ? "mobile-notification-item-read"
+                          : "mobile-notification-item-unread"
+                      }`}
                     >
-                      <p className="text-sm font-medium text-gray-700">
+                      <p className="mobile-notification-text">
                         {activity.message}
                       </p>
                     </div>
@@ -234,28 +223,28 @@ export default function Header() {
       </div>
 
       {/* Navigation Links (Desktop) */}
-      <nav className="hidden md:flex space-x-10 text-gray-800 font-medium">
-        <Link href="/dashboard" className="hover:text-orange-500 transition-colors">
+      <nav className="navbar-menu">
+        <Link href="/dashboard" className="navbar-link">
           Dashboard
         </Link>
 
         <div className="relative" ref={customerRef}>
           <button
             onClick={() => setCustomerOpen(!customerOpen)}
-            className="hover:text-orange-500 transition-colors cursor-pointer"
+            className="navbar-dropdown-btn"
           >
             Customer ▾
           </button>
 
           {customerOpen && (
-            <div className="absolute left-0 mt-2 w-52 bg-white rounded-md shadow-lg py-2 z-50 border border-gray-100">
-              <Link href="/customer-list" className="hover:text-orange-500 block px-4 py-2 hover:bg-gray-50 transition-colors">
+            <div className="navbar-dropdown-menu">
+              <Link href="/customer-list" className="navbar-dropdown-item">
                 Customers
               </Link>
-              <Link href="/contacts" className="hover:text-orange-500 block px-4 py-2 hover:bg-gray-50 transition-colors">
+              <Link href="/contacts" className="navbar-dropdown-item">
                 Contact Details
               </Link>
-              <Link href="/contactDesignation" className="hover:text-orange-500 block px-4 py-2 hover:bg-gray-50 transition-colors">
+              <Link href="/contactDesignation" className="navbar-dropdown-item">
                 Contact Designation
               </Link>
             </div>
@@ -265,115 +254,113 @@ export default function Header() {
         <div className="relative" ref={salesRef}>
           <button
             onClick={() => setSalesOpen(!salesOpen)}
-            className="hover:text-orange-500 transition-colors cursor-pointer"
+            className="navbar-dropdown-btn"
           >
             Sales ▾
           </button>
 
           {salesOpen && (
-            <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-50 border border-gray-100">
-              <Link href="/sales/lead" className="hover:text-orange-500 block px-4 py-2 hover:bg-gray-50 transition-colors">
+            <div className="navbar-dropdown-menu">
+              <Link href="/sales/lead" className="navbar-dropdown-item">
                 Lead
               </Link>
-              <Link href="/sales/quotation" className="hover:text-orange-500 block px-4 py-2 hover:bg-gray-50 transition-colors">
+              <Link href="/sales/quotation" className="navbar-dropdown-item">
                 Quotation
               </Link>
-              <Link href="/sales/proforma" className="hover:text-orange-500 block px-4 py-2 hover:bg-gray-50 transition-colors">
+              <Link href="/sales/proforma" className="navbar-dropdown-item">
                 Proforma Invoice
               </Link>
             </div>
           )}
         </div>
-        <Link href="/contracts" className="hover:text-orange-500 transition-colors">
+        <Link href="/contracts" className="navbar-link">
           Contracts
         </Link>
-        <Link href="/tasks" className="hover:text-orange-500 transition-colors">
+        <Link href="/tasks" className="navbar-link">
           Task List
         </Link>
-        <Link href="/setup" className="hover:text-orange-500 transition-colors">
+        <Link href="/setup" className="navbar-link">
           Settings
         </Link>
       </nav>
 
-
-
-
       {/* Logout Button (Desktop) */}
       <div className="hidden md:flex items-center gap-6">
-
         {/* Notification Bell */}
-        <div className="relative" ref={notificationRef}>
+        <div className="notification-wrapper " ref={notificationRef}>
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className="relative p-2.5 bg-white rounded-xl border cursor-pointer border-gray-200 hover:shadow-md transition-all"
+            className="notification-btn "
           >
             <Bell
-              className={`w-5 h-5 ${activities.some((a) => !a.is_read)
-                ? "text-orange-500"
-                : "text-gray-500"
-                }`}
+              className={`w-5 h-5 ${
+                activities.some((a) => !a.is_read)
+                  ? "notification-icon-active"
+                  : "notification-icon"
+              }`}
             />
 
             {activities.some((a) => !a.is_read) && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+              <span className="notification-badge">
                 {activities.filter((a) => !a.is_read).length}
               </span>
             )}
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 top-[135%] w-[360px] bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] border border-gray-100 z-[999] overflow-visible animate-in fade-in zoom-in-95 duration-200">
-
+            <div className="notification-dropdown">
               {/* Arrow */}
-              <div className="absolute top-2 right-5 w-4 h-4 bg-white border-l border-t border-gray-100 rotate-45"></div>
+              <div className="notification-arrow"></div>
 
               {/* Header */}
-              <div className="p-4 bg-orange-500 rounded-t-2xl flex justify-between items-center relative z-10">
-                <h3 className="font-bold text-white flex items-center gap-2">
+              <div className="notification-header">
+                <h3 className="notification-title">
                   <Bell size={18} />
                   Notifications
                 </h3>
 
                 <button
                   onClick={handleMarkAllRead}
-                  className="text-xs text-white font-semibold cursor-pointer"
+                  className="notification-readall"
                 >
                   Mark all read
                 </button>
               </div>
 
               {/* Notifications */}
-              <div className="max-h-[400px] overflow-y-auto p-2 bg-gray-50">
+              <div className="notification-body">
                 {activities.length === 0 ? (
-                  <div className="p-6 text-center text-gray-400">
+                  <div className="notification-empty">
                     No notifications found
                   </div>
                 ) : (
                   activities.map((activity) => (
                     <div
                       key={activity.id}
-                      className={`p-3 rounded-xl mb-2 ${activity.is_read
-                        ? "bg-white opacity-70"
-                        : "bg-orange-50 border border-orange-100"
-                        }`}
+                      className={`p-3 rounded-xl mb-2 ${
+                        activity.is_read
+                          ? "notification-item-read"
+                          : "notification-item-unread"
+                      }`}
                     >
                       <div className="flex gap-3">
                         <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center ${activity.is_read
-                            ? "bg-gray-100 text-gray-400"
-                            : "bg-orange-100 text-orange-600"
-                            }`}
+                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                            activity.is_read
+                              ? "notification-activity-active"
+                              : "notification-activity"
+                          }`}
                         >
                           <Activity size={14} />
                         </div>
 
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-700">
+                          <p className="notification-message">
                             {activity.message}
                           </p>
 
                           <div className="flex justify-between items-center mt-2">
-                            <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                            <span className="notification-time ">
                               <Clock size={10} />
                               {new Date(activity.created_at).toLocaleString()}
                             </span>
@@ -381,7 +368,7 @@ export default function Header() {
                             {!activity.is_read && (
                               <button
                                 onClick={() => handleMarkAsRead(activity.id)}
-                                className="text-xs text-orange-600 font-semibold cursor-pointer"
+                                className="notification-read-btn "
                               >
                                 Mark Read
                               </button>
@@ -398,64 +385,124 @@ export default function Header() {
         </div>
 
         {/* Logout Button */}
-        <button
-          onClick={handlelogout}
-          className="flex items-center text-3xl text-gray-600 font-semibold hover:text-orange-500 transition-colors cursor-pointer"
-        >
+        <button onClick={handlelogout} className="logout-btn">
           <i className="bi bi-box-arrow-right"></i>
         </button>
       </div>
 
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
-        <nav className="md:hidden absolute top-full left-0 w-full bg-white shadow-xl flex flex-col items-start px-6 space-y-4 text-gray-800 font-medium pb-8 pt-4 border-t border-gray-100 z-[100] animate-in slide-in-from-top duration-300">
-          <Link onClick={() => setMobileMenuOpen(false)} href="/dashboard" className="hover:text-orange-500 w-full py-1">
+        <nav className="mobile-menu ">
+          <Link
+            onClick={() => setMobileMenuOpen(false)}
+            href="/dashboard"
+            className="mobile-menu-link"
+          >
             Dashboard
           </Link>
 
-          <div className="w-full">
-            <button onClick={() => setMobileCustomerOpen(!mobileCustomerOpen)} className="flex justify-between w-full hover:text-orange-500 py-1">
-              Customer <span className="ml-1 text-gray-400">{mobileCustomerOpen ? '▴' : '▾'}</span>
+          <div className="mobile-dropdown">
+            <button
+              onClick={() => setMobileCustomerOpen(!mobileCustomerOpen)}
+              className="mobile-dropdown-btn"
+            >
+              Customer{" "}
+              <span className="mobile-dropdown-icon">
+                {mobileCustomerOpen ? "▴" : "▾"}
+              </span>
             </button>
             {mobileCustomerOpen && (
-              <div className="flex flex-col pl-4 mt-2 space-y-3 border-l-2 border-orange-100">
-                <Link href="/customer-list" onClick={() => setMobileMenuOpen(false)} className="hover:text-orange-500 text-sm">Customers</Link>
-                <Link href="/contacts" onClick={() => setMobileMenuOpen(false)} className="hover:text-orange-500 text-sm">Contact Details</Link>
-                <Link href="/contactDesignation" onClick={() => setMobileMenuOpen(false)} className="hover:text-orange-500 text-sm">Contact Designation</Link>
+              <div className="mobile-submenu">
+                <Link
+                  href="/customer-list"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="mobile-submenu-link"
+                >
+                  Customers
+                </Link>
+                <Link
+                  href="/contacts"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="mobile-submenu-link"
+                >
+                  Contact Details
+                </Link>
+                <Link
+                  href="/contactDesignation"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="mobile-submenu-link"
+                >
+                  Contact Designation
+                </Link>
               </div>
             )}
           </div>
 
           <div className="w-full">
-            <button onClick={() => setMobileSalesOpen(!mobileSalesOpen)} className="flex justify-between w-full hover:text-orange-500 py-1">
-              Sales <span className="ml-1 text-gray-400">{mobileSalesOpen ? '▴' : '▾'}</span>
+            <button
+              onClick={() => setMobileSalesOpen(!mobileSalesOpen)}
+              className="mobile-dropdown-btn "
+            >
+              Sales{" "}
+              <span className="ml-1 text-gray-400">
+                {mobileSalesOpen ? "▴" : "▾"}
+              </span>
             </button>
             {mobileSalesOpen && (
-              <div className="flex flex-col pl-4 mt-2 space-y-3 border-l-2 border-orange-100">
-                <Link href="/sales/lead" onClick={() => setMobileMenuOpen(false)} className="hover:text-orange-500 text-sm">Lead</Link>
-                <Link href="/sales/quotation" onClick={() => setMobileMenuOpen(false)} className="hover:text-orange-500 text-sm">Quotation</Link>
-                <Link href="/sales/proforma" onClick={() => setMobileMenuOpen(false)} className="hover:text-orange-500 text-sm">Proforma Invoice</Link>
+              <div className="mobile-submenu">
+                <Link
+                  href="/sales/lead"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="mobile-submenu-link"
+                >
+                  Lead
+                </Link>
+                <Link
+                  href="/sales/quotation"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="mobile-submenu-link"
+                >
+                  Quotation
+                </Link>
+                <Link
+                  href="/sales/proforma"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="mobile-submenu-link"
+                >
+                  Proforma Invoice
+                </Link>
               </div>
             )}
           </div>
-          <Link onClick={() => setMobileMenuOpen(false)} href="/contracts" className="hover:text-orange-500 w-full py-1">
+          <Link
+            onClick={() => setMobileMenuOpen(false)}
+            href="/contracts"
+            className="mobile-menu-link"
+          >
             Contracts
           </Link>
-          <Link onClick={() => setMobileMenuOpen(false)} href="/tasks" className="hover:text-orange-500 w-full py-1">
+          <Link
+            onClick={() => setMobileMenuOpen(false)}
+            href="/tasks"
+            className="mobile-menu-link"
+          >
             Task List
           </Link>
-          <Link onClick={() => setMobileMenuOpen(false)} href="/setup" className="hover:text-orange-500 w-full py-1">
+          <Link
+            onClick={() => setMobileMenuOpen(false)}
+            href="/setup"
+            className="mobile-menu-link"
+          >
             Settings
           </Link>
 
-
           {/* Logout Option Inside Menu (Mobile Only) */}
-          <div className="w-full pt-4 border-t border-gray-100 mt-2">
+          <div className="mobile-logout-wrapper">
             <button
               onClick={handlelogout}
-              className="flex items-center text-red-500 hover:text-red-600 cursor-pointer transition-colors w-full font-bold text-lg"
+              className="mobile-logout-btn"
             >
-              <i className="bi bi-box-arrow-right mr-3 text-2xl"></i>
+              <i className="bi bi-box-arrow-right mobile-logout-icon "></i>
               Logout
             </button>
           </div>

@@ -4,7 +4,6 @@ import axios from "redaxios";
 import Link from "next/link";
 import { toast } from "react-toastify";
 
-
 export default function CommonMasterPage({
   title,
   listApi,
@@ -38,7 +37,6 @@ export default function CommonMasterPage({
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-
   const fetchData = useCallback(
     async (parentDesignation = "", name = "", status = "") => {
       try {
@@ -52,7 +50,9 @@ export default function CommonMasterPage({
       } catch (err) {
         console.error("Fetch error:", err);
       }
-    }, [listApi]);
+    },
+    [listApi],
+  );
 
   useEffect(() => {
     fetchData();
@@ -84,7 +84,6 @@ export default function CommonMasterPage({
   useEffect(() => {
     if (showForm && showRadio && parentListApi) fetchParentOptions();
   }, [showForm, showRadio, parentListApi, fetchParentOptions]);
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -130,8 +129,10 @@ export default function CommonMasterPage({
       });
       setData((prevData) =>
         prevData.map((item) =>
-          item.id === id ? { ...item, status: currentStatus === 1 ? 0 : 1 } : item
-        )
+          item.id === id
+            ? { ...item, status: currentStatus === 1 ? 0 : 1 }
+            : item,
+        ),
       );
     } catch (err) {
       console.error("Error updating status:", err);
@@ -156,8 +157,8 @@ export default function CommonMasterPage({
       await axios.put(`${saveApi}/default/${id}`, { default: newDefault });
       setData((prev) =>
         prev.map((item) =>
-          item.id === id ? { ...item, default: newDefault } : item
-        )
+          item.id === id ? { ...item, default: newDefault } : item,
+        ),
       );
     } catch (err) {
       console.error("Error updating checkbox:", err);
@@ -193,33 +194,23 @@ export default function CommonMasterPage({
     setCurrentPage(1);
   }, [parentDesignation, name, statusFilter, itemsPerPage]);
 
-
   return (
     <>
       <div className="bg-gray-100">
         {/* Header */}
-         <div className="breadcrumb-container">
+        <div className="breadcrumb-container">
           <div className="breadcrumb-left">
             <p className="breadcrumb-path">
-              <Link
-                href="/dashboard"
-                className="breadcrumb-home"
-              >
+              <Link href="/dashboard" className="breadcrumb-home">
                 <i className="bi bi-house"></i>
               </Link>
               <i className="bi bi-chevron-right text-[10px]"></i>{" "}
-              <Link
-                href="/setup"
-                className="breadcrumb-link"
-              >
+              <Link href="/setup" className="breadcrumb-link">
                 Setup
               </Link>
               <i className="bi bi-chevron-right text-[10px]"></i>{" "}
               {breadcrumbs.map((b, i) => (
-                <span
-                  key={i}
-                className="breadcrumb-link"
-                >
+                <span key={i} className="breadcrumb-link">
                   <span className="mx-2">{b}</span>
                   {i < breadcrumbs.length - 1 && (
                     <i className="bi bi-chevron-right text-[10px]"></i>
@@ -233,7 +224,8 @@ export default function CommonMasterPage({
             <button
               type="button"
               onClick={() => setShowForm(true)}
-className="add-btn "            >
+              className="add-btn "
+            >
               + Add {title}
             </button>
           </div>
@@ -241,16 +233,26 @@ className="add-btn "            >
 
         {/* Filters */}
         <div className="mx-6 md:hidden mt-3 relative z-40">
-          <button type="button" onClick={() => setShowMobileFilters(!showMobileFilters)} className="w-full flex items-center justify-between text-orange-500 font-semibold bg-orange-50 px-4 py-2 rounded-sm border border-orange-200 shadow-sm transition-all">
-             <span className="flex items-center gap-2"><i className="bi bi-funnel"></i> Filters</span>
-             <i className={`bi bi-chevron-down transition-transform ${showMobileFilters ? "rotate-180" : ""}`}></i>
+          <button
+            type="button"
+            onClick={() => setShowMobileFilters(!showMobileFilters)}
+            className="w-full flex items-center justify-between text-orange-500 font-semibold bg-orange-50 px-4 py-2 rounded-sm border border-orange-200 shadow-sm transition-all"
+          >
+            <span className="flex items-center gap-2">
+              <i className="bi bi-funnel"></i> Filters
+            </span>
+            <i
+              className={`bi bi-chevron-down transition-transform ${showMobileFilters ? "rotate-180" : ""}`}
+            ></i>
           </button>
         </div>
 
-        <div className={`
+        <div
+          className={`
           ${showMobileFilters ? "absolute left-6 right-6 top-50 bg-white p-5 shadow-2xl border border-gray-100 z-50 rounded-lg grid grid-cols-2 gap-3 mt-1" : "hidden"} 
           md:mx-6 md:flex md:flex-wrap md:items-center md:gap-y-2 md:relative md:bg-transparent md:p-0 md:shadow-none md:border-none md:z-auto
-        `}>
+        `}
+        >
           {extraColumn && (
             <select
               value={parentDesignation}
@@ -295,13 +297,15 @@ className="add-btn "            >
                 setShowMobileFilters(false);
                 fetchData();
               }}
-className="filter-clear-btn w-full md:w-auto"            >
+              className="filter-clear-btn w-full md:w-auto"
+            >
               Clear
             </button>
             <button
               type="button"
               onClick={() => setShowMobileFilters(false)}
-className="filter-apply-btn w-full"            >
+              className="filter-apply-btn w-full"
+            >
               Apply
             </button>
           </div>
@@ -411,14 +415,15 @@ className="filter-apply-btn w-full"            >
                 </select>
               </div>
 
-
               {/* Right side: Navigation buttons (only if totalPages > 1) */}
               {totalPages > 1 && (
                 <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
                   {/* Previous Button */}
                   <button
                     type="button"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                     className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
@@ -446,7 +451,9 @@ className="filter-apply-btn w-full"            >
                   {/* Next Button */}
                   <button
                     type="button"
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
                     disabled={currentPage === totalPages}
                     className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
@@ -455,7 +462,6 @@ className="filter-apply-btn w-full"            >
                 </div>
               )}
             </div>
-
           </div>
         </form>
 

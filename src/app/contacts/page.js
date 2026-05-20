@@ -421,7 +421,7 @@ className="add-btn "            >
             </button>
             <button
               onClick={() => setShowMobileFilters(false)}
-              className="md:hidden border border-orange-300 w-full cursor-pointer rounded-sm p-2 bg-orange-100 text-orange-700 hover:bg-orange-200 text-sm text-center font-semibold"
+              className="filter-apply-btn w-full"
             >
               Apply
             </button>

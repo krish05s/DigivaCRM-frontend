@@ -214,28 +214,23 @@ export default function Page() {
       <Header />
       {/* bredcrumb */}
       {/* <div className="bg-white w-full  shadow-lg p-3 mt-1 mb-5 top-10 sticky z-10"> */}
-      <div className="bg-white w-full shadow-lg p-3 mt-1 mb-5 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
-        <div className="hidden sm:flex items-center text-gray-700 w-full sm:w-auto">
-          <p className="flex items-center flex-wrap">
-            <Link
-              href="/dashboard"
-              className="mx-2 text-xl text-gray-400 hover:text-indigo-600"
-            >
-              <i className="bi bi-house"></i>
-            </Link>
-            <i className="bi bi-chevron-right text-[10px]"></i>
+      <div className="breadcrumb-container">
+          <div className="breadcrumb-left">
+            <p className="breadcrumb-path">
+              <Link href="/dashboard" className="breadcrumb-home">
+                <i className="bi bi-house"></i>
+              </Link>
+            <i className="bi bi-chevron-right text-[10px]"></i>{" "}
             <Link
               href="/todolist"
-              className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
-            >
+ className="breadcrumb-link"            >
               Todo List
             </Link>
           </p>
         </div>
         <button
           onClick={() => openModal()}
-          className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-sm text-sm font-bold tracking-wide transition-all shadow-sm"
-        >
+className="add-btn "        >
           + ADD TODO
         </button>
       </div>
