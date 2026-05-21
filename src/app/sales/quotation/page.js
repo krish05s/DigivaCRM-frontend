@@ -763,20 +763,15 @@ export default function QuotationPage() {
         <div className="breadcrumb-container">
           <div className="breadcrumb-left">
             <p className="breadcrumb-path">
-              <Link
-                href="/dashboard" className="breadcrumb-home"   >
+              <Link href="/dashboard" className="breadcrumb-home">
                 <i className="bi bi-house"></i>
               </Link>
               <i className="bi bi-chevron-right text-[10px]"></i>{" "}
-              <Link
-                href="#"
- className="breadcrumb-link"              >
+              <Link href="#" className="breadcrumb-link">
                 Sales
               </Link>
               <i className="bi bi-chevron-right text-[10px]"></i>{" "}
-              <Link
-                href="/sales/quotation"
- className="breadcrumb-link"              >
+              <Link href="/sales/quotation" className="breadcrumb-link">
                 Quotation
               </Link>
             </p>
@@ -797,17 +792,12 @@ export default function QuotationPage() {
               </button>
               {showExportMenu && (
                 <div className="export-dropdown ">
-                  <button
-                    onClick={exportToExcel}
-className="export-item"                  >
+                  <button onClick={exportToExcel} className="export-item">
                     <i className="bi bi-file-earmark-excel text-green-600 text-base"></i>
                     Export Excel
                   </button>
                   <div className="h-px bg-gray-100 mx-3"></div>
-                  <button
-                    onClick={exportToPDF}
-                    className="export-item"
-                  >
+                  <button onClick={exportToPDF} className="export-item">
                     <i className="bi bi-file-earmark-pdf text-red-600 text-base"></i>
                     Export PDF
                   </button>
@@ -930,41 +920,41 @@ className="export-item"                  >
 
         {/* Tabs + Table */}
         <div className="bg-white rounded-sm border border-gray-100 py-2 mx-7">
-          <div className="flex items-center gap-6 px-6 pt-4 border-b border-gray-100">
+          <div className="table-tabs ">
             <button
               onClick={() => setActiveTab("Pending")}
-              className={`pb-3 px-3 text-sm font-medium relative transition-all ${activeTab === "Pending" ? "text-blue-600" : "text-gray-400 hover:text-gray-600"}`}
+              className={`table-tab-btn ${activeTab === "Pending" ? "table-tab-pending-active" : "table-tab-inactive"}`}
             >
               Pending{" "}
-              <span className="ml-2 bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-full">
+              <span className="table-tab-badge-pending table-tab-badge">
                 {pendingCount}
               </span>
               {activeTab === "Pending" && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"></div>
+                <div className="table-tab-line table-tab-line-pending"></div>
               )}
             </button>
             <button
               onClick={() => setActiveTab("Won")}
-              className={`pb-3 text-sm font-medium relative ${activeTab === "Won" ? "text-green-600" : "text-gray-500"}`}
+              className={`pb-3 text-sm font-medium relative ${activeTab === "Won" ? "table-tab-won-active" : "table-tab-inactive"}`}
             >
               Won{" "}
-              <span className="ml-2 bg-green-100 text-green-600 text-xs px-2 py-0.5 rounded-full">
+              <span className="table-tab-badge-won table-tab-badge">
                 {wonCount}
               </span>
               {activeTab === "Won" && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-green-600"></div>
+                <div className="table-tab-line  table-tab-line-won "></div>
               )}
             </button>
             <button
               onClick={() => setActiveTab("Lost")}
-              className={`pb-3 text-sm font-medium relative ${activeTab === "Lost" ? "text-red-600" : "text-gray-500"}`}
+              className={`pb-3 text-sm font-medium relative ${activeTab === "Lost" ? "table-tab-lost-active" : "table-tab-inactive"}`}
             >
               Lost{" "}
-              <span className="ml-2 bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full">
+              <span className="table-tab-badge-lost table-tab-badge">
                 {lostCount}
               </span>
               {activeTab === "Lost" && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-red-600"></div>
+                <div className="table-tab-line  table-tab-line-lost"></div>
               )}
             </button>
           </div>
@@ -973,76 +963,51 @@ className="export-item"                  >
             {loading ? (
               <div className="text-center py-10 text-gray-400">Loading...</div>
             ) : (
-              // <div className="overflow-x-auto">
-              //   <table className="w-full text-sm">
               <div
-                className="overflow-x-auto overflow-y-scroll max-h-[500px] custom-scroll"
-                style={{ overflowX: "scroll" }}
+                className="table-scroll"
+                style={{
+                  maxHeight: "500px",
+                  overflowY: "auto",
+                  overflowX: "auto",
+                }}
               >
-                <table className="w-full text-sm whitespace-nowrap">
+                <table className="custom-table">
                   <thead>
-                    <tr className="bg-gray-50 border-b border-gray-100">
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        #
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Company Name
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Customer Name
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Lead Title
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Create Quotation
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Quotation No
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Created
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Last Activity
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Grand Total
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Assignee
-                      </th>
+                    <tr className="table-head-row">
+                      <th className="table-head">#</th>
+                      <th className="table-head">Company Name</th>
+                      <th className="table-head">Customer Name</th>
+                      <th className="table-head">Lead Title</th>
+                      <th className="table-head">Create Quotation</th>
+                      <th className="table-head">Quotation No</th>
+                      <th className="table-head">Created</th>
+                      <th className="table-head">Last Activity</th>
+                      <th className="table-head">Grand Total</th>
+                      <th className="table-head">Assignee</th>
                       {/* ✅ NEW: Proforma % Column */}
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Proforma %
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Action
-                      </th>
+                      <th className="table-head">Proforma %</th>
+                      <th className="table-head">Status</th>
+                      <th className="table-head">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredQuotations.length > 0 ? (
                       paginatedQuotations.map((q, index) => (
-                        <tr
-                          key={q.lead_id}
-                          className="border-b border-gray-50 hover:bg-indigo-50/30 transition-colors"
-                        >
-                          <td className="py-3 px-3">
+                        <tr key={q.lead_id} className="table-row">
+                          <td className="table-cell">
                             {(currentPage - 1) * itemsPerPage + index + 1}
                           </td>
-                          <td className="font-medium px-3">
+                          <td className="table-cell-bold">
                             {q.company_name || "-"}
                           </td>
-                          <td className="text-orange-500 px-3">
+                          <td className="table-customer cursor-pointer">
                             {q.customer_name || "-"}
                           </td>
-                          <td className="px-3">{q.lead_title || "-"}</td>
+                          <td className="table-cell w-46 max-w-46 truncate">
+                            {q.lead_title || "-"}
+                          </td>
 
-                          <td className="text-lg px-3 text-center">
+                          <td className="table-cell text-center">
                             {q.displayStatus === "Won" ||
                             q.displayStatus === "Lost" ? (
                               <div
@@ -1069,17 +1034,17 @@ className="export-item"                  >
                               </button>
                             )}
                           </td>
-                          <td className="px-3 text-gray-600">
+                          <td className="table-cell">
                             {q.quotation_no || "-"}
                           </td>
-                          <td className="px-3 text-gray-500">
+                          <td className="table-cell ">
                             {q.first_quotation_date
                               ? new Date(
                                   q.first_quotation_date,
                                 ).toLocaleDateString()
                               : "-"}
                           </td>
-                          <td className="px-3 text-gray-500">
+                          <td className="table-cell ">
                             {q.quotation_date
                               ? new Date(q.quotation_date).toLocaleDateString()
                               : q.quotation_created_at
@@ -1088,12 +1053,12 @@ className="export-item"                  >
                                   ).toLocaleDateString()
                                 : "-"}
                           </td>
-                          <td className="px-3 font-semibold text-gray-700">
+                          <td className="table-cell-bold">
                             {q.grand_total
                               ? `₹ ${Number(q.grand_total).toLocaleString()}`
                               : "-"}
                           </td>
-                          <td className="px-3">
+                          <td className="table-cell">
                             {q.assignee ? (
                               <div className="flex gap-1 items-center">
                                 {String(q.assignee)
@@ -1102,7 +1067,7 @@ className="export-item"                  >
                                     <div
                                       key={i}
                                       title={name.trim()}
-                                      className="px-3 py-1.5 bg-blue-800 text-white rounded-full font-semibold text-xs flex justify-center items-center min-w-[28px] select-none"
+                                      className="table-assignee-badge"
                                     >
                                       {name.trim().charAt(0).toUpperCase()}
                                     </div>
@@ -1113,7 +1078,7 @@ className="export-item"                  >
                             )}
                           </td>
 
-                          <td className="px-3 text-center">
+                          <td className="table-cell text-center">
                             {q.proforma_percentage &&
                             Number(q.proforma_percentage) > 0 ? (
                               <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-full">
@@ -1125,7 +1090,7 @@ className="export-item"                  >
                             )}
                           </td>
 
-                          <td className="px-3">
+                          <td className="table-cell">
                             <select
                               value={q.displayStatus || "Pending"}
                               onMouseDown={(e) => {
@@ -1171,7 +1136,7 @@ className="export-item"                  >
                                   );
                                 }
                               }}
-                              className={`border rounded-sm px-3 py-1 text-xs font-semibold outline-none
+                              className={`table-status
                                 ${q.displayStatus === "Pending" && !q.has_approved ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed" : ""}
                                 ${q.displayStatus === "Pending" && q.has_approved ? "border-gray-200 bg-gray-50 text-gray-700 cursor-pointer" : ""}
                                 ${q.displayStatus === "Won" ? "border-green-300 bg-green-50 text-green-700" : ""}
@@ -1184,7 +1149,7 @@ className="export-item"                  >
                             </select>
                           </td>
 
-                          <td className="px-3 text-center">
+                          <td className="table-cell text-center">
                             <div className="flex items-center justify-center gap-2">
                               {q.displayStatus === "Won" &&
                                 q.latest_quotation_id &&
@@ -1259,10 +1224,7 @@ className="export-item"                  >
                       ))
                     ) : (
                       <tr>
-                        <td
-                          colSpan="13"
-                          className="text-center py-10 text-gray-400"
-                        >
+                        <td colSpan="13" className="table-empty">
                           No Quotations Found
                         </td>
                       </tr>
@@ -1273,8 +1235,8 @@ className="export-item"                  >
                 {/* ✅ STANDARDIZED MICARA IMS PAGINATION */}
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-200 bg-white rounded-b-lg">
                   {/* Left side: Rows per page selector */}
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm text-slate-500 font-medium">
+                  <div className="pagination-left">
+                    <span className="pagination-label">
                       Rows per page:
                     </span>
                     <select
@@ -1283,8 +1245,7 @@ className="export-item"                  >
                         setItemsPerPage(Number(e.target.value));
                         setCurrentPage(1);
                       }}
-                      className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-slate-100 transition-all cursor-pointer font-medium"
-                    >
+className="pagination-select"                    >
                       {[10, 20, 100, 200].map((size) => (
                         <option key={size} value={size}>
                           {size}
@@ -1295,7 +1256,7 @@ className="export-item"                  >
 
                   {/* Right side: Navigation buttons (only if totalPages > 1) */}
                   {totalPages > 1 && (
-                    <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
+                    <div className="pagination-right">
                       {/* Previous Button */}
                       <button
                         type="button"
@@ -1589,37 +1550,43 @@ className="export-item"                  >
                 </div>
 
                 <div className="p-4 border-t border-gray-100 bg-gray-50 mt-auto flex gap-3">
-                 <button
-  onClick={handleQuotationSubmit}
-  disabled={isSubmitting}
-  className={`flex-1 common-btn rounded-xl py-3 text-sm font-semibold transition-all flex justify-center items-center gap-2
+                  <button
+                    onClick={handleQuotationSubmit}
+                    disabled={isSubmitting}
+                    className={`flex-1 common-btn rounded-xl py-3 text-sm font-semibold transition-all flex justify-center items-center gap-2
   ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
->
-  {isSubmitting ? (
-    <>
-      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-        <circle
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="white"
-          strokeWidth="4"
-          opacity="0.25"
-        />
-        <path
-          fill="white"
-          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-        />
-      </svg>
-      Processing...
-    </>
-  ) : (
-    <>
-      <i className="bi bi-floppy2-fill"></i>
-      {editingId ? "Update Quotation" : "Save Quotation Activity"}
-    </>
-  )}
-</button>
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <svg
+                          className="animate-spin h-4 w-4"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                        >
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="white"
+                            strokeWidth="4"
+                            opacity="0.25"
+                          />
+                          <path
+                            fill="white"
+                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                          />
+                        </svg>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-floppy2-fill"></i>
+                        {editingId
+                          ? "Update Quotation"
+                          : "Save Quotation Activity"}
+                      </>
+                    )}
+                  </button>
                   {editingId && (
                     <button
                       onClick={() => {
@@ -1752,14 +1719,6 @@ className="export-item"                  >
                                     <i className="bi bi-pencil-square"></i>
                                   </button>
                                 )}
-                              {/* DELETE IN HISTORY - COMMENTED OUT (will be enabled later) */}
-                              {/* <button
-  onClick={() => handleDeleteQuotation(item.id)}
-  className="text-gray-400 hover:text-red-600 transition-colors p-1"
-  title="Delete Quotation Activity"
->
-  <i className="bi bi-trash"></i>
-</button> */}
                             </div>
                           </div>
                           <div className="mt-2 grid grid-cols-2 gap-4 bg-gray-50 p-2.5 rounded-lg border border-gray-100 text-sm">
@@ -1908,7 +1867,7 @@ className="export-item"                  >
             <div className="px-6 py-3 bg-white  flex justify-end gap-3 rounded-b-2xl">
               <button
                 onClick={() => setShowFileModal(false)}
-               className="common-btn px-5 py-2 rounded-sm text-sm font-semibold transition-all"
+                className="common-btn px-5 py-2 rounded-sm text-sm font-semibold transition-all"
               >
                 Done
               </button>
@@ -1958,7 +1917,7 @@ className="export-item"                  >
               <button
                 onClick={handleDeleteQuotation}
                 disabled={isDeleting}
-               className="common-btn px-6 py-2 rounded-sm text-sm font-semibold shadow-md flex items-center gap-2"
+                className="common-btn px-6 py-2 rounded-sm text-sm font-semibold shadow-md flex items-center gap-2"
               >
                 {isDeleting ? (
                   <>

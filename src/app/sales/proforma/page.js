@@ -874,29 +874,21 @@ export default function ProformaPage() {
     <>
       <Header />
 
-      <div className="bg-gray-100 min-h-screen">
+      <div className="bg-gray-100 ">
         {/* ── BREADCRUMB + EXPORT ─────────────────────────── */}
 
         <div className="breadcrumb-container">
           <div className="breadcrumb-left">
             <p className="breadcrumb-path">
-              <Link
-                href="/dashboard"
- className="breadcrumb-home"              >
+              <Link href="/dashboard" className="breadcrumb-home">
                 <i className="bi bi-house"></i>
               </Link>
               <i className="bi bi-chevron-right text-[10px]"></i>{" "}
-              <Link
-                href="#"
-                className="breadcrumb-link"
-              >
+              <Link href="#" className="breadcrumb-link">
                 Sales
               </Link>
               <i className="bi bi-chevron-right text-[10px]"></i>{" "}
-              <Link
-                href="/sales/proforma"
-                className="breadcrumb-link"
-              >
+              <Link href="/sales/proforma" className="breadcrumb-link">
                 Proforma
               </Link>
             </p>
@@ -916,16 +908,12 @@ export default function ProformaPage() {
               </button>
               {showExportMenu && (
                 <div className="export-dropdown ">
-                  <button
-                    onClick={exportToExcel}
-className="export-item"                  >
+                  <button onClick={exportToExcel} className="export-item">
                     <i className="bi bi-file-earmark-excel text-green-600 text-base"></i>
                     Export Excel
                   </button>
                   <div className="h-px bg-gray-100 mx-3"></div>
-                  <button
-                    onClick={exportToPDF}
-className="export-item"                  >
+                  <button onClick={exportToPDF} className="export-item">
                     <i className="bi bi-file-earmark-pdf text-red-600 text-base"></i>
                     Export PDF
                   </button>
@@ -1077,53 +1065,26 @@ className="export-item"                  >
 
         {/* ── TABLE ────────────────────────────────────────── */}
         <div className="table-wrapper">
-          <div className="py-1">
+          <div className="py-2">
             {loading ? (
               <div className="text-center py-10 text-gray-400">Loading...</div>
             ) : (
-              <div
-                className="table-scroll"
-                style={{ overflowX: "scroll" }}
-              >
+              <div className="table-scroll" style={{ overflowX: "scroll" }}>
                 <table className="custom-table min-w-[1400px]">
                   <thead>
                     <tr className="table-head-row">
-                      <th className="table-head">
-                        #
-                      </th>
-                        <th className="table-head">
-                          PI No
-                      </th>
-                      <th className="table-head">
-                        PI Date
-                      </th>
-                      <th className="table-head">
-                        Customer Name
-                      </th>
-                      <th className="table-head">
-                        Quotation No
-                      </th>
-                      <th className="table-head">
-                        Assignee
-                      </th>
-                      <th className="table-head">
-                        Total
-                      </th>
-                      <th className="table-head">
-                        PI %
-                      </th>
-                      <th className="table-head">
-                        Status
-                      </th>
-                      <th className="table-head">
-                        Follow-Up
-                      </th>
-                      <th className="table-head">
-                        Download
-                      </th>
-                      <th className="table-head">
-                        Created
-                      </th>
+                      <th className="table-head">#</th>
+                      <th className="table-head">PI No</th>
+                      <th className="table-head">PI Date</th>
+                      <th className="table-head">Customer Name</th>
+                      <th className="table-head">Quotation No</th>
+                      <th className="table-head">Assignee</th>
+                      <th className="table-head">Total</th>
+                      <th className="table-head">PI %</th>
+                      <th className="table-head">Status</th>
+                      <th className="table-head">Follow-Up</th>
+                      <th className="table-head">Download</th>
+                      <th className="table-head">Created</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1132,10 +1093,7 @@ className="export-item"                  >
                         const globalIndex = indexOfFirstItem + index;
                         const isWon = item.status === "paid";
                         return (
-                          <tr
-                            key={item.pi_id}
-                            className="table-row"
-                          >
+                          <tr key={item.pi_id} className="table-row">
                             <td className="table-cell">{globalIndex + 1}</td>
                             <td className="table-cell-bold ">
                               {formatPINumber(globalIndex)}
@@ -1259,10 +1217,7 @@ className="export-item"                  >
                       })
                     ) : (
                       <tr>
-                        <td
-                          colSpan="12"
-                          className="table-empty"
-                        >
+                        <td colSpan="12" className="table-empty">
                           No Data Found
                         </td>
                       </tr>
@@ -1275,9 +1230,7 @@ className="export-item"                  >
                 <div className="pagination-wrapper">
                   {/* Left side: Rows per page selector */}
                   <div className="pagination-left ">
-                    <span className="pagination-label ">
-                      Rows per page:
-                    </span>
+                    <span className="pagination-label ">Rows per page:</span>
                     <select
                       value={itemsPerPage}
                       onChange={(e) => {
@@ -1724,14 +1677,14 @@ className="export-item"                  >
                   >
                     Cancel
                   </button>
-                 <button
-  onClick={editing ? handleUpdate : handleSubmitFollowUp}
-  disabled={afterRemainingPct < 0 && enteredPct > 0}
-  className={`common-btn px-6 py-2 rounded-xl text-sm font-semibold text-white transition-all shadow-md
+                  <button
+                    onClick={editing ? handleUpdate : handleSubmitFollowUp}
+                    disabled={afterRemainingPct < 0 && enteredPct > 0}
+                    className={`common-btn px-6 py-2 rounded-xl text-sm font-semibold text-white transition-all shadow-md
   ${afterRemainingPct < 0 && enteredPct > 0 ? "opacity-50 cursor-not-allowed shadow-none" : ""}`}
->
-  {editing ? "Update Follow-Up" : "Add Follow-Up"}
-</button>
+                  >
+                    {editing ? "Update Follow-Up" : "Add Follow-Up"}
+                  </button>
                 </div>
               </div>
             </div>

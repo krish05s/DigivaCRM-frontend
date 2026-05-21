@@ -41,12 +41,13 @@ html, body {
   height: 100%;
 }
 
-/* Hide all scrollbars globally */
-*{
+/* Hide page scrollbar only */
+body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-*::-webkit-scrollbar {
+
+body::-webkit-scrollbar {
   display: none;
 }
 
@@ -666,27 +667,26 @@ transition-all duration-300;  }
   @apply overflow-x-auto
   overflow-y-auto
   max-h-[500px];
-}
 
-/* scrollbar */
-.table-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: #c1c1c1 transparent;
+  scrollbar-width: thin !important;
+  scrollbar-color: #cbd5e1 transparent;
 }
 
 .table-scroll::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  display: block !important;
+  width: 8px;
+  height: 8px;
 }
 
 .table-scroll::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
+  background: #cbd5e1;
   border-radius: 10px;
 }
 
 .table-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
+
   /* Main Table */
   .custom-table {
   @apply w-full text-sm whitespace-nowrap;
