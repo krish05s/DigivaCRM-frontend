@@ -313,42 +313,42 @@ export default function CommonMasterPage({
 
         {/* Table */}
         <form className="p-1 mx-5">
-          <div className="overflow-x-auto overflow-y-auto max-h-[500px] custom-scroll bg-white shadow-md rounded-sm p-1 border border-gray-200">
-            <table className="w-full text-sm text-left text-gray-700 border-collapse mt-2 mb-2 whitespace-nowrap">
-              <thead className="bg-gray-50 text-gray-900 uppercase text-xs">
-                <tr>
-                  <th className="py-3 px-5 w-10">#</th>
+          <div className="table-scroll" style={{ overflowX: "scroll" }}>
+            <table className="custom-table min-w-[1400px]">
+              <thead>
+                    <tr className="table-head-row">
+                  <th className="table-head w-10">#</th>
                   {extraColumn && (
-                    <th className="py-3 px-4 text-center">
+                    <th className="table-head text-center">
                       {extraColumn.label}
                     </th>
                   )}
-                  <th className="py-3 px-4">{title} Name</th>
+                  <th className="table-head ">{title} Name</th>
                   {showCheckboxColumn && (
-                    <th className="py-3 px-4 text-center">Select</th>
+                    <th className="table-head text-center">Select</th>
                   )}
-                  <th className="py-3 px-4 text-center">Status</th>
-                  <th className="py-3 px-4 text-center">Action</th>
+                  <th className="table-head text-center">Status</th>
+                  <th className="table-head text-center">Action</th>
                 </tr>
               </thead>
 
               <tbody>
                 {currentData.map((item, i) => (
-                  <tr key={item.id} className={`hover:bg-gray-50 transition`}>
-                    <td className="py-1 px-4 text-gray-600">
+                  <tr key={item.id} className="table-row">
+                    <td className="table-cell text-center">
                       {(currentPage - 1) * itemsPerPage + i + 1}
                     </td>
                     {extraColumn && (
-                      <td className="py-2 px-4 text-center">
+                      <td className="table-cell text-center">
                         {item[extraColumn.key] || "-"}
                       </td>
                     )}
-                    <td className="py-1 px-4 font-medium text-gray-800">
+                    <td className="table-cell-bold ">
                       {item.name}
                     </td>
 
                     {showCheckboxColumn && (
-                      <td className="py-2 px-4 text-center">
+                      <td className="table-cell text-center">
                         <input
                           type="checkbox"
                           checked={item.default === 1}
@@ -360,7 +360,7 @@ export default function CommonMasterPage({
                       </td>
                     )}
 
-                    <td className="py-1 px-4 text-center">
+                    <td className="table-cell text-center">
                       <label className="inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
@@ -378,7 +378,7 @@ export default function CommonMasterPage({
                       </label>
                     </td>
 
-                    <td className="py-1 px-4 text-center">
+                    <td className="table-cell text-center">
                       <button
                         type="button"
                         onClick={() => handleEdit(item)}

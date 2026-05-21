@@ -1111,7 +1111,7 @@ export default function ProformaPage() {
                             <td className="table-cell">
                               {item.quotation_no || "-"}
                             </td>
-                            <td className="py-3 px-3">
+                            <td className="table-cell">
                               {item.assignee ? (
                                 <div className="table-assignee ">
                                   {String(item.assignee)
@@ -1133,7 +1133,7 @@ export default function ProformaPage() {
                             <td className="table-cell-bold ">
                               Rs.{Number(item.total).toLocaleString()}
                             </td>
-                            <td className="py-3 px-3">
+                            <td className="table-cell">
                               <div className="table-progress-wrapper">
                                 <div className="table-progress-bg">
                                   <div
@@ -1148,7 +1148,7 @@ export default function ProformaPage() {
                                 </span>
                               </div>
                             </td>
-                            <td className="py-3 px-3">
+                            <td className="table-cell">
                               <span
                                 className={`table-status
                                   ${item.status === "paid" ? "border-green-200 bg-green-50 text-green-700" : ""}
@@ -1169,7 +1169,7 @@ export default function ProformaPage() {
                                         : "Draft"}
                               </span>
                             </td>
-                            <td className="py-3 px-3 text-center">
+                            <td className="table-cell text-center">
                               <button
                                 onClick={() => {
                                   setSelectedPI(item);

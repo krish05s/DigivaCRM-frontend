@@ -169,41 +169,33 @@ export default function CustomerList() {
       <Header />
       <div className="bg-gray-100">
         {/* Header bar */}
-    <div className="breadcrumb-container">
+        <div className="breadcrumb-container">
+          <div className="breadcrumb-left flex justify-between items-center w-full">
+            <p className="breadcrumb-path">
+              <Link href="/dashboard" className="breadcrumb-home">
+                <i className="bi bi-house"></i>
+              </Link>
+              <i className="bi bi-chevron-right text-[10px]"></i>{" "}
+              <Link href="/customer-list" className="breadcrumb-link">
+                Customer List
+              </Link>
+            </p>
 
-  <div className="breadcrumb-left flex justify-between items-center w-full">
+            <div className="flex flex-col sm:flex-row items-center gap-3 ml-auto">
+              <input
+                type="text"
+                placeholder="🔍 Search..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="search-input"
+              />
 
-    <p className="breadcrumb-path">
-      <Link href="/dashboard" className="breadcrumb-home">
-        <i className="bi bi-house"></i>
-      </Link>
-
-      <i className="bi bi-chevron-right text-[10px]"></i>{" "}
-
-      <Link href="/customer-list" className="breadcrumb-link">
-        Customer List
-      </Link>
-    </p>
-
-    <div className="flex flex-col sm:flex-row items-center gap-3 ml-auto">
-
-      <input
-        type="text"
-        placeholder="🔍 Search..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="search-input"
-      />
-
-      <Link href="/customer" className="add-btn">
-        + ADD CUSTOMER
-      </Link>
-
-    </div>
-
-  </div>
-
-</div>
+              <Link href="/customer" className="add-btn">
+                + ADD CUSTOMER
+              </Link>
+            </div>
+          </div>
+        </div>
         {/* Filters */}
         <div className="mx-4 mb-2 md:hidden mt-3 relative z-40">
           <button
@@ -302,45 +294,37 @@ export default function CustomerList() {
 
         {/* Table */}
         <form className="p-2 w-8xl mx-3">
-          <div className="bg-white shadow rounded-sm p-6">
-            <div
-              className="overflow-x-auto overflow-y-scroll max-h-[380px] custom-scroll"
-              style={{ overflowX: "scroll" }}
-            >
-              <table className="w-full text-sm border border-gray-200 text-left whitespace-nowrap">
-                <thead className="bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  <tr>
-                    <th className="px-3 py-2 text-center">#</th>
-                    <th className="px-4 py-2">Company Name</th>
-                    <th className="px-4 py-2">Customer Name</th>
-                    <th className="px-4 py-2">Email</th>
-                    <th className="px-4 py-2">Mobile No.</th>
-                    <th className="px-4 py-2">Customer Type</th>
-                    <th className="px-4 py-2">Website</th>
-                    <th className="px-4 py-2">Industry</th>
-                    <th className="px-4 py-2">Action</th>
+          <div className="bg-white shadow rounded-sm p-4">
+            <div className="table-scroll" style={{ overflowX: "scroll" }}>
+              <table className="custom-table min-w-[1400px]">
+                <thead>
+                  <tr className="table-head-row">
+                    <th className="table-head text-center">#</th>
+                    <th className="table-head">Company Name</th>
+                    <th className="table-head">Customer Name</th>
+                    <th className="table-head">Email</th>
+                    <th className="table-head">Mobile No.</th>
+                    <th className="table-head">Customer Type</th>
+                    <th className="table-head">Website</th>
+                    <th className="table-head">Industry</th>
+                    <th className="table-head">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentData.length > 0 ? (
                     currentData.map((row, index) => (
-                      <tr
-                        key={index}
-                        className="border-b border-gray-100 hover:bg-gray-50"
-                      >
-                        <td className="px-3 py-2">
+                      <tr key={index} className="table-row">
+                        <td className="table-cell">
                           {indexOfFirstItem + index + 1}
                         </td>
-                        <td className="px-4 py-2">{row.company_name}</td>
-                        <td className="px-4 py-2 text-orange-500">
-                          {row.customer_name}
-                        </td>
-                        <td className="px-4 py-2">{row.email}</td>
-                        <td className="px-4 py-2">{row.mobile}</td>
-                        <td className="px-4 py-2">{row.customer_type}</td>
-                        <td className="px-4 py-2">{row.website}</td>
-                        <td className="px-4 py-2">{row.industry_name}</td>
-                        <td className="py-2 px-4 text-lg">
+                        <td className="table-cell">{row.company_name}</td>
+                        <td className="table-customer ">{row.customer_name}</td>
+                        <td className="table-cell">{row.email}</td>
+                        <td className="table-cell">{row.mobile}</td>
+                        <td className="table-cell">{row.customer_type}</td>
+                        <td className="table-cell">{row.website}</td>
+                        <td className="table-cell">{row.industry_name}</td>
+                        <td className="table-cell">
                           <button
                             type="button"
                             onClick={() =>
@@ -381,10 +365,7 @@ export default function CustomerList() {
                     ))
                   ) : (
                     <tr>
-                      <td
-                        colSpan="9"
-                        className="text-center py-4 text-gray-500"
-                      >
+                      <td colSpan="9" className="table-empty">
                         No data found
                       </td>
                     </tr>
