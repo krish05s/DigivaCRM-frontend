@@ -35,6 +35,27 @@ body {
 
 }
 
+/* ==========================
+   ANIMATIONS
+========================== */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+
 /* ADD this in globals.css */
 html, body {
   overflow: hidden;
@@ -77,39 +98,536 @@ body::-webkit-scrollbar {
 
 
 @layer components {
-
 /* dashboard */
-/* Dashboard Loading Wrapper */
+/* ==========================================
+   DASHBOARD LAYOUT
+========================================== */
+
+.dashboard-page {
+  @apply min-h-screen bg-gray-100 font-sans text-gray-900 pb-12;
+}
+
+.dashboard-container {
+  @apply max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full;
+}
+
+.dashboard-grid {
+  @apply grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6;
+}
+
 .dashboard-loading {
   @apply h-32 flex items-center justify-center
-  bg-white rounded-sm
-  border border-gray-200
-  mb-6 shadow-sm;
+  bg-white/90 backdrop-blur-xl
+  rounded-2xl border border-slate-100 mb-6;
+  box-shadow: 0 8px 30px rgb(0 0 0 / 4%);
 }
 
-/* Dashboard Loading Text */
-.dashboard-loading-text {
-  @apply text-gray-400
-  font-semibold
-  animate-pulse;
+/* ==========================================
+   SUMMARY CARDS
+========================================== */
+
+.summary-card {
+  @apply bg-gradient-to-br
+  from-white
+  to-gray-50/40
+  backdrop-blur-xl
+  rounded-xl
+  border border-gray-100
+  p-3 sm:p-4
+  flex flex-col
+  cursor-pointer
+  transition-all duration-300
+  relative overflow-hidden;
+  box-shadow: 0 4px 20px rgb(0 0 0 / 3%);
 }
 
-/* Dashboard Cards Grid */
-.dashboard-cards-grid {
-  @apply grid
-  grid-cols-2
-  lg:grid-cols-4
-  gap-3 sm:gap-4
-  mb-6;
+.summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgb(0 0 0 / 6%);
 }
 
-/* Dashboard Card Icon Theme */
-.dashboard-card-icon {
-  @apply bg-black
+.summary-card-icon {
+  @apply p-2 sm:p-2.5 rounded-xl shadow-sm transition-all duration-300;
+}
+
+.summary-card:hover .summary-card-icon {
+  transform: scale(1.1);
+}
+
+.summary-card-title {
+  @apply text-gray-400 text-[9px] sm:text-[10px]
+  font-bold uppercase tracking-wider mb-0.5;
+}
+
+.summary-card-value {
+  @apply text-xl sm:text-2xl font-black text-gray-800 tracking-tight;
+}
+
+/* ==========================================
+   SECTION HEADERS
+========================================== */
+
+.section-header {
+  @apply flex justify-between items-center mb-4;
+}
+
+/* ==========================================
+   FILTER BUTTONS
+========================================== */
+
+.dashboard-filter-wrapper {
+  @apply flex space-x-1 bg-gray-50 p-0.5 rounded-lg border border-gray-100;
+}
+
+.dashboard-filter-btn {
+  @apply px-3 py-1 text-[10px]
+  rounded-md font-bold
+  transition-all duration-200;
+}
+
+.dashboard-filter-btn-active {
+  @apply bg-black text-white shadow-sm;
+}
+
+.dashboard-filter-btn-inactive {
+  @apply text-gray-500 hover:text-gray-700;
+}
+
+/* ==========================================
+   CHARTS
+========================================== */
+
+.chart-wrapper {
+  @apply h-[200px] w-full mt-auto relative z-10;
+}
+
+.chart-height {
+  @apply h-[200px] flex items-center justify-center mt-auto;
+}
+
+/* ==========================================
+   TODO INPUT
+========================================== */
+
+.todo-input {
+  @apply w-full bg-white border border-gray-200
+  rounded-lg py-1.5 pl-3 pr-8
+  text-[12px]
+  text-gray-800 font-medium
+  placeholder-gray-400
+  transition-all;
+}
+
+.todo-input:focus {
+  @apply outline-none ring-2 ring-black/20;
+}
+
+.todo-add-btn {
+  @apply absolute right-1 top-1/2
+  -translate-y-1/2
+  p-1
   text-white
-  border border-black;
+  bg-black
+  rounded-md
+  transition-all;
 }
 
+.todo-add-btn:hover {
+  @apply bg-gray-800;
+}
+
+/* ==========================================
+   PAYMENT
+========================================== */
+
+.payment-label {
+  @apply text-[10px]
+  font-bold uppercase tracking-wider
+  text-gray-500;
+}
+
+.payment-success {
+  @apply text-xl font-extrabold text-green-600;
+}
+
+.payment-danger {
+  @apply text-xl font-extrabold text-red-500;
+}
+
+.progress-track {
+  @apply overflow-hidden
+  h-2.5
+  rounded-full
+  bg-red-100;
+}
+
+.progress-fill {
+  @apply bg-green-500
+  h-full
+  transition-all
+  duration-1000;
+}
+
+/* ==========================================
+   STATUS BADGES
+========================================== */
+
+.status-badge {
+  @apply px-2 py-0.5
+  rounded-full
+  text-[9px]
+  font-black uppercase;
+}
+
+.status-won {
+  @apply bg-green-100 text-green-700;
+}
+
+.status-lost {
+  @apply bg-red-100 text-red-700;
+}
+
+.status-pending {
+  @apply bg-gray-200 text-gray-800;
+}
+
+/* ==========================
+   MAIN DASHBOARD CARD
+========================== */
+
+.dashboard-card {
+  @apply bg-gradient-to-br
+  from-white
+  to-gray-100
+  backdrop-blur-xl
+  rounded-xl
+  border
+  border-slate-100
+  p-5
+  flex
+  flex-col
+  transition-all
+  duration-300
+  relative
+  overflow-hidden;
+  box-shadow: 0 4px 20px rgb(0 0 0 / 3%);
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgb(0 0 0 / 6%);
+}
+
+/* ==========================
+   CARD TITLE
+========================== */
+
+.dashboard-title {
+  @apply text-lg font-extrabold text-gray-800;
+}
+
+.dashboard-subtitle {
+  @apply text-[10px]
+  text-gray-500
+  font-semibold
+  uppercase
+  tracking-wider
+  mt-0.5;
+}
+
+/* ==========================
+   SUMMARY CARD
+========================== */
+
+.summary-card {
+  @apply bg-gradient-to-br
+  from-white
+  to-gray-100
+  rounded-xl
+  border
+  border-gray-100
+  p-4
+  flex
+  flex-col
+  cursor-pointer
+  transition-all
+  duration-300
+  relative
+  overflow-hidden;
+  box-shadow: 0 4px 20px rgb(0 0 0 / 3%);
+}
+
+.summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgb(0 0 0 / 6%);
+}
+
+.summary-card-icon {
+  @apply p-2.5
+  rounded-xl
+  shadow-sm
+  transition-all
+  duration-300;
+}
+
+.summary-card:hover .summary-card-icon {
+  transform: scale(1.1);
+}
+
+.summary-title {
+  @apply text-[10px]
+  uppercase
+  tracking-wider
+  font-bold
+  text-gray-400;
+}
+
+.summary-value {
+  @apply text-2xl
+  font-black
+  text-gray-800
+  tracking-tight;
+}
+
+/* ==========================
+   TODO SECTION
+========================== */
+
+.todo-wrapper {
+  height: 100%;
+}
+
+.todo-header {
+  min-height: 70px;
+}
+
+.todo-body {
+  flex: 1;
+}
+
+.todo-column {
+  @apply bg-white/60
+  backdrop-blur-sm
+  border
+  border-gray-100
+  p-3
+  rounded-xl
+  shadow-sm
+  flex
+  flex-col;
+  height: 180px;
+}
+
+.todo-scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.todo-item {
+  @apply flex
+  justify-between
+  items-center
+  rounded-md
+  px-2.5
+  py-1.5;
+}
+
+.todo-item-unfinished {
+  @apply bg-gray-100;
+}
+
+.todo-item-finished {
+  @apply bg-green-50/50;
+}
+
+/* ==========================
+   PAYMENT SECTION
+========================== */
+
+.payment-wrapper {
+  height: 100%;
+}
+
+.payment-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.payment-label {
+  @apply text-[10px]
+  uppercase
+  font-bold
+  tracking-wider
+  text-gray-500;
+}
+
+.payment-value-success {
+  @apply text-xl
+  font-extrabold
+  text-green-600;
+}
+
+.payment-value-danger {
+  @apply text-xl
+  font-extrabold
+  text-red-500;
+}
+
+.progress-track {
+  @apply overflow-hidden
+  h-2.5
+  rounded-full
+  bg-red-100;
+}
+
+.progress-fill {
+  @apply bg-green-500
+  h-full
+  transition-all
+  duration-1000;
+}
+
+/* ==========================
+   LEAD CARD
+========================== */
+
+.lead-card {
+  @apply bg-white/60
+  backdrop-blur-sm
+  border
+  border-gray-200
+  p-4
+  rounded-xl
+  relative
+  overflow-hidden
+  transition-all;
+}
+
+.lead-card:hover {
+  box-shadow: 0 8px 20px rgb(0 0 0 / 8%);
+}
+
+.lead-title {
+  @apply font-bold
+  text-gray-800
+  text-sm
+  truncate;
+}
+
+.lead-company {
+  @apply text-black
+  text-xs
+  font-bold;
+}
+
+/* ==========================
+   STATUS BADGES
+========================== */
+
+.status-won {
+  @apply bg-green-100
+  text-green-700;
+}
+
+.status-lost {
+  @apply bg-red-100
+  text-red-700;
+}
+
+.status-pending {
+  @apply bg-orange-100
+  text-orange-700;
+}
+
+.status-badge {
+  @apply px-2
+  py-0.5
+  rounded-full
+  text-[9px]
+  font-black
+  uppercase;
+}
+
+/* ==========================
+   BUTTONS
+========================== */
+
+.dashboard-btn {
+  @apply px-3
+  py-1.5
+  rounded-lg
+  font-bold
+  transition-all;
+}
+
+.dashboard-btn-orange {
+  @apply bg-black text-white;
+}
+
+.dashboard-btn-orange:hover {
+  @apply bg-gray-800 text-white;
+}
+
+/* ==========================
+   CHART WRAPPER
+========================== */
+
+.chart-container {
+  height: 200px;
+  width: 100%;
+}
+
+/* ==========================
+   SCROLLBAR
+========================== */
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #fb923c;
+  border-radius: 999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #ea580c;
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+
+@media (max-width: 1024px) {
+  .todo-column {
+    height: 150px;
+  }
+
+  .chart-container {
+    height: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-card {
+    padding: 16px;
+  }
+
+  .summary-value {
+    font-size: 1.25rem;
+  }
+
+  .chart-container {
+    height: 170px;
+  }
+}
 
 
 /* for notifivation  */

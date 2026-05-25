@@ -488,8 +488,8 @@ export default function Dashboard() {
   const recentLeadsList = safeLeads.slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-slate-50/80 font-sans text-gray-900 pb-12">
-      <style jsx global>{`
+    <div className="dashboard-page">
+      {/* <style jsx global>{`
         @keyframes fadeInUp {
           from {
             opacity: 0;
@@ -504,67 +504,65 @@ export default function Dashboard() {
           animation: fadeInUp 0.6s ease-out forwards;
           opacity: 0;
         }
-      `}</style>
+      `}</style> */}
       <Header />
-      <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+      <main className="dashboard-container">
         {/* Top Summary Cards */}
         {loading ? (
           <div className="dashboard-loading">
-            <span className="dashboard-loading-text">
+            <span className="text-gray-400 font-semibold animate-pulse">
               Loading amazing metrics...
             </span>
           </div>
         ) : (
-          <div className="dashboard-cards-grid">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
             <DashboardCard
               onClick={() => router.push("/sales/lead")}
               title="Total Leads"
               value={leads.length}
               icon={UserPlus}
-              colorClass="dashboard-card-icon"
+              colorClass="bg-orange-50 text-orange-500 border border-orange-100/50 group-hover:bg-orange-500 group-hover:text-white"
             />
-
             <DashboardCard
               onClick={() => router.push("/customer-list")}
               title="Total Customers"
               value={customers.length}
               icon={Users}
-              colorClass="dashboard-card-icon"
+              colorClass="bg-orange-50 text-orange-500 border border-orange-100/50 group-hover:bg-orange-500 group-hover:text-white"
             />
-
             <DashboardCard
               onClick={() => router.push("/tasks")}
               title="Total Tasks"
               value={tasks.length}
               icon={CheckSquare}
-              colorClass="dashboard-card-icon"
+              colorClass="bg-orange-50 text-orange-500 border border-orange-100/50 group-hover:bg-orange-500 group-hover:text-white"
             />
-
             <DashboardCard
               onClick={() => router.push("/todolist")}
               title="Active To-Dos"
               value={todos.filter((t) => !t.is_finished).length}
               icon={ListTodo}
-              colorClass="dashboard-card-icon"
+              colorClass="bg-orange-50 text-orange-500 border border-orange-100/50 group-hover:bg-orange-500 group-hover:text-white"
             />
           </div>
         )}
+
         {/* Dashboard Analytics & Widgets */}
         {!loading && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6">
+          <div className="dashboard-grid">
             {/* ROW 1 */}
             {/* Sales Chart (Span 8) */}
             <div
-              className="lg:col-span-8 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col relative overflow-hidden group animate-fade-in-up"
+              className="lg:col-span-8 dashboard-card relative overflow-hidden group animate-fade-in-up"
               style={{ animationDelay: "0.1s" }}
             >
               <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-orange-50/60 to-transparent pointer-events-none transition-opacity opacity-0 group-hover:opacity-100 duration-500"></div>
               <div className="flex justify-between items-center mb-4 relative z-10">
                 <div>
-                  <h3 className="text-md font-extrabold text-gray-800">
+                  <h3 className="dashboard-title">
                     Sales Overview
                   </h3>
-                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                  <p className="dashboard-subtitle">
                     Approved quotations revenue
                   </p>
                 </div>
@@ -583,7 +581,7 @@ export default function Dashboard() {
                   </button>
                 </div>
               </div>
-              <div className="h-[200px] w-full mt-auto relative z-10">
+              <div className="chart-wrapper">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={salesData}
@@ -648,18 +646,18 @@ export default function Dashboard() {
 
             {/* Leads Donut Chart (Span 4) */}
             <div
-              className="lg:col-span-4 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
+              className="lg:col-span-4 dashboard-card animate-fade-in-up"
               style={{ animationDelay: "0.2s" }}
             >
               <div className="mb-1">
-                <h3 className="text-md font-extrabold text-gray-800">
+                <h3 className="dashboard-title">
                   Lead Status
                 </h3>
-                <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                <p className="dashboard-subtitle">
                   CRM leads distribution
                 </p>
               </div>
-              <div className="h-[200px] flex items-center justify-center mt-auto">
+              <div className="chart-height">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -707,15 +705,15 @@ export default function Dashboard() {
             {/* ROW 2 */}
             {/* Split View To-Do List (Span 7) */}
             <div
-              className="lg:col-span-7 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
+              className="lg:col-span-7 dashboard-card todo-wrapper animate-fade-in-up"
               style={{ animationDelay: "0.3s" }}
             >
-              <div className="flex flex-col md:flex-row justify-between md:items-center gap-3 mb-4">
+              <div className="todo-header flex flex-col md:flex-row justify-between md:items-center gap-3 mb-4">
                 <div>
-                  <h3 className="text-md font-extrabold text-gray-800">
+                  <h3 className="dashboard-title">
                     Todo List
                   </h3>
-                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                  <p className="dashboard-subtitle">
                     Productivity
                   </p>
                 </div>
@@ -731,34 +729,33 @@ export default function Dashboard() {
                       placeholder={
                         editingTodoId ? "Update task..." : "Quick add..."
                       }
-                      className="w-full bg-white border border-gray-200 rounded-lg py-1.5 pl-3 pr-8 text-[12px] focus:outline-none focus:ring-2 focus:ring-orange-500/20 transition-all text-gray-800 font-medium placeholder-gray-400"
+                      className="todo-input"
                       disabled={addingTodo}
                     />
                     <button
                       type="submit"
                       disabled={addingTodo || !newTodoTitle.trim()}
-                      className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 text-white bg-orange-500 rounded-md hover:bg-orange-600 disabled:opacity-50 transition-all"
+                      className="todo-add-btn disabled:opacity-50"
                     >
                       <Plus size={12} strokeWidth={3} />
                     </button>
                   </form>
                   <button
                     onClick={() => router.push("/todolist")}
-                    className="text-[10px] text-orange-600 hover:text-white bg-orange-50 hover:bg-orange-500 px-2.5 py-1.5 rounded-lg font-bold transition-all"
-                  >
+className="dashboard-btn dashboard-btn-orange"                  >
                     View All
                   </button>
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-auto">
-                <div className="bg-white/60 backdrop-blur-sm border border-gray-100 p-3 rounded-xl shadow-sm flex flex-col">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 todo-body">
+                <div className="todo-column">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="w-2 h-2 rounded-full bg-orange-500"></span>
                     <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
                       Unfinished
                     </h3>
                   </div>
-                  <div className="space-y-1.5 overflow-y-auto h-[120px] custom-scrollbar">
+                  <div className="space-y-1.5 todo-scroll custom-scrollbar">
                     {unfinishedTodos.map((todo) => (
                       <div
                         key={todo.id}
@@ -792,14 +789,14 @@ export default function Dashboard() {
                     ))}
                   </div>
                 </div>
-                <div className="bg-white/60 backdrop-blur-sm border border-gray-100 p-3 rounded-xl shadow-sm flex flex-col">
+                <div className="todo-column">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="w-2 h-2 rounded-full bg-green-500"></span>
                     <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
                       Finished
                     </h3>
                   </div>
-                  <div className="space-y-1.5 overflow-y-auto h-[120px] custom-scrollbar">
+                  <div className="space-y-1.5 todo-scroll custom-scrollbar">
                     {finishedTodos.map((todo) => (
                       <div
                         key={todo.id}
@@ -833,18 +830,19 @@ export default function Dashboard() {
 
             {/* Payment Due Progress Bar (Span 5) */}
             <div
-              className="lg:col-span-5 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
+              className="lg:col-span-5 dashboard-card payment-wrapper animate-fade-in-up"
               style={{ animationDelay: "0.5s" }}
             >
               <div className="mb-6">
-                <h3 className="text-md font-extrabold text-gray-800">
-                  Payment Due
+<h3 className="dashboard-title">
+                    Payment Due
                 </h3>
-                <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                <p className="dashboard-subtitle">
+
                   Proforma Collection
                 </p>
               </div>
-              <div className="flex flex-col gap-5 mt-auto">
+              <div className="payment-content flex flex-col gap-5">
                 <div className="flex justify-between items-end">
                   <div>
                     <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">
@@ -907,15 +905,15 @@ export default function Dashboard() {
             {/* ROW 4 */}
             {/* Tasks Priority Donut (Span 6) */}
             <div
-              className="lg:col-span-6 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
+              className="lg:col-span-6 dashboard-card animate-fade-in-up"
               style={{ animationDelay: "0.6s" }}
             >
               <div className="mb-1">
-                <h3 className="text-lg font-extrabold text-gray-800">
+                <h3 className="dashboard-title">
                   Tasks Priority
                 </h3>
-                <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
-                  Focus areas
+<p className="dashboard-subtitle">
+                    Focus areas
                 </p>
               </div>
               <div className="h-[200px] flex items-center justify-center mt-auto">
@@ -965,14 +963,14 @@ export default function Dashboard() {
 
             {/* Quotation Status Chart (Span 6) */}
             <div
-              className="lg:col-span-6 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
+              className="lg:col-span-6 dashboard-card animate-fade-in-up"
               style={{ animationDelay: "0.7s" }}
             >
               <div className="mb-1">
-                <h3 className="text-lg font-extrabold text-gray-800">
+                <h3 className="dashboard-title">
                   Quotation Status
                 </h3>
-                <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                <p className="dashboard-subtitle">
                   Active vs Won vs Lost
                 </p>
               </div>
@@ -1023,21 +1021,21 @@ export default function Dashboard() {
 
             {/* Recent Leads (Last 3) */}
             <div
-              className="lg:col-span-12 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
+              className="lg:col-span-12 dashboard-card animate-fade-in-up"
               style={{ animationDelay: "0.8s" }}
             >
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  <h3 className="text-lg font-extrabold text-gray-800">
+                  <h3 className="dashboard-title">
                     Recent Leads
                   </h3>
-                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                  <p className="dashboard-subtitle">
                     Last 3 leads added
                   </p>
                 </div>
                 <button
                   onClick={() => router.push("/sales/lead")}
-                  className="text-[10px] text-orange-600 hover:text-white bg-orange-50 hover:bg-orange-500 px-3 py-1.5 rounded-lg font-bold transition-all uppercase tracking-wider"
+                  className="dashboard-btn dashboard-btn-orange uppercase tracking-wider"
                 >
                   View All Leads
                 </button>
@@ -1046,7 +1044,7 @@ export default function Dashboard() {
                 {safeLeads.slice(0, 3).map((lead, idx) => (
                   <div
                     key={idx}
-                    className="bg-white/60 backdrop-blur-sm border border-orange-100 p-4 rounded-xl shadow-sm hover:shadow-md transition-all group relative overflow-hidden"
+                    className="lead-card group"
                   >
                     <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
                       <UserPlus size={40} className="text-orange-500" />
