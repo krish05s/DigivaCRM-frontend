@@ -711,65 +711,81 @@ className="add-btn "            >
       )}
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-gray-900/30 z-50 flex justify-center items-center">
-          <div className="bg-white rounded-sm shadow-xl w-[380px] relative overflow-hidden">
-            {/* Header */}
-            <div className="from-orange-100 to-white bg-gradient-to-r  px-5 py-3 flex items-center justify-between ">
-              <div className="flex items-center gap-2">
-                <div className="bg-white rounded-xl shadow-lg p-6 w-[500px] relative overflow-hidden"></div>{" "}
-                <i className="bi bi-trash3 text-orange-500 text-sm"></i>
-                <span className="text-xs font-bold tracking-widest text-gray-700 uppercase">
-                  Delete Contact
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={handleDeleteCancel}
-                className="text-orange-500 text-md "
-              >
-                ✕
-              </button>
-            </div>
+  <div className="delete-overlay">
 
-            {/* Body */}
-            <div className="px-6 py-6 flex flex-col items-center">
-              {/* Trash Icon */}
-              <div className="bg-orange-100 rounded-full p-4 mb-4">
-                <i className="bi bi-trash3 text-orange-500 text-2xl"></i>
-              </div>
+    <div className="delete-modal">
 
-              {/* Contact Name */}
-              <h3 className="text-center text-base font-bold text-gray-800 mb-1 uppercase tracking-wide">
-                {contacts.find((c) => c.id === deleteId)?.contact_person ||
-                  "This Contact"}
-              </h3>
+      {/* Header */}
+      <div className="delete-header">
 
-              {/* Subtext */}
-              <p className="text-center text-sm text-gray-400 mb-6">
-                This action cannot be undone. Are you sure?
-              </p>
+        <div className="delete-header-left">
 
-              {/* Buttons */}
-              <div className="flex gap-3 w-full p-x-6">
-                <button
-                  type="button"
-                  onClick={handleDeleteCancel}
-                  className="flex-1 py-2.5 rounded-md border  border-gray-300 text-gray-600 hover:bg-gray-50 transition-all text-sm font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleDeleteConfirm}
-                  className="common-btn flex-1 px-4 py-2 text-sm font-semibold transition-colors hover:cursor-pointer"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
+          <span className="delete-dot"></span>
+
+          <span className="delete-title">
+            Delete Contact
+          </span>
+
         </div>
-      )}
+
+        <button
+          type="button"
+          onClick={handleDeleteCancel}
+          className="delete-close"
+        >
+          ✕
+        </button>
+
+      </div>
+
+      {/* Body */}
+      <div className="delete-body">
+
+        {/* Icon */}
+        <div className="delete-icon-wrap">
+
+          <i className="bi bi-trash3 delete-icon"></i>
+
+        </div>
+
+        {/* Name */}
+        <h3 className="delete-name">
+          {contacts.find((c) => c.id === deleteId)?.contact_person ||
+            "This Contact"}
+        </h3>
+
+        {/* Subtitle */}
+        <p className="delete-subtitle">
+          This action cannot be undone. Are you sure?
+        </p>
+
+      </div>
+
+      {/* Footer */}
+      <div className="delete-footer">
+
+        <button
+          type="button"
+          onClick={handleDeleteCancel}
+          className="delete-cancel-btn"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          onClick={handleDeleteConfirm}
+          className="delete-delete-btn"
+        >
+          Delete
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
     </>
   );
 }

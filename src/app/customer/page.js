@@ -266,21 +266,21 @@ export default function AddCustomer() {
 
           {/* ── PERSONAL INFORMATION TAB ── */}
           {activeTab === "customer" && (
-            <div className="bg-white rounded-sm border border-gray-200 shadow-sm p-6 space-y-5 max-w-[900px] max-h-[63vh] overflow-y-auto custom-scroll">
+            <div className="edit-form max-w-[900px] max-h-[63vh] overflow-y-auto custom-scroll">
               {/* Customer Type */}
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                <label className="edit-label mb-2">
                   Customer Type
                 </label>
                 <div className="flex gap-4">
                   {["Individual", "Business"].map((type) => (
                     <label
                       key={type}
-                      className={`flex items-center gap-2.5 px-4 py-2.5 rounded-lg border-2 cursor-pointer transition-all ${
-                        formData.customer_type === type
-                          ? "border-orange-400 bg-orange-50 text-orange-500"
-                          : "border-gray-200 text-gray-600 hover:border-gray-300"
-                      }`}
+                     className={`edit-radio ${
+  formData.customer_type === type
+    ? "edit-radio-active"
+    : ""
+}`}
                     >
                       <input
                         type="radio"
@@ -298,7 +298,7 @@ export default function AddCustomer() {
                         }`}
                       >
                         {formData.customer_type === type && (
-                          <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                          <div className="edit-radio-dot"></div>
                         )}
                       </div>
                       <span className="text-sm font-medium">{type}</span>
@@ -310,7 +310,7 @@ export default function AddCustomer() {
               {/* Row 1 — Company / Customer / Mobile */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                  <label className="edit-label">
                     Company Name <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -318,11 +318,11 @@ export default function AddCustomer() {
                     value={formData.company_name}
                     onChange={handleChange}
                     placeholder="Enter Company name"
-                    className="w-full bg-gray-50 border border-orange-300 rounded-sm px-3 py-2.5 text-sm text-gray-700 outline-none transition-all"
+                    className="edit-input"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                  <label className="edit-label">
                     Customer Name <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -331,11 +331,11 @@ export default function AddCustomer() {
                     value={formData.customer_name}
                     onChange={handleChange}
                     placeholder="Enter customer name"
-                    className="w-full bg-gray-50 border border-orange-300 rounded-sm px-3 py-2.5 text-sm text-gray-700 outline-none transition-all"
+                    className="edit-input"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                  <label className="edit-label">
                     Email <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -553,10 +553,10 @@ export default function AddCustomer() {
 
           {/* ── CONTACT DETAILS TAB ── */}
           {activeTab === "contact" && (
-            <div className="bg-white rounded-sm border border-gray-200 shadow-sm p-6 space-y-5 max-w-[900px] max-h-[63vh] overflow-y-auto custom-scroll">
+            <div className="edit-form max-w-[900px] max-h-[63vh] overflow-y-auto custom-scroll">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                  <label className="edit-label">
                     Contact Person <span className="text-red-400">*</span>
                   </label>
                   <input

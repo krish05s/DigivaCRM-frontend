@@ -1437,3 +1437,269 @@ transition-all duration-300;  }
     text-sm font-semibold;
   }
 }
+
+/* customerlist view css */
+
+@import "tailwindcss";
+
+/* =========================
+   VIEW MODAL THEME
+========================= */
+:root {
+  --view-primary: #000000;         /* Main blue */
+  --view-header-bg: #111111;      /* Header bg */
+  --view-hover: #dbeafe;          /* Button hover */
+  --view-bg: #ffffff;             /* Modal bg */
+  --view-card-bg: #f9fafb;        /* Card bg */
+  --view-border: #e5e7eb;         /* Border */
+  --view-text: #374151;           /* Main text */
+  --view-subtext: #9ca3af;        /* Label text */
+  --view-overlay: rgba(0, 0, 0, 0.35); /* Background overlay */
+}
+
+/* =========================
+   VIEW MODAL COMPONENTS
+========================= */
+@layer components {
+
+  /* Overlay */
+  .view-overlay {
+    @apply fixed inset-0 z-50 flex items-center justify-center;
+    background: var(--view-overlay);
+  }
+
+  /* Main Modal */
+  .view-modal {
+    @apply w-full max-w-3xl rounded-2xl shadow-xl overflow-hidden;
+    background: var(--view-bg);
+    border: 1px solid var(--view-border);
+  }
+
+  /* Header */
+.view-header {
+  @apply flex items-center justify-between px-6 py-4 border-b;
+  background: linear-gradient(
+    to right,
+    #000000 0%,
+    #111111 25%,
+    #2b2b2b 45%,
+    #f5f5f5 100%
+  );
+  border-color: var(--view-border);
+}
+
+  .view-header-left {
+    @apply flex items-center gap-3;
+  }
+
+  .view-header-icon {
+  @apply text-xl;
+  color: white;
+}
+
+
+ .view-title {
+  @apply text-sm font-bold uppercase tracking-wide;
+  color: white;
+}
+
+.view-subtitle {
+  @apply text-xs;
+  color: #d1d5db;
+}
+
+  .view-close {
+  @apply text-xl cursor-pointer transition-all duration-200 hover:scale-110;
+  color: black;
+}
+
+  /* Body */
+  .view-body {
+    @apply p-6 grid grid-cols-1 md:grid-cols-2 gap-4;
+  }
+
+  /* Card */
+  .view-card {
+    @apply rounded-xl px-4 py-4 flex items-center gap-3 border;
+    background: var(--view-card-bg);
+    border-color: var(--view-border);
+  }
+
+  .view-card-icon {
+    @apply text-lg;
+    color: var(--view-primary);
+  }
+
+  .view-card-content {
+    @apply flex flex-col;
+  }
+
+  .view-card-label {
+    @apply text-xs uppercase font-medium tracking-wide;
+    color: var(--view-subtext);
+  }
+
+  .view-card-value {
+    @apply text-sm font-semibold break-all;
+    color: var(--view-text);
+  }
+
+  /* Footer */
+  .view-footer {
+    @apply flex justify-end px-6 py-5 border-t;
+    border-color: var(--view-border);
+    background: var(--view-bg);
+  }
+
+  /* Button */
+  .view-btn {
+    @apply px-6 py-2 rounded-xl text-sm font-medium transition-all duration-200;
+    border: 1px solid var(--view-border);
+    background: white;
+    color: var(--view-text);
+  }
+
+  .view-btn:hover {
+    background: var(--view-hover);
+  }
+}
+
+
+
+/*customer delete foem css */
+
+
+@import "tailwindcss";
+
+/* =========================
+   DELETE MODAL THEME
+========================= */
+:root {
+  --delete-primary: #f97316;
+  --delete-primary-light: #fff7ed;
+
+  --delete-bg: #ffffff;
+  --delete-border: #e5e7eb;
+
+  --delete-text: #1f2937;
+  --delete-subtext: #9ca3af;
+
+  --delete-overlay: rgba(0, 0, 0, 0.35);
+
+  --delete-hover: #ea580c;
+
+  --delete-cancel-bg: #ffffff;
+  --delete-cancel-text: #6b7280;
+
+  --delete-delete-text: #111827;
+}
+
+/* =========================
+   DELETE MODAL COMPONENTS
+========================= */
+@layer components {
+
+  /* Overlay */
+  .delete-overlay {
+    @apply fixed inset-0 z-50 flex items-center justify-center;
+    background: var(--delete-overlay);
+  }
+
+  /* Main Modal */
+  .delete-modal {
+    @apply w-full max-w-sm rounded-sm shadow-xl overflow-hidden;
+    background: var(--delete-bg);
+    border: 1px solid var(--delete-border);
+  }
+
+  /* =========================
+     HEADER
+  ========================= */
+  .delete-header {
+    @apply flex items-center justify-between px-6 py-4 border-b;
+
+    background: linear-gradient(
+      to right,
+      #000000 0%,
+      #111111 25%,
+      #2b2b2b 45%,
+      #f5f5f5 100%
+    );
+
+    border-color: var(--delete-border);
+  }
+
+  .delete-header-left {
+    @apply flex items-center gap-2;
+  }
+
+  .delete-dot {
+    @apply w-2 h-2 rounded-full;
+    background: var(--delete-primary);
+  }
+
+  .delete-title {
+    @apply text-sm font-semibold uppercase tracking-wide;
+    color: #ffffff;
+  }
+
+  .delete-close {
+    @apply text-xl cursor-pointer transition-all duration-200 hover:scale-110;
+    color: #ffffff;
+  }
+
+  /* =========================
+     BODY
+  ========================= */
+  .delete-body {
+    @apply p-6 text-center;
+  }
+
+  .delete-icon-wrap {
+    @apply w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4;
+    background: var(--delete-primary-light);
+  }
+
+  .delete-icon {
+    @apply w-8 h-8;
+    color: var(--delete-primary);
+  }
+
+  .delete-name {
+    @apply font-semibold text-base mb-1 uppercase;
+    color: var(--delete-text);
+  }
+
+  .delete-subtitle {
+    @apply text-sm;
+    color: var(--delete-subtext);
+  }
+
+  /* =========================
+     FOOTER
+  ========================= */
+  .delete-footer {
+    @apply flex gap-3 px-5 pb-5;
+  }
+
+  .delete-cancel-btn {
+    @apply flex-1 px-4 py-2 text-sm border rounded-sm transition-colors;
+    background: var(--delete-cancel-bg);
+    color: var(--delete-cancel-text);
+    border-color: var(--delete-border);
+  }
+
+  .delete-cancel-btn:hover {
+    background: #f9fafb;
+  }
+
+  .delete-delete-btn {
+    @apply flex-1 px-4 py-2 text-sm font-semibold transition-colors hover:cursor-pointer rounded-sm;
+    background: transparent;
+    color: var(--delete-delete-text);
+  }
+
+  .delete-delete-btn:hover {
+    color: var(--delete-hover);
+  }
+}

@@ -655,11 +655,11 @@ export default function Page() {
   const filteredLeads = hasActiveFilters
     ? leads
     : leads.filter((l) => {
-        if (activeTab === "Pending") {
-          return l.status !== "Won" && l.status !== "Lost";
-        }
-        return l.status === activeTab;
-      });
+      if (activeTab === "Pending") {
+        return l.status !== "Won" && l.status !== "Lost";
+      }
+      return l.status === activeTab;
+    });
 
   const pendingCount = leads.filter((l) => l.status === "Pending").length;
   const wonCount = leads.filter((l) => l.status === "Won").length;
@@ -740,7 +740,7 @@ export default function Page() {
           { params: { status: 1 } },
         );
         setLeadSource(res.data);
-      } catch {}
+      } catch { }
     };
 
     fetchSource();
@@ -754,7 +754,7 @@ export default function Page() {
           { params: { status: 1 } },
         );
         setLeadCategory(res.data);
-      } catch {}
+      } catch { }
     };
 
     fetchCategory();
@@ -767,7 +767,7 @@ export default function Page() {
           params: { status: 1 },
         });
         setCategory(res.data);
-      } catch {}
+      } catch { }
     };
 
     fetchProductCategory();
@@ -808,9 +808,8 @@ export default function Page() {
                 <i className="bi bi-download text-base"></i>
                 Export
                 <i
-                  className={`bi bi-chevron-down text-xs transition-transform duration-200 ${
-                    showExportMenu ? "rotate-180" : ""
-                  }`}
+                  className={`bi bi-chevron-down text-xs transition-transform duration-200 ${showExportMenu ? "rotate-180" : ""
+                    }`}
                 ></i>
               </button>
 
@@ -1019,11 +1018,10 @@ export default function Page() {
           <div className="table-tabs">
             <button
               onClick={() => setActiveTab("Pending")}
-              className={`table-tab-btn ${
-                activeTab === "Pending"
+              className={`table-tab-btn ${activeTab === "Pending"
                   ? "table-tab-pending-active"
                   : "table-tab-inactive"
-              }`}
+                }`}
             >
               Pending
               <span className=" table-tab-badge-pending cursor-pointer table-tab-badge">
@@ -1036,9 +1034,8 @@ export default function Page() {
 
             <button
               onClick={() => setActiveTab("Won")}
-              className={`pb-3 text-sm font-medium cursor-pointer relative ${
-                activeTab === "Won" ? "table-tab-won-active" : "table-tab-inactive"
-              }`}
+              className={`pb-3 text-sm font-medium cursor-pointer relative ${activeTab === "Won" ? "table-tab-won-active" : "table-tab-inactive"
+                }`}
             >
               Won
               <span className=" table-tab-badge-won  cursor-pointer table-tab-badge">
@@ -1051,9 +1048,8 @@ export default function Page() {
 
             <button
               onClick={() => setActiveTab("Lost")}
-              className={`pb-3 text-sm font-medium relative ${
-                activeTab === "Lost" ? "table-tab-lost-active" : "table-tab-inactive"
-              }`}
+              className={`pb-3 text-sm font-medium relative ${activeTab === "Lost" ? "table-tab-lost-active" : "table-tab-inactive"
+                }`}
             >
               Lost
               <span className=" table-tab-badge-lost  cursor-pointer table-tab-badge">
@@ -1133,23 +1129,23 @@ export default function Page() {
                           >
                             {lead.assignee
                               ? String(lead.assignee)
-                                  .split(",")
-                                  .map((name, index) => {
-                                    const letter = name
-                                      .trim()
-                                      .charAt(0)
-                                      .toUpperCase();
+                                .split(",")
+                                .map((name, index) => {
+                                  const letter = name
+                                    .trim()
+                                    .charAt(0)
+                                    .toUpperCase();
 
-                                    return (
-                                      <div
-                                        key={index}
-                                        title={name.trim()}
-                                        className="table-assignee-badge"
-                                      >
-                                        {letter}
-                                      </div>
-                                    );
-                                  })
+                                  return (
+                                    <div
+                                      key={index}
+                                      title={name.trim()}
+                                      className="table-assignee-badge"
+                                    >
+                                      {letter}
+                                    </div>
+                                  );
+                                })
                               : "-"}
                           </td>
 
@@ -1161,11 +1157,10 @@ export default function Page() {
                                     openUpdateModal(lead);
                                   }
                                 }}
-                                className={`${
-                                  lead.status === "Pending"
+                                className={`${lead.status === "Pending"
                                     ? "cursor-pointer text-blue-800"
                                     : "text-gray-400 cursor-not-allowed"
-                                }`}
+                                  }`}
                               >
                                 {new Date(
                                   lead.next_follow_up_date,
@@ -1189,11 +1184,10 @@ export default function Page() {
                                   });
                                   setShowModal(true);
                                 }}
-                                className={`table-action-btn                                  ${
-                                  lead.status === "Pending"
+                                className={`table-action-btn                                  ${lead.status === "Pending"
                                     ? "hover:bg-gray-100 cursor-pointer"
                                     : "bg-gray-100 cursor-not-allowed opacity-60"
-                                }`}
+                                  }`}
                               >
                                 <i className="bi bi-plus text-lg"></i>
                               </button>
@@ -1328,11 +1322,10 @@ export default function Page() {
                           <button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            className={`pagination-btn ${
-                              currentPage === page
+                            className={`pagination-btn ${currentPage === page
                                 ? "pagination-btn-active"
                                 : "pagination-btn"
-                            }`}
+                              }`}
                           >
                             {page}
                           </button>
@@ -1848,8 +1841,8 @@ export default function Page() {
                             <span className="text-xs text-gray-400">
                               {item.follow_up_date
                                 ? new Date(
-                                    item.follow_up_date,
-                                  ).toLocaleDateString()
+                                  item.follow_up_date,
+                                ).toLocaleDateString()
                                 : "—"}
                             </span>
                             <i
@@ -1887,8 +1880,8 @@ export default function Page() {
                           label: "Follow-Up Date",
                           value: previewFollowUp.follow_up_date
                             ? new Date(
-                                previewFollowUp.follow_up_date,
-                              ).toLocaleDateString()
+                              previewFollowUp.follow_up_date,
+                            ).toLocaleDateString()
                             : "—",
                         },
                         {
@@ -2123,121 +2116,138 @@ export default function Page() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30">
           <div className="bg-white w-full max-w-2xl border border-gray-100 rounded-sm shadow-2xl overflow-hidden ">
             {/* Orange Header */}
-            <div className="from-orange-100 to-white  px-6 py-3 flex items-center justify-between bg-gradient-to-r">
-              <div className="flex items-center gap-3">
-                <div className="w-7 h-7 flex items-center justify-center">
-                  <i className="bi bi-person  text-md text-orange-500"></i>
-                </div>
-                <div>
-                  <p className="text-sm  font-semibold text-gray-700 uppercase tracking-wide">
-                    {viewLead.customer_name || "—"}
-                  </p>
-                  <p className="text-gray-400 text-md">
-                    {viewLead.status || "—"}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowViewModal(false)}
-                className="w-7 h-7  flex items-center justify-center text-orange-500 text-md"
-              >
-                <i className="bi bi-x-lg text-sm"></i>
-              </button>
-            </div>
+           {/* Header */}
+<div className="view-header">
+  <div className="view-header-left">
+    <div className="w-7 h-7 flex items-center justify-center">
+      <i className="bi bi-person view-header-icon"></i>
+    </div>
+
+    <div>
+      <p className="view-title">
+        {viewLead.customer_name || "—"}
+      </p>
+
+      <p className="view-subtitle">
+        {viewLead.status || "—"}
+      </p>
+    </div>
+  </div>
+
+  <button
+    onClick={() => setShowViewModal(false)}
+    className="view-close"
+  >
+    <i className="bi bi-x-lg text-sm"></i>
+  </button>
+</div>
 
             {/* Cards Grid */}
             <div className="p-6 grid grid-cols-2 gap-4">
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
-                <i className="bi bi-building text-orange-400 text-lg"></i>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wider ">
+              <div className="view-card">
+                <i className="bi bi-building view-card-icon"></i>
+
+                <div className="view-card-content">
+                  <p className="view-card-label">
                     Company
                   </p>
-                  <p className="text-sm font-semibold text-gray-700">
+
+                  <p className="view-card-value">
                     {viewLead.company_name || "—"}
                   </p>
                 </div>
               </div>
+              <div className="view-card">
+                <i className="bi bi-person-circle view-card-icon"></i>
 
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
-                <i className="bi bi-person-circle text-orange-400 text-lg"></i>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+                <div className="view-card-content">
+                  <p className="view-card-label">
                     Customer Name
                   </p>
-                  <p className="text-sm font-semibold text-gray-700">
+
+                  <p className="view-card-value">
                     {viewLead.customer_name || "—"}
                   </p>
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
-                <i className="bi bi-flag text-orange-400 text-lg"></i>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+              <div className="view-card">
+                <i className="bi bi-flag view-card-icon"></i>
+
+                <div className="view-card-content">
+                  <p className="view-card-label">
                     Source
                   </p>
-                  <p className="text-sm font-semibold text-gray-700">
+
+                  <p className="view-card-value">
                     {viewLead.source || "—"}
                   </p>
                 </div>
               </div>
+              <div className="view-card">
+                <i className="bi bi-layers view-card-icon"></i>
 
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
-                <i className="bi bi-layers text-orange-400 text-lg"></i>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+                <div className="view-card-content">
+                  <p className="view-card-label">
                     Product Category
                   </p>
-                  <p className="text-sm font-semibold text-gray-700">
+
+                  <p className="view-card-value">
                     {viewLead.product_category || "—"}
                   </p>
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
-                <i className="bi bi-box-seam text-orange-400 text-lg"></i>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+              <div className="view-card">
+                <i className="bi bi-box-seam view-card-icon"></i>
+
+                <div className="view-card-content">
+                  <p className="view-card-label">
                     Product Name
                   </p>
-                  <p className="text-sm font-semibold text-gray-700">
+
+                  <p className="view-card-value">
                     {viewLead.product_name || "—"}
                   </p>
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
-                <i className="bi bi-tag text-orange-400 text-lg"></i>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+              <div className="view-card">
+                <i className="bi bi-tag view-card-icon"></i>
+
+                <div className="view-card-content">
+                  <p className="view-card-label">
                     Category
                   </p>
-                  <p className="text-sm font-semibold text-gray-700">
+
+                  <p className="view-card-value">
                     {viewLead.category || "—"}
                   </p>
                 </div>
               </div>
+              <div className="view-card">
+                <i className="bi bi-person-check view-card-icon"></i>
 
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
-                <i className="bi bi-person-check text-orange-400 text-lg"></i>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+                <div className="view-card-content">
+                  <p className="view-card-label">
                     Assignee
                   </p>
-                  <p className="text-sm font-semibold text-gray-700">
+
+                  <p className="view-card-value">
                     {viewLead.assignee || "—"}
                   </p>
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
-                <i className="bi bi-calendar3 text-orange-400 text-lg"></i>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+              <div className="view-card">
+                <i className="bi bi-calendar3 view-card-icon"></i>
+
+                <div className="view-card-content">
+                  <p className="view-card-label">
                     Created
                   </p>
-                  <p className="text-sm font-semibold text-gray-700">
+
+                  <p className="view-card-value">
                     {viewLead.created_at
                       ? new Date(viewLead.created_at).toLocaleDateString()
                       : "—"}
@@ -2245,30 +2255,33 @@ export default function Page() {
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-start gap-3">
-                <i className="bi bi-pencil text-orange-400 text-lg"></i>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+              <div className="view-card items-start">
+                <i className="bi bi-pencil view-card-icon"></i>
+
+                <div className="view-card-content flex-1 min-w-0">
+                  <p className="view-card-label">
                     Lead Title
                   </p>
-                  <p className="text-sm font-semibold text-gray-700 break-words whitespace-normal">
+
+                  <p className="view-card-value break-words whitespace-normal">
                     {viewLead.lead_title || "—"}
                   </p>
                 </div>
               </div>
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-start gap-3">
-                <i className="bi bi-chat-left-text text-orange-400 text-lg"></i>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+              <div className="view-card items-start">
+                <i className="bi bi-chat-left-text view-card-icon"></i>
+
+                <div className="view-card-content flex-1 min-w-0">
+                  <p className="view-card-label">
                     Description
                   </p>
-                  <p className="text-sm font-semibold text-gray-700 break-words whitespace-normal">
+
+                  <p className="view-card-value break-words whitespace-normal">
                     {viewLead.description || "—"}
                   </p>
                 </div>
               </div>
             </div>
-
             {/* Footer */}
             <div className="flex justify-end px-6 py-4 border-t border-gray-100">
               <button

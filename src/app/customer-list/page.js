@@ -450,100 +450,119 @@ export default function CustomerList() {
       </div>
 
       {/* Delete Modal */}
-      {deleteModal.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30">
-          <div className="bg-white rounded-sm shadow-xl w-full max-w-sm border border-gray-100 overflow-hidden">
-            <div className="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-orange-100 to-white">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-orange-500 inline-block"></span>
-                <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                  Delete Customer
-                </span>
-              </div>
-              <button
-                onClick={() =>
-                  setDeleteModal({ open: false, id: null, name: "" })
-                }
-                className="w-7 h-7 flex items-center justify-center text-orange-500 text-md"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-6 text-center">
-              <div className="w-16 h-16 rounded-full bg-orange-50 flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-orange-400"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={1.8}
-                  viewBox="0 0 24 24"
-                >
-                  <polyline points="3 6 5 6 21 6" />
-                  <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
-                  <path d="M10 11v6M14 11v6" />
-                  <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
-                </svg>
-              </div>
-              <p className="font-semibold text-gray-800 text-base mb-1">
-                {deleteModal.name}
-              </p>
-              <p className="text-sm text-gray-400">
-                This action cannot be undone. Are you sure?
-              </p>
-            </div>
-            <div className="flex gap-3 px-5 pb-5">
-              <button
-                onClick={() =>
-                  setDeleteModal({ open: false, id: null, name: "" })
-                }
-                className="flex-1 px-4 py-2 text-sm text-gray-500 border border-gray-200 rounded-sm hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  handleDelete(deleteModal.id);
-                  setDeleteModal({ open: false, id: null, name: "" });
-                }}
-                className="common-btn flex-1 px-4 py-2 text-sm font-semibold transition-colors hover:cursor-pointer"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
+     {deleteModal.open && (
+  <div className="delete-overlay">
+    
+    <div className="delete-modal">
+
+      {/* Header */}
+      <div className="delete-header">
+
+        <div className="delete-header-left">
+          <span className="delete-dot"></span>
+
+          <span className="delete-title">
+            Delete Customer
+          </span>
         </div>
-      )}
+
+        <button
+          onClick={() =>
+            setDeleteModal({ open: false, id: null, name: "" })
+          }
+          className="delete-close"
+        >
+          ✕
+        </button>
+
+      </div>
+
+      {/* Body */}
+      <div className="delete-body">
+
+        <div className="delete-icon-wrap">
+          <svg
+            className="delete-icon"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.8}
+            viewBox="0 0 24 24"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+          </svg>
+        </div>
+
+        <p className="delete-name">
+          {deleteModal.name}
+        </p>
+
+        <p className="delete-subtitle">
+          This action cannot be undone. Are you sure?
+        </p>
+
+      </div>
+
+      {/* Footer */}
+      <div className="delete-footer">
+
+        <button
+          onClick={() =>
+            setDeleteModal({ open: false, id: null, name: "" })
+          }
+          className="delete-cancel-btn"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={() => {
+            handleDelete(deleteModal.id);
+            setDeleteModal({ open: false, id: null, name: "" });
+          }}
+          className="delete-delete-btn"
+        >
+          Delete
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
 
       {/* View Customer Modal */}
       {viewModal.open && viewModal.data && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30">
-          <div className="bg-white rounded-sm shadow-xl w-full max-w-2xl overflow-hidden border border-gray-100">
-            <div className="flex items-center justify-between px-6 py-3 from-orange-100 to-white bg-gradient-to-r">
-              <div className="flex items-center gap-3">
-                <div className="w-7 h-7 flex items-center justify-center">
-                  <i className="bi bi-person text-orange-500 text-md"></i>
+          <div className="view-modal">
+            <div className="view-header">
+              <div className="view-header-left">
+                <div className="view-header-icon-wrap">
+                  <i className="bi bi-person view-header-icon"></i>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                  <p className="view-title">
                     {viewModal.data.customer_name}
                   </p>
-                  <p className="text-gray-400 text-md">
+                  <p className="view-subtitle">
                     {viewModal.data.customer_type}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setViewModal({ open: false, data: null })}
-                className="w-7 h-7 flex items-center justify-center text-orange-500 text-md"
+                className="view-close"
               >
                 ✕
               </button>
             </div>
-            <div className="p-6 grid grid-cols-2 gap-4">
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
-                <i className="bi bi-building text-orange-400 text-lg"></i>
+            <div className="view-body">
+              <div className="view-card">
+                <i className="bi bi-building view-card-icon"></i>
                 <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide">
+                  <p className="view-label">
                     Company
                   </p>
                   <p className="text-sm font-semibold text-gray-700">
@@ -551,73 +570,73 @@ export default function CustomerList() {
                   </p>
                 </div>
               </div>
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
-                <i className="bi bi-person-circle text-orange-400 text-lg"></i>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide">
-                    Customer Name
-                  </p>
-                  <p className="text-sm font-semibold text-gray-700">
-                    {viewModal.data.customer_name || "—"}
-                  </p>
-                </div>
-              </div>
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
-                <i className="bi bi-envelope text-orange-400 text-lg"></i>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide">
-                    Email
-                  </p>
-                  <p className="text-sm font-semibold text-gray-700 break-all">
-                    {viewModal.data.email || "—"}
-                  </p>
-                </div>
-              </div>
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
-                <i className="bi bi-telephone text-orange-400 text-lg"></i>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide">
-                    Mobile
-                  </p>
-                  <p className="text-sm font-semibold text-gray-700">
-                    {viewModal.data.mobile || "—"}
-                  </p>
-                </div>
-              </div>
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
-                <i className="bi bi-tag text-orange-400 text-lg"></i>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide">
-                    Customer Type
-                  </p>
-                  <p className="text-sm font-semibold text-gray-700">
-                    {viewModal.data.customer_type || "—"}
-                  </p>
-                </div>
-              </div>
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
-                <i className="bi bi-globe text-orange-400 text-lg"></i>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide">
-                    Website
-                  </p>
-                  <p className="text-sm font-semibold text-gray-700">
-                    {viewModal.data.website || "—"}
-                  </p>
-                </div>
-              </div>
-              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3">
-                <i className="bi bi-briefcase text-orange-400 text-lg"></i>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide">
-                    Industry
-                  </p>
-                  <p className="text-sm font-semibold text-gray-700">
-                    {viewModal.data.industry_name || "—"}
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div className="view-card">
+  <i className="bi bi-person-circle view-card-icon"></i>
+  <div>
+    <p className="view-label">
+      Customer Name
+    </p>
+    <p className="text-sm font-semibold text-gray-700">
+      {viewModal.data.customer_name || "—"}
+    </p>
+  </div>
+</div>
+             <div className="view-card">
+  <i className="bi bi-envelope view-card-icon"></i>
+  <div>
+    <p className="view-label">
+      Email
+    </p>
+    <p className="text-sm font-semibold text-gray-700 break-all">
+      {viewModal.data.email || "—"}
+    </p>
+  </div>
+</div>
+             <div className="view-card">
+  <i className="bi bi-telephone view-card-icon"></i>
+  <div>
+    <p className="view-label">
+      Mobile
+    </p>
+    <p className="text-sm font-semibold text-gray-700">
+      {viewModal.data.mobile || "—"}
+    </p>
+  </div>
+</div>
+            <div className="view-card">
+  <i className="bi bi-tag view-card-icon"></i>
+  <div>
+    <p className="view-label">
+      Customer Type
+    </p>
+    <p className="text-sm font-semibold text-gray-700">
+      {viewModal.data.customer_type || "—"}
+    </p>
+  </div>
+</div>
+<div className="view-card">
+  <i className="bi bi-globe view-card-icon"></i>
+  <div>
+    <p className="view-label">
+      Website
+    </p>
+    <p className="text-sm font-semibold text-gray-700">
+      {viewModal.data.website || "—"}
+    </p>
+  </div>
+</div>
+           <div className="view-card">
+  <i className="bi bi-briefcase view-card-icon"></i>
+  <div>
+    <p className="view-label">
+      Industry
+    </p>
+    <p className="text-sm font-semibold text-gray-700">
+      {viewModal.data.industry_name || "—"}
+    </p>
+  </div>
+</div>
+</div>
             <div className="px-6 pb-5 flex justify-end gap-3">
               <button
                 onClick={() => setViewModal({ open: false, data: null })}
