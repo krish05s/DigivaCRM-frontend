@@ -192,7 +192,6 @@ export default function Dashboard() {
 
       const fetchedProducts = productsRes.data?.data || productsRes.data;
       setProducts(Array.isArray(fetchedProducts) ? fetchedProducts : []);
-
     } catch (error) {
       console.error("Dashboard Data Fetch Error:", error);
     } finally {
@@ -328,8 +327,6 @@ export default function Dashboard() {
       toast.error("Failed to update task");
     }
   };
-
-
 
   // Date formatting helpers
   const formatTime = (dateString, formatStr = "medium") => {
@@ -510,47 +507,48 @@ export default function Dashboard() {
       `}</style>
       <Header />
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
-
         {/* Top Summary Cards */}
         {loading ? (
-          <div className="h-32 flex items-center justify-center bg-white/90 backdrop-blur-xl rounded-2xl border border-slate-100 mb-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-            <span className="text-gray-400 font-semibold animate-pulse">
+          <div className="dashboard-loading">
+            <span className="dashboard-loading-text">
               Loading amazing metrics...
             </span>
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+          <div className="dashboard-cards-grid">
             <DashboardCard
               onClick={() => router.push("/sales/lead")}
               title="Total Leads"
               value={leads.length}
               icon={UserPlus}
-              colorClass="bg-orange-50 text-orange-500 border border-orange-100/50 group-hover:bg-orange-500 group-hover:text-white"
+              colorClass="dashboard-card-icon"
             />
+
             <DashboardCard
               onClick={() => router.push("/customer-list")}
               title="Total Customers"
               value={customers.length}
               icon={Users}
-              colorClass="bg-orange-50 text-orange-500 border border-orange-100/50 group-hover:bg-orange-500 group-hover:text-white"
+              colorClass="dashboard-card-icon"
             />
+
             <DashboardCard
               onClick={() => router.push("/tasks")}
               title="Total Tasks"
               value={tasks.length}
               icon={CheckSquare}
-              colorClass="bg-orange-50 text-orange-500 border border-orange-100/50 group-hover:bg-orange-500 group-hover:text-white"
+              colorClass="dashboard-card-icon"
             />
+
             <DashboardCard
               onClick={() => router.push("/todolist")}
               title="Active To-Dos"
               value={todos.filter((t) => !t.is_finished).length}
               icon={ListTodo}
-              colorClass="bg-orange-50 text-orange-500 border border-orange-100/50 group-hover:bg-orange-500 group-hover:text-white"
+              colorClass="dashboard-card-icon"
             />
           </div>
         )}
-
         {/* Dashboard Analytics & Widgets */}
         {!loading && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6">
@@ -1073,12 +1071,13 @@ export default function Dashboard() {
                     </div>
                     <div className="mt-4 pt-3 border-t border-orange-50 flex justify-between items-center">
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${lead.status === "Won"
+                        className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${
+                          lead.status === "Won"
                             ? "bg-green-100 text-green-700"
                             : lead.status === "Lost"
                               ? "bg-red-100 text-red-700"
                               : "bg-orange-100 text-orange-700"
-                          }`}
+                        }`}
                       >
                         {lead.status}
                       </span>

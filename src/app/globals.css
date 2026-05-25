@@ -78,6 +78,40 @@ body::-webkit-scrollbar {
 
 @layer components {
 
+/* dashboard */
+/* Dashboard Loading Wrapper */
+.dashboard-loading {
+  @apply h-32 flex items-center justify-center
+  bg-white rounded-sm
+  border border-gray-200
+  mb-6 shadow-sm;
+}
+
+/* Dashboard Loading Text */
+.dashboard-loading-text {
+  @apply text-gray-400
+  font-semibold
+  animate-pulse;
+}
+
+/* Dashboard Cards Grid */
+.dashboard-cards-grid {
+  @apply grid
+  grid-cols-2
+  lg:grid-cols-4
+  gap-3 sm:gap-4
+  mb-6;
+}
+
+/* Dashboard Card Icon Theme */
+.dashboard-card-icon {
+  @apply bg-black
+  text-white
+  border border-black;
+}
+
+
+
 /* for notifivation  */
 /* Notification Wrapper */
   .notification-wrapper {
