@@ -192,6 +192,7 @@ export default function Dashboard() {
 
       const fetchedProducts = productsRes.data?.data || productsRes.data;
       setProducts(Array.isArray(fetchedProducts) ? fetchedProducts : []);
+
     } catch (error) {
       console.error("Dashboard Data Fetch Error:", error);
     } finally {
@@ -327,6 +328,8 @@ export default function Dashboard() {
       toast.error("Failed to update task");
     }
   };
+
+
 
   // Date formatting helpers
   const formatTime = (dateString, formatStr = "medium") => {
@@ -488,8 +491,8 @@ export default function Dashboard() {
   const recentLeadsList = safeLeads.slice(0, 5);
 
   return (
-    <div className="dashboard-page">
-      {/* <style jsx global>{`
+    <div className="min-h-screen bg-slate-50/80 font-sans text-gray-900 pb-12">
+      <style jsx global>{`
         @keyframes fadeInUp {
           from {
             opacity: 0;
@@ -504,12 +507,13 @@ export default function Dashboard() {
           animation: fadeInUp 0.6s ease-out forwards;
           opacity: 0;
         }
-      `}</style> */}
+      `}</style>
       <Header />
-      <main className="dashboard-container">
+      <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+
         {/* Top Summary Cards */}
         {loading ? (
-          <div className="dashboard-loading">
+          <div className="h-32 flex items-center justify-center bg-white/90 backdrop-blur-xl rounded-2xl border border-slate-100 mb-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <span className="text-gray-400 font-semibold animate-pulse">
               Loading amazing metrics...
             </span>
@@ -549,20 +553,20 @@ export default function Dashboard() {
 
         {/* Dashboard Analytics & Widgets */}
         {!loading && (
-          <div className="dashboard-grid">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6">
             {/* ROW 1 */}
             {/* Sales Chart (Span 8) */}
             <div
-              className="lg:col-span-8 dashboard-card relative overflow-hidden group animate-fade-in-up"
+              className="lg:col-span-8 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col relative overflow-hidden group animate-fade-in-up"
               style={{ animationDelay: "0.1s" }}
             >
               <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-orange-50/60 to-transparent pointer-events-none transition-opacity opacity-0 group-hover:opacity-100 duration-500"></div>
               <div className="flex justify-between items-center mb-4 relative z-10">
                 <div>
-                  <h3 className="dashboard-title">
+                  <h3 className="text-md font-extrabold text-gray-800">
                     Sales Overview
                   </h3>
-                  <p className="dashboard-subtitle">
+                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                     Approved quotations revenue
                   </p>
                 </div>
@@ -581,7 +585,7 @@ export default function Dashboard() {
                   </button>
                 </div>
               </div>
-              <div className="chart-wrapper">
+              <div className="h-[200px] w-full mt-auto relative z-10">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={salesData}
@@ -646,18 +650,18 @@ export default function Dashboard() {
 
             {/* Leads Donut Chart (Span 4) */}
             <div
-              className="lg:col-span-4 dashboard-card animate-fade-in-up"
+              className="lg:col-span-4 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
               style={{ animationDelay: "0.2s" }}
             >
               <div className="mb-1">
-                <h3 className="dashboard-title">
+                <h3 className="text-md font-extrabold text-gray-800">
                   Lead Status
                 </h3>
-                <p className="dashboard-subtitle">
+                <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                   CRM leads distribution
                 </p>
               </div>
-              <div className="chart-height">
+              <div className="h-[200px] flex items-center justify-center mt-auto">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -705,15 +709,15 @@ export default function Dashboard() {
             {/* ROW 2 */}
             {/* Split View To-Do List (Span 7) */}
             <div
-              className="lg:col-span-7 dashboard-card todo-wrapper animate-fade-in-up"
+              className="lg:col-span-7 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
               style={{ animationDelay: "0.3s" }}
             >
-              <div className="todo-header flex flex-col md:flex-row justify-between md:items-center gap-3 mb-4">
+              <div className="flex flex-col md:flex-row justify-between md:items-center gap-3 mb-4">
                 <div>
-                  <h3 className="dashboard-title">
+                  <h3 className="text-md font-extrabold text-gray-800">
                     Todo List
                   </h3>
-                  <p className="dashboard-subtitle">
+                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                     Productivity
                   </p>
                 </div>
@@ -729,33 +733,34 @@ export default function Dashboard() {
                       placeholder={
                         editingTodoId ? "Update task..." : "Quick add..."
                       }
-                      className="todo-input"
+                      className="w-full bg-white border border-gray-200 rounded-lg py-1.5 pl-3 pr-8 text-[12px] focus:outline-none focus:ring-2 focus:ring-orange-500/20 transition-all text-gray-800 font-medium placeholder-gray-400"
                       disabled={addingTodo}
                     />
                     <button
                       type="submit"
                       disabled={addingTodo || !newTodoTitle.trim()}
-                      className="todo-add-btn disabled:opacity-50"
+                      className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 text-white bg-orange-500 rounded-md hover:bg-orange-600 disabled:opacity-50 transition-all"
                     >
                       <Plus size={12} strokeWidth={3} />
                     </button>
                   </form>
                   <button
                     onClick={() => router.push("/todolist")}
-className="dashboard-btn dashboard-btn-orange"                  >
+                    className="text-[10px] text-orange-600 hover:text-white bg-orange-50 hover:bg-orange-500 px-2.5 py-1.5 rounded-lg font-bold transition-all"
+                  >
                     View All
                   </button>
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 todo-body">
-                <div className="todo-column">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-auto">
+                <div className="bg-white/60 backdrop-blur-sm border border-gray-100 p-3 rounded-xl shadow-sm flex flex-col">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="w-2 h-2 rounded-full bg-orange-500"></span>
                     <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
                       Unfinished
                     </h3>
                   </div>
-                  <div className="space-y-1.5 todo-scroll custom-scrollbar">
+                  <div className="space-y-1.5 overflow-y-auto h-[120px] custom-scrollbar">
                     {unfinishedTodos.map((todo) => (
                       <div
                         key={todo.id}
@@ -789,14 +794,14 @@ className="dashboard-btn dashboard-btn-orange"                  >
                     ))}
                   </div>
                 </div>
-                <div className="todo-column">
+                <div className="bg-white/60 backdrop-blur-sm border border-gray-100 p-3 rounded-xl shadow-sm flex flex-col">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="w-2 h-2 rounded-full bg-green-500"></span>
                     <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
                       Finished
                     </h3>
                   </div>
-                  <div className="space-y-1.5 todo-scroll custom-scrollbar">
+                  <div className="space-y-1.5 overflow-y-auto h-[120px] custom-scrollbar">
                     {finishedTodos.map((todo) => (
                       <div
                         key={todo.id}
@@ -830,19 +835,18 @@ className="dashboard-btn dashboard-btn-orange"                  >
 
             {/* Payment Due Progress Bar (Span 5) */}
             <div
-              className="lg:col-span-5 dashboard-card payment-wrapper animate-fade-in-up"
+              className="lg:col-span-5 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
               style={{ animationDelay: "0.5s" }}
             >
               <div className="mb-6">
-<h3 className="dashboard-title">
-                    Payment Due
+                <h3 className="text-md font-extrabold text-gray-800">
+                  Payment Due
                 </h3>
-                <p className="dashboard-subtitle">
-
+                <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                   Proforma Collection
                 </p>
               </div>
-              <div className="payment-content flex flex-col gap-5">
+              <div className="flex flex-col gap-5 mt-auto">
                 <div className="flex justify-between items-end">
                   <div>
                     <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">
@@ -905,15 +909,15 @@ className="dashboard-btn dashboard-btn-orange"                  >
             {/* ROW 4 */}
             {/* Tasks Priority Donut (Span 6) */}
             <div
-              className="lg:col-span-6 dashboard-card animate-fade-in-up"
+              className="lg:col-span-6 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
               style={{ animationDelay: "0.6s" }}
             >
               <div className="mb-1">
-                <h3 className="dashboard-title">
+                <h3 className="text-lg font-extrabold text-gray-800">
                   Tasks Priority
                 </h3>
-<p className="dashboard-subtitle">
-                    Focus areas
+                <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                  Focus areas
                 </p>
               </div>
               <div className="h-[200px] flex items-center justify-center mt-auto">
@@ -963,14 +967,14 @@ className="dashboard-btn dashboard-btn-orange"                  >
 
             {/* Quotation Status Chart (Span 6) */}
             <div
-              className="lg:col-span-6 dashboard-card animate-fade-in-up"
+              className="lg:col-span-6 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
               style={{ animationDelay: "0.7s" }}
             >
               <div className="mb-1">
-                <h3 className="dashboard-title">
+                <h3 className="text-lg font-extrabold text-gray-800">
                   Quotation Status
                 </h3>
-                <p className="dashboard-subtitle">
+                <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                   Active vs Won vs Lost
                 </p>
               </div>
@@ -1021,21 +1025,21 @@ className="dashboard-btn dashboard-btn-orange"                  >
 
             {/* Recent Leads (Last 3) */}
             <div
-              className="lg:col-span-12 dashboard-card animate-fade-in-up"
+              className="lg:col-span-12 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
               style={{ animationDelay: "0.8s" }}
             >
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  <h3 className="dashboard-title">
+                  <h3 className="text-lg font-extrabold text-gray-800">
                     Recent Leads
                   </h3>
-                  <p className="dashboard-subtitle">
+                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                     Last 3 leads added
                   </p>
                 </div>
                 <button
                   onClick={() => router.push("/sales/lead")}
-                  className="dashboard-btn dashboard-btn-orange uppercase tracking-wider"
+                  className="text-[10px] text-orange-600 hover:text-white bg-orange-50 hover:bg-orange-500 px-3 py-1.5 rounded-lg font-bold transition-all uppercase tracking-wider"
                 >
                   View All Leads
                 </button>
@@ -1044,7 +1048,7 @@ className="dashboard-btn dashboard-btn-orange"                  >
                 {safeLeads.slice(0, 3).map((lead, idx) => (
                   <div
                     key={idx}
-                    className="lead-card group"
+                    className="bg-white/60 backdrop-blur-sm border border-orange-100 p-4 rounded-xl shadow-sm hover:shadow-md transition-all group relative overflow-hidden"
                   >
                     <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
                       <UserPlus size={40} className="text-orange-500" />
@@ -1069,13 +1073,12 @@ className="dashboard-btn dashboard-btn-orange"                  >
                     </div>
                     <div className="mt-4 pt-3 border-t border-orange-50 flex justify-between items-center">
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${
-                          lead.status === "Won"
+                        className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${lead.status === "Won"
                             ? "bg-green-100 text-green-700"
                             : lead.status === "Lost"
                               ? "bg-red-100 text-red-700"
                               : "bg-orange-100 text-orange-700"
-                        }`}
+                          }`}
                       >
                         {lead.status}
                       </span>
