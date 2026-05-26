@@ -64,9 +64,9 @@ function DashboardCard({
   return (
     <div
       onClick={onClick}
-      className="bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl hover:to-orange-50/80 rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 p-3 sm:p-4 flex flex-col transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group relative overflow-hidden"
+      className="bg-gradient-to-br from-white to-gray-50 backdrop-blur-xl hover:to-gray-50 rounded-xl border border-gray-100 p-3 sm:p-4 flex flex-col transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group relative overflow-hidden"
     >
-      <div className="absolute -right-8 -top-8 w-28 h-28 bg-orange-100/50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+      <div className="absolute -right-8 -top-8 w-28 h-28 bg-gray-100/50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
       <div className="flex justify-between items-start mb-3 relative z-10">
         <div
           className={`p-2 sm:p-2.5 rounded-xl shadow-sm transition-all duration-300 group-hover:scale-110 ${colorClass}`}
@@ -87,7 +87,7 @@ function DashboardCard({
         )}
       </div>
       <div className="relative z-10 mt-1">
-        <h3 className="text-gray-400 text-[9px] sm:text-[10px] font-bold tracking-wider uppercase mb-0.5 group-hover:text-orange-500 transition-colors">
+        <h3 className="text-gray-400 text-[9px] sm:text-[10px] font-bold tracking-wider uppercase mb-0.5 group-hover:text-black transition-colors">
           {title}
         </h3>
         <h2 className="text-xl sm:text-2xl font-black text-gray-800 tracking-tight group-hover:scale-105 transform origin-left transition-transform duration-300">
@@ -264,7 +264,7 @@ export default function Dashboard() {
       html: `
         <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0">
           <div style="width:56px; height:56px; background:#fff4ed; border-radius:50%; display:flex; align-items:center; justify-content:center;">
-            <svg width="28" height="28" fill="none" stroke="#f97316" stroke-width="1.8" viewBox="0 0 24 24">
+            <svg width="28" height="28" fill="none" stroke="#000000" stroke-width="1.8" viewBox="0 0 24 24">
               <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
             </svg>
           </div>
@@ -287,7 +287,7 @@ export default function Dashboard() {
         style.innerHTML = `
           .swal-todo-popup { border-radius: 20px !important; padding: 28px 24px !important; width: 340px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.12) !important; }
           .swal-actions { gap: 10px !important; margin-top: 20px !important; }
-          .swal-confirm-btn { background: #f97316; color: white; padding: 9px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; }
+          .swal-confirm-btn { background: #000000; color: white; padding: 9px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; }
           .swal-confirm-btn:hover { background: #ea6c0a; }
           .swal-cancel-btn { background: #f3f4f6; color: #6b7280; padding: 9px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; }
           .swal-cancel-btn:hover { background: #e5e7eb; }
@@ -567,13 +567,13 @@ export default function Dashboard() {
                 <div className="flex space-x-1 bg-gray-50 p-0.5 rounded-lg border border-gray-100">
                   <button
                     onClick={() => setSalesTimeframe("monthly")}
-                    className={`px-3 py-1 text-[10px] rounded-md font-bold transition-all duration-200 ${salesTimeframe === "monthly" ? "bg-white text-orange-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                    className={`px-3 py-1 text-[10px] rounded-md font-bold transition-all duration-200 ${salesTimeframe === "monthly" ? "bg-white text-black shadow-sm" : "text-gray-500 hover:text-black"}`}
                   >
                     Monthly
                   </button>
                   <button
                     onClick={() => setSalesTimeframe("yearly")}
-                    className={`px-3 py-1 text-[10px] rounded-md font-bold transition-all duration-200 ${salesTimeframe === "yearly" ? "bg-white text-orange-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                    className={`px-3 py-1 text-[10px] rounded-md font-bold transition-all duration-200 ${salesTimeframe === "yearly" ? "bg-white text-black shadow-sm" : "text-gray-500 hover:text-black"}`}
                   >
                     Yearly
                   </button>
@@ -608,7 +608,7 @@ export default function Dashboard() {
                     />
                     <Tooltip
                       cursor={{
-                        stroke: "#f97316",
+                        stroke: "#000000",
                         strokeWidth: 1,
                         strokeDasharray: "4 4",
                       }}
@@ -618,7 +618,7 @@ export default function Dashboard() {
                         boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
                       }}
                       itemStyle={{
-                        color: "#ea580c",
+                        color: "#000000",
                         fontWeight: 800,
                         fontSize: "12px",
                       }}
@@ -626,13 +626,13 @@ export default function Dashboard() {
                     <Line
                       type="monotone"
                       dataKey="sales"
-                      stroke="#ea580c"
+                      stroke="#000000"
                       strokeWidth={3}
                       dot={{ r: 3, strokeWidth: 2, fill: "#fff" }}
                       activeDot={{
                         r: 6,
                         strokeWidth: 2,
-                        fill: "#f97316",
+                        fill: "#000000",
                         stroke: "#fff",
                       }}
                       animationDuration={2000}
@@ -699,7 +699,7 @@ export default function Dashboard() {
             {/* ROW 2 */}
             {/* Split View To-Do List (Span 7) */}
             <div
-className="dashboard-widget lg:col-span-7"
+              className="dashboard-widget lg:col-span-7"
               style={{ animationDelay: "0.3s" }}
             >
               <div className="flex flex-col md:flex-row justify-between md:items-center gap-3 mb-4">
@@ -719,20 +719,20 @@ className="dashboard-widget lg:col-span-7"
                       placeholder={
                         editingTodoId ? "Update task..." : "Quick add..."
                       }
-                      className="w-full bg-white border border-gray-200 rounded-lg py-1.5 pl-3 pr-8 text-[12px] focus:outline-none focus:ring-2 focus:ring-orange-500/20 transition-all text-gray-800 font-medium placeholder-gray-400"
+                      className="w-full bg-white border border-gray-200 rounded-lg py-1.5 pl-3 pr-8 text-[12px] focus:outline-none  transition-all text-gray-800 font-medium placeholder-gray-400"
                       disabled={addingTodo}
                     />
                     <button
                       type="submit"
                       disabled={addingTodo || !newTodoTitle.trim()}
-                      className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 text-white bg-orange-500 rounded-md hover:bg-orange-600 disabled:opacity-50 transition-all"
+                      className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 text-white bg-gray-500 rounded-md hover:bg-gray-600 disabled:opacity-50 transition-all"
                     >
                       <Plus size={12} strokeWidth={3} />
                     </button>
                   </form>
                   <button
                     onClick={() => router.push("/todolist")}
-                    className="text-[10px] text-orange-600 hover:text-white bg-orange-50 hover:bg-orange-500 px-2.5 py-1.5 rounded-lg font-bold transition-all"
+                    className="text-[10px] text-black hover:text-white bg-gray-200 hover:bg-gray-500 px-2.5 py-1.5 rounded-lg font-bold transition-all"
                   >
                     View All
                   </button>
@@ -741,7 +741,7 @@ className="dashboard-widget lg:col-span-7"
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-auto">
                 <div className="bg-white/60 backdrop-blur-sm border border-gray-100 p-3 rounded-xl shadow-sm flex flex-col">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="w-2 h-2 rounded-full bg-orange-500"></span>
+                    <span className="w-2 h-2 rounded-full bg-red-500"></span>
                     <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
                       Unfinished
                     </h3>
@@ -750,13 +750,13 @@ className="dashboard-widget lg:col-span-7"
                     {unfinishedTodos.map((todo) => (
                       <div
                         key={todo.id}
-                        className="group flex justify-between items-center bg-orange-50/50 rounded-md px-2.5 py-1.5"
+                        className="group flex justify-between items-center bg-red-50 rounded-md px-2.5 py-1.5"
                       >
                         <div className="flex items-center gap-2 flex-1 truncate">
                           <input
                             type="checkbox"
                             onChange={() => handleToggleTodo(todo.id)}
-                            className="w-3.5 h-3.5 accent-orange-500 cursor-pointer"
+                            className="w-3.5 h-3.5 accent-black cursor-pointer"
                           />
                           <p className="text-[12px] font-semibold text-gray-700 truncate">
                             {todo.title}
@@ -782,7 +782,7 @@ className="dashboard-widget lg:col-span-7"
                 </div>
                 <div className="bg-white/60 backdrop-blur-sm border border-gray-100 p-3 rounded-xl shadow-sm flex flex-col">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span className="w-2 h-2 rounded-full bg-green-600"></span>
                     <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
                       Finished
                     </h3>
@@ -791,14 +791,14 @@ className="dashboard-widget lg:col-span-7"
                     {finishedTodos.map((todo) => (
                       <div
                         key={todo.id}
-                        className="group flex justify-between items-center bg-green-50/50 rounded-md px-2.5 py-1.5"
+                        className="group flex justify-between items-center bg-green-50 rounded-md px-2.5 py-1.5"
                       >
                         <div className="flex items-center gap-2 flex-1 truncate">
                           <input
                             type="checkbox"
                             checked
                             onChange={() => handleToggleTodo(todo.id)}
-                            className="w-3.5 h-3.5 accent-green-500 cursor-pointer"
+                            className="w-3.5 h-3.5 accent-green-600 cursor-pointer"
                           />
                           <p className="text-[12px] font-semibold text-gray-400 line-through truncate">
                             {todo.title}
@@ -821,7 +821,7 @@ className="dashboard-widget lg:col-span-7"
 
             {/* Payment Due Progress Bar (Span 5) */}
             <div
-className="dashboard-widget lg:col-span-5"
+              className="dashboard-widget lg:col-span-5"
               style={{ animationDelay: "0.5s" }}
             >
               <div className="mb-6">
@@ -891,7 +891,7 @@ className="dashboard-widget lg:col-span-5"
             {/* ROW 4 */}
             {/* Tasks Priority Donut (Span 6) */}
             <div
-className="dashboard-widget lg:col-span-6"
+              className="dashboard-widget lg:col-span-6"
               style={{ animationDelay: "0.6s" }}
             >
               <div className="mb-1">
@@ -945,7 +945,7 @@ className="dashboard-widget lg:col-span-6"
 
             {/* Quotation Status Chart (Span 6) */}
             <div
-className="dashboard-widget lg:col-span-6"
+              className="dashboard-widget lg:col-span-6"
               style={{ animationDelay: "0.7s" }}
             >
               <div className="mb-1">
@@ -1009,7 +1009,7 @@ className="dashboard-widget lg:col-span-6"
                 </div>
                 <button
                   onClick={() => router.push("/sales/lead")}
-                  className="text-[10px] text-orange-600 hover:text-white bg-orange-50 hover:bg-orange-500 px-3 py-1.5 rounded-lg font-bold transition-all uppercase tracking-wider"
+                  className="text-[10px] text-gray-600 hover:text-white bg-gray-50 hover:bg-gray-500 px-3 py-1.5 rounded-lg font-bold transition-all uppercase tracking-wider"
                 >
                   View All Leads
                 </button>
@@ -1018,15 +1018,15 @@ className="dashboard-widget lg:col-span-6"
                 {safeLeads.slice(0, 3).map((lead, idx) => (
                   <div
                     key={idx}
-                    className="bg-white/60 backdrop-blur-sm border border-orange-100 p-4 rounded-xl shadow-sm hover:shadow-md transition-all group relative overflow-hidden"
+                    className="bg-white/60 backdrop-blur-sm border border-gray200 p-4 rounded-xl shadow-sm hover:shadow-md transition-all group relative overflow-hidden"
                   >
                     <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                      <UserPlus size={40} className="text-orange-500" />
+                      <UserPlus size={40} className="text-black" />
                     </div>
                     <h4 className="font-bold text-gray-800 text-sm mb-1 truncate pr-8">
                       {lead.lead_title || "Untitled Lead"}
                     </h4>
-                    <p className="text-orange-600 text-xs font-bold mb-3">
+                    <p className="text-black text-xs font-bold mb-3">
                       {lead.company_name}
                     </p>
                     <div className="space-y-2">
@@ -1041,14 +1041,14 @@ className="dashboard-widget lg:col-span-6"
                         </span>
                       </div>
                     </div>
-                    <div className="mt-4 pt-3 border-t border-orange-50 flex justify-between items-center">
+                    <div className="mt-4 pt-3 border-t border-gray-50 flex justify-between items-center">
                       <span
                         className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${
                           lead.status === "Won"
                             ? "bg-green-100 text-green-700"
                             : lead.status === "Lost"
                               ? "bg-red-100 text-red-700"
-                              : "bg-orange-100 text-orange-700"
+                              : "bg-gray-200 text-gray-800"
                         }`}
                       >
                         {lead.status}
@@ -1057,7 +1057,7 @@ className="dashboard-widget lg:col-span-6"
                         onClick={() =>
                           router.push(`/sales/lead?id=${lead.lead_id}`)
                         }
-                        className="text-[10px] font-bold text-gray-400 hover:text-orange-500 transition-colors"
+                        className="text-[10px] font-bold text-gray-400 hover:text-gray-500 transition-colors"
                       >
                         Details →
                       </button>

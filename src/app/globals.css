@@ -150,13 +150,13 @@ body::-webkit-scrollbar {
 
 /* Dashboard Summary Card Icon Theme */
 .dashboard-card-icon {
- background: #f8fafc;
-  color: #f97316;
-  border: 1px solid #fed7aa;
+ background: #000000;
+  color: #ffffff;
+  border: 1px solid #d1d5db;
 }
 /* Hover Effect */
 .group:hover .dashboard-card-icon {
-  background: #f97316;
+  background: #000000;
   color: #ffffff;
 }
 /* Dashboard Main Grid */
