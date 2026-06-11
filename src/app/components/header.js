@@ -165,8 +165,8 @@ export default function Header() {
           <Image
             src="/Logo.png"
             alt="Company Logo"
-            width={133}
-            height={133}
+            width={87}
+            height={87}
             className="object-contain"
           />
         </div>
