@@ -20,7 +20,7 @@ export default function Page() {
   const [currentTodo, setCurrentTodo] = useState({ id: null, title: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useAuth();
+  useAuth(["Admin", "Super Admin", "Sales", "Estimation", "Leads Management"]);
 
   const router = useRouter();
 
@@ -145,8 +145,8 @@ export default function Page() {
     const confirmed = await Swal.fire({
       html: `
     <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0">
-      <div style="width:56px; height:56px; background:#fff4ed; border-radius:50%; display:flex; align-items:center; justify-content:center;">
-        <svg width="28" height="28" fill="none" stroke="#f97316" stroke-width="1.8" viewBox="0 0 24 24">
+      <div style="width:56px; height:56px; background:#f4f6fc; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+        <svg width="28" height="28" fill="none" stroke="#3b5e9c" stroke-width="1.8" viewBox="0 0 24 24">
           <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
         </svg>
       </div>
@@ -169,8 +169,8 @@ export default function Page() {
         style.innerHTML = `
       .swal-todo-popup { border-radius: 20px !important; padding: 28px 24px !important; width: 340px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.12) !important; }
       .swal-actions { gap: 10px !important; margin-top: 20px !important; }
-      .swal-confirm-btn { background: #f97316; color: white; padding: 9px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; }
-      .swal-confirm-btn:hover { background: #ea6c0a; }
+      .swal-confirm-btn { background: #3b5e9c; color: white; padding: 9px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; }
+      .swal-confirm-btn:hover { background: #2c4675; }
       .swal-cancel-btn { background: #f3f4f6; color: #6b7280; padding: 9px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; }
       .swal-cancel-btn:hover { background: #e5e7eb; }
     `;

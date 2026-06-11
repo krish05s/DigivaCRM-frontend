@@ -368,7 +368,7 @@ export default function CommonMasterPage({
                           onChange={() => handleToggle(item.id, item.status)}
                         />
                         <div
-                          className={`relative w-12 h-6 rounded-full transition-all duration-300 ${item.status === 1 ? "bg-orange-500" : "bg-gray-300"}`}
+                          className={`relative w-12 h-6 rounded-full transition-all duration-300 ${item.status === 1 ? "bg-green-500" : "bg-gray-300"}`}
                         >
                           <div
                             className={`absolute top-1 left-1 w-4 h-3 bg-white rounded-full transition-all duration-300 ${item.status === 1 ? "translate-x-6" : "translate-x-1"}`}

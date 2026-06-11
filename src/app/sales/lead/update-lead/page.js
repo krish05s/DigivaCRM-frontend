@@ -28,11 +28,9 @@ export default function Page() {
     lead_id: "",
     company_name: "",
     customer_name: "",
-    lead_title: "",
+    reference: "",
     source: "",
     status: "",
-    product_category: "",
-    product_name: "",
     priority: "",
     assignee: "",
     category: "",
@@ -42,7 +40,9 @@ export default function Page() {
   // ✅ Helper: get token from localStorage/sessionStorage
   const getToken = () => {
     return (
-      localStorage.getItem("token") || sessionStorage.getItem("token") || ""
+      localStorage.getItem("token") ||
+      sessionStorage.getItem("token") ||
+      ""
     );
   };
 
@@ -58,12 +58,9 @@ export default function Page() {
       lead_id: parsedLead.lead_id || "",
       company_name: parsedLead.company_id || parsedLead.company_name || "",
       customer_name: parsedLead.customer_name || "",
-      lead_title: parsedLead.lead_title || "",
+      reference: parsedLead.reference || "",
       source: parsedLead.source_id || parsedLead.source || "",
       status: parsedLead.status || "",
-      product_category:
-        parsedLead.product_category_id || parsedLead.product_category || "",
-      product_name: parsedLead.product_id || parsedLead.product_name || "",
       priority: parsedLead.priority || "",
       assignee: parsedLead.assignee || "",
       category: parsedLead.category_id || parsedLead.category || "",
@@ -106,17 +103,15 @@ export default function Page() {
           body: JSON.stringify({
             company_name: formData.company_name,
             customer_name: formData.customer_name,
-            lead_title: formData.lead_title,
+            reference: formData.reference,
             source: formData.source,
             status: formData.status,
-            product_category: formData.product_category,
-            product_name: formData.product_name,
             priority: formData.priority,
             assignee: formData.assignee,
             category: formData.category,
             description: formData.description,
           }),
-        },
+        }
       );
 
       const data = await response.json();
@@ -125,6 +120,9 @@ export default function Page() {
         toast.success("Lead Updated Successfully");
         clearTimeout(timeout);
         sessionStorage.removeItem("editLead");
+        if (formData.status === "Won") {
+          sessionStorage.setItem("leadActiveTab", "Won");
+        }
         router.push("/sales/lead");
       } else {
         toast.error(data.message || "Update Failed");
@@ -144,7 +142,7 @@ export default function Page() {
       try {
         const res = await axios.get(
           `${API_BASE}/api/inquiry-lead-source/read`,
-          { params: { status: 1 } },
+          { params: { status: 1 } }
         );
         setLeadSource(res.data);
       } catch {}
@@ -158,7 +156,7 @@ export default function Page() {
       try {
         const res = await axios.get(
           `${API_BASE}/api/inquiry-lead-category/read`,
-          { params: { status: 1 } },
+          { params: { status: 1 } }
         );
         setLeadCategory(res.data);
       } catch {}
@@ -167,38 +165,41 @@ export default function Page() {
   }, []);
 
   // ✅ Fetch Product Categories
-  useEffect(() => {
-    const fetchProductCategory = async () => {
-      try {
-        const res = await axios.get(`${API_BASE}/api/product-category/read`, {
-          params: { status: 1 },
-        });
-        setCategory(res.data);
-      } catch {}
-    };
-    fetchProductCategory();
-  }, []);
+  // useEffect(() => {
+  //   const fetchProductCategory = async () => {
+  //     try {
+  //       const res = await axios.get(
+  //         `${API_BASE}/api/product-category/read`,
+  //         { params: { status: 1 } }
+  //       );
+  //       setCategory(res.data);
+  //     } catch {}
+  //   };
+  //   fetchProductCategory();
+  // }, []);
 
   // ✅ Fetch Products filtered by selected category
-  useEffect(() => {
-    if (!formData.product_category) {
-      setProductList([]);
-      return;
-    }
-    axios
-      .get(`${API_BASE}/api/product-master/read`, {
-        params: { search2: formData.product_category },
-      })
-      .then((res) => setProductList(res.data))
-      .catch(() => setProductList([]));
-  }, [formData.product_category]);
+  // useEffect(() => {
+  //   if (!formData.product_category) {
+  //     setProductList([]);
+  //     return;
+  //   }
+  //   axios
+  //     .get(`${API_BASE}/api/product-master/read`, {
+  //       params: { search2: formData.product_category },
+  //     })
+  //     .then((res) => setProductList(res.data))
+  //     .catch(() => setProductList([]));
+  // }, [formData.product_category]);
 
   // ✅ Fetch Assignees
   useEffect(() => {
     const fetchAssignee = async () => {
       try {
+        const token = getToken();
         const res = await axios.get(`${API_BASE}/api/manage-user/asignee`, {
           params: { status: 1 },
+          headers: { Authorization: `Bearer ${token}` },
         });
         const data = res.data.data || res.data || [];
         const formatted = data.map((item) => {
@@ -220,38 +221,24 @@ export default function Page() {
 
       <div className="bg-gray-100">
         {/* Breadcrumb */}
-        <div className="bg-white w-full shadow-lg border-gray-100 p-3 mt-1 mb-5 flex justify-between items-center">
-          <div className="flex items-center text-gray-700">
-            <p>
-              <Link
-                href="/dashboard"
-                className="mx-3 text-xl text-gray-400 hover:text-indigo-600"
-              >
-                <i className="bi bi-house"></i>
-              </Link>
-              <i className="bi bi-chevron-right"></i>
-              <Link
-                href="#"
-                className="mx-3 text-md text-gray-700 hover:text-orange-500"
-              >
-                Sales
-              </Link>
-              <i className="bi bi-chevron-right"></i>
-              <Link
-                href="/sales/lead"
-                className="mx-3 text-md text-gray-700 hover:text-orange-500"
-              >
-                Lead
-              </Link>
-              <i className="bi bi-chevron-right"></i>
-              <Link
-                href="/add-lead"
-                className="mx-3 text-md text-gray-700 hover:text-orange-500"
-              >
-                Edit Lead
-              </Link>
-            </p>
-          </div>
+        <div className="bg-white w-full rounded-xl shadow-md p-2 mt-1 mb-2 flex justify-between items-center">
+          <p className="text-gray-700">
+            <Link
+              href="/dashboard"
+              className="mx-3 text-xl text-gray-400 hover:text-indigo-600"
+            >
+              <i className="bi bi-house"></i>
+            </Link>
+            <i className="bi bi-chevron-right"></i> Sales
+            <i className="bi bi-chevron-right"></i>
+            <button
+              onClick={() => router.push("/sales/lead")}
+              className="mx-3 hover:text-indigo-600"
+            >
+              Lead
+            </button>
+            <i className="bi bi-chevron-right"></i> Edit Lead
+          </p>
         </div>
 
         <form
@@ -268,7 +255,7 @@ export default function Page() {
               {/* Company Name */}
               <div>
                 <label className="block mb-1 text-xs font-medium text-gray-600">
-                  Company Name *
+                  Company Name 
                 </label>
                 <input
                   name="company_name"
@@ -293,20 +280,6 @@ export default function Page() {
                 />
               </div>
 
-              {/* Lead Title */}
-              <div>
-                <label className="block mb-1 text-xs font-medium text-gray-600">
-                  Lead Title *
-                </label>
-                <input
-                  type="text"
-                  name="lead_title"
-                  value={formData.lead_title}
-                  onChange={handleChange}
-                  className="w-full border border-orange-300 rounded-md px-2 py-1.5 text-sm text-gray-700 outline-none bg-white"
-                />
-              </div>
-
               {/* Source */}
               <div>
                 <label className="block mb-1 text-xs font-medium text-gray-600">
@@ -325,6 +298,20 @@ export default function Page() {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              {/* Lead Title */}
+              <div>
+                <label className="block mb-1 text-xs font-medium text-gray-600">
+                  Reference
+                </label>
+                <input
+                  type="text"
+                  name="reference"
+                  value={formData.reference}
+                  onChange={handleChange}
+                  className="w-full border border-orange-300 rounded-md px-2 py-1.5 text-sm text-gray-700 outline-none bg-white"
+                />
               </div>
 
               {/* Status */}
@@ -350,7 +337,7 @@ export default function Page() {
               </div>
 
               {/* Product Category */}
-              <div>
+              {/* <div>
                 <label className="block mb-1 text-xs font-medium text-gray-600">
                   Product Category *
                 </label>
@@ -367,10 +354,10 @@ export default function Page() {
                     </option>
                   ))}
                 </select>
-              </div>
+              </div> */}
 
               {/* Product Name */}
-              <div>
+              {/* <div>
                 <label className="block mb-1 text-xs font-medium text-gray-600">
                   Product Name
                 </label>
@@ -387,7 +374,7 @@ export default function Page() {
                     </option>
                   ))}
                 </select>
-              </div>
+              </div> */}
 
               {/* Priority */}
               <div>
@@ -407,85 +394,7 @@ export default function Page() {
                 </select>
               </div>
 
-              {/* Assignee */}
-              <div>
-                <label className="block mb-1 text-xs font-medium text-gray-600">
-                  Assignee *
-                </label>
-                <Select
-                  isMulti
-                  instanceId="assignee-select"
-                  options={asignee}
-                  value={asignee.filter((option) =>
-                    formData.assignee?.split(",").includes(option.value),
-                  )}
-                  onChange={(selectedOptions) => {
-                    const values = selectedOptions
-                      ? selectedOptions.map((option) => option.value).join(",")
-                      : "";
-                    setFormData((prev) => ({ ...prev, assignee: values }));
-                  }}
-                  className="w-full"
-                  styles={{
-                    control: (provided, state) => ({
-                      ...provided,
-                      borderColor: "#fdba74",
-                      boxShadow: state.isFocused ? "0 0 0 1px #F5C99A" : "none",
-                      "&:hover": { borderColor: "#fdba74" },
-                      minHeight: "34px",
-                      fontSize: "13px",
-                      borderRadius: "6px",
-                    }),
-                    menu: (provided) => ({
-                      ...provided,
-                      backgroundColor: "#fff",
-                      borderRadius: "6px",
-                      overflow: "hidden",
-                      padding: "2px",
-                    }),
-                    option: (provided, state) => ({
-                      ...provided,
-                      fontSize: "13px",
-                      backgroundColor: state.isSelected
-                        ? "#767676"
-                        : state.isFocused
-                          ? "#767676"
-                          : "#ffffff",
-                      color:
-                        state.isSelected || state.isFocused
-                          ? "#ffffff"
-                          : "#000000",
-                      cursor: "pointer",
-                      padding: "4px 6px",
-                      ":active": {
-                        ...provided[":active"],
-                        backgroundColor: "#767676",
-                      },
-                    }),
-                    placeholder: (provided) => ({
-                      ...provided,
-                      color: "#767676",
-                      fontSize: "13px",
-                    }),
-                    multiValue: (provided) => ({
-                      ...provided,
-                      backgroundColor: "#767676",
-                    }),
-                    multiValueLabel: (provided) => ({
-                      ...provided,
-                      color: "#fff",
-                    }),
-                    multiValueRemove: (provided) => ({
-                      ...provided,
-                      color: "#fff",
-                      "&:hover": {
-                        backgroundColor: "#767676",
-                        color: "#fff",
-                      },
-                    }),
-                  }}
-                />
-              </div>
+
 
               {/* Category */}
               <div>

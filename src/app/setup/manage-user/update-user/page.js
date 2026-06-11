@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import useAuth from "@/app/components/useAuth";
+import CheckPermission from "@/app/components/CheckPermission";
 
 export default function UpdateUserForm() {
 
@@ -74,7 +75,10 @@ export default function UpdateUserForm() {
     useEffect(() => {
         if (!userId) return;
 
-        axios.get(`${API_BASE}/api/manage-user/read/${userId}`)
+        const token = localStorage.getItem("token");
+        axios.get(`${API_BASE}/api/manage-user/read/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
             .then((res) => {
                 const d = res.data.data;
 
@@ -132,9 +136,13 @@ export default function UpdateUserForm() {
         const sendData = { ...formData, name: fullName };
 
         try {
+            const token = localStorage.getItem("token");
             const res = await axios.put(
                 `${API_BASE}/api/manage-user/update/${userId}`,
-                sendData
+                sendData,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
             );
 
             if (res.status === 200) {
@@ -152,13 +160,23 @@ export default function UpdateUserForm() {
     //   Load Dropdowns
 
     useEffect(() => {
-        axios.get(`${API_BASE}/api/organizations/organization-name`, { params: { status: 1 } })
+        const token = localStorage.getItem("token");
+        axios.get(`${API_BASE}/api/organizations/organization-name`, {
+            params: { status: 1 },
+            headers: { Authorization: `Bearer ${token}` }
+        })
             .then((res) => setOrganizations(res.data.data));
 
-        axios.get(`${API_BASE}/api/role-master/role-name`, { params: { status: 1 } })
+        axios.get(`${API_BASE}/api/role-master/role-name`, {
+            params: { status: 1 },
+            headers: { Authorization: `Bearer ${token}` }
+        })
             .then((res) => setRoles(res.data.data));
 
-        axios.get(`${API_BASE}/api/contact/read`, { params: { status: 1 } })
+        axios.get(`${API_BASE}/api/contact/read`, {
+            params: { status: 1 },
+            headers: { Authorization: `Bearer ${token}` }
+        })
             .then((res) => setDesignations(res.data.data || res.data));
     }, []);
 
@@ -168,8 +186,8 @@ export default function UpdateUserForm() {
     return (
         <>
             <Header />
-
-            <div className="bg-gray-100">
+            <CheckPermission allowedRoles={["Super Admin"]}>
+                <div className="bg-gray-100">
 
                 <div className="bg-white w-full rounded-2xl shadow-lg p-2 mt-1 mb-5 flex justify-between items-center">
                     <div className="flex items-center text-gray-700">
@@ -359,6 +377,7 @@ export default function UpdateUserForm() {
                     </form>
                 </div>
             </div>
+            </CheckPermission>
         </>
     );
 }

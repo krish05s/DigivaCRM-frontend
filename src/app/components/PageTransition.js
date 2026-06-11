@@ -90,7 +90,7 @@ export default function PageTransition({ children }) {
 
         loading && !disableLoader && (
 
-          <div className="fixed top-[73px] left-0 w-full z-50">
+          <div className="fixed top-[78px] left-0 w-full z-50">
 
             <div
               className="h-[3px] transition-all duration-200"

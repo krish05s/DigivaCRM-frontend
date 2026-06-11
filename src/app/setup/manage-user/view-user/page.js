@@ -6,6 +6,7 @@ import Header from "@/app/components/header";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import useAuth from "@/app/components/useAuth";
+import CheckPermission from "@/app/components/CheckPermission";
 
 export default function ViewUser() {
    
@@ -65,7 +66,10 @@ export default function ViewUser() {
     useEffect(() => {
         if (!userId) return;
 
-        axios.get(`${API_BASE}/api/manage-user/read/${userId}`)
+        const token = localStorage.getItem("token");
+        axios.get(`${API_BASE}/api/manage-user/read/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
             .then((res) => {
                 const d = res.data.data;
 
@@ -107,7 +111,8 @@ export default function ViewUser() {
     return (
         <>
             <Header />
-            <div className="bg-gray-100">
+            <CheckPermission allowedRoles={["Super Admin", "Admin"]}>
+                <div className="bg-gray-100">
                 <div className="bg-white w-full rounded-2xl shadow-lg p-3 mt-1 mb-5 flex justify-between items-center">
                     <div className="flex items-center text-gray-700">
                         <p>
@@ -219,6 +224,7 @@ export default function ViewUser() {
                     }} className="px-4 py-2 border border-blue-800 text-blue-800 rounded hover:bg-blue-900 hover:text-white transition">CANCEL</button>
                 </div>
             </div>
+            </CheckPermission>
         </>
     );
 }

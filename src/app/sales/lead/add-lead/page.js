@@ -26,11 +26,9 @@ export default function Page() {
   const [formData, setFormData] = useState({
     company_name: "",
     customer_name: "",
-    lead_title: "",
+    reference: "",
     source: "",
     status: "Qualified",
-    product_category: "",
-    product_name: "",
     priority: "",
     assignee: "",
     category: "",
@@ -46,10 +44,8 @@ export default function Page() {
   const validate = () => {
     const newErrors = {};
     if (!formData.customer_name.trim()) newErrors.customer_name = "Customer Name is required";
-    if (!formData.lead_title.trim()) newErrors.lead_title = "Lead Title is required";
-    if (!formData.product_category) newErrors.product_category = "Product Category is required";
-    if (!formData.product_name) newErrors.product_name = "Product Name is required";
-    if (!formData.assignee.trim()) newErrors.assignee = "Assignee is required";
+    if (!formData.reference.trim()) newErrors.reference = "Lead Title is required";
+    if (!formData.source) newErrors.source = "Source is required";
     return newErrors;
   };
 
@@ -102,11 +98,9 @@ export default function Page() {
     setFormData({
       company_name: "",
       customer_name: "",
-      lead_title: "",
+      reference: "",
       source: "",
       status: "Qualified",
-      product_category: "",
-      product_name: "",
       priority: "",
       assignee: "",
       category: "",
@@ -148,41 +142,41 @@ export default function Page() {
     fetchCategory();
   }, []);
 
-  useEffect(() => {
-    const fetchProductCategory = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`${API_BASE}/api/product-category/read`, {
-          params: { status: 1 },
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setCategory(res.data);
-      } catch (err) {
-        console.error("Product category fetch error:", err);
-      }
-    };
-    fetchProductCategory();
-  }, []);
+  // useEffect(() => {
+  //   const fetchProductCategory = async () => {
+  //     try {
+  //       const token = localStorage.getItem("token");
+  //       const res = await axios.get(`${API_BASE}/api/product-category/read`, {
+  //         params: { status: 1 },
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       });
+  //       setCategory(res.data);
+  //     } catch (err) {
+  //       console.error("Product category fetch error:", err);
+  //     }
+  //   };
+  //   fetchProductCategory();
+  // }, []);
 
-  useEffect(() => {
-    if (!formData.product_category) {
-      setProductList([]);
-      return;
-    }
-    const fetchProducts = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`${API_BASE}/api/product-master/read`, {
-          params: { search2: formData.product_category },
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setProductList(res.data);
-      } catch {
-        setProductList([]);
-      }
-    };
-    fetchProducts();
-  }, [formData.product_category]);
+  // useEffect(() => {
+  //   if (!formData.product_category) {
+  //     setProductList([]);
+  //     return;
+  //   }
+  //   const fetchProducts = async () => {
+  //     try {
+  //       const token = localStorage.getItem("token");
+  //       const res = await axios.get(`${API_BASE}/api/product-master/read`, {
+  //         params: { search2: formData.product_category },
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       });
+  //       setProductList(res.data);
+  //     } catch {
+  //       setProductList([]);
+  //     }
+  //   };
+  //   fetchProducts();
+  // }, [formData.product_category]);
 
   useEffect(() => {
     const fetchAssignee = async () => {
@@ -259,22 +253,9 @@ export default function Page() {
               {errors.customer_name && <p className="text-red-500 text-xs mt-1">{errors.customer_name}</p>}
             </div>
 
-            {/* Lead Title */}
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-600">Lead Title *</label>
-              <input
-                type="text"
-                name="lead_title"
-                value={formData.lead_title}
-                onChange={handleChange}
-                className="w-full border border-orange-300 rounded-md px-3 py-1.5 text-sm text-gray-700 focus:outline-none  bg-white"
-              />
-              {errors.lead_title && <p className="text-red-500 text-xs mt-1">{errors.lead_title}</p>}
-            </div>
-
             {/* Source */}
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-600">Source</label>
+              <label className="block mb-1 text-sm font-medium text-gray-600">Source *</label>
               <select
                 name="source"
                 value={formData.source}
@@ -286,6 +267,21 @@ export default function Page() {
                   <option key={item.id} value={item.id}>{item.name}</option>
                 ))}
               </select>
+              {errors.source && <p className="text-red-500 text-xs mt-1">{errors.source}</p>}
+            </div>
+
+            {/* reference */}
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-600">Reference</label>
+              <input
+                type="text"
+                name="reference"
+                value={formData.reference}
+                placeholder="Reference"
+                onChange={handleChange}
+                className="w-full border border-orange-300 rounded-md px-3 py-1.5 text-sm text-gray-700 focus:outline-none  bg-white"
+              />
+              {errors.reference && <p className="text-red-500 text-xs mt-1">{errors.reference}</p>}
             </div>
 
             {/* Status */}
@@ -302,7 +298,7 @@ export default function Page() {
             </div>
 
             {/* Product Category */}
-            <div>
+            {/* <div>
               <label className="block mb-1 text-sm font-medium text-gray-600">Product Category *</label>
               <select
                 name="product_category"
@@ -316,10 +312,10 @@ export default function Page() {
                 ))}
               </select>
               {errors.product_category && <p className="text-red-500 text-xs mt-1">{errors.product_category}</p>}
-            </div>
+            </div> */}
 
             {/* Product Name */}
-            <div>
+            {/* <div>
               <label className="block mb-1 text-sm font-medium text-gray-600">Product Name *</label>
               <select
                 name="product_name"
@@ -333,7 +329,7 @@ export default function Page() {
                 ))}
               </select>
               {errors.product_name && <p className="text-red-500 text-xs mt-1">{errors.product_name}</p>}
-            </div>
+            </div> */}
 
             {/* Priority */}
             <div>
@@ -351,62 +347,6 @@ export default function Page() {
               </select>
             </div>
 
-            {/* Assignee */}
-            <div>
-              <label className="block mb-1 text-sm font-medium  ">
-                Assignee *
-              </label>
-
-              <Select
-                isMulti
-                placeholder="-- Select --"
-                instanceId="assignee-select"
-                options={asignee}
-                value={asignee.filter((option) => {
-                  if (!formData.assignee) return false;
-                  return formData.assignee.split(",").includes(option.value);
-                })}
-                onChange={(selectedOptions) => {
-                  const values = selectedOptions
-                    ? selectedOptions.map((o) => o.value).join(",")
-                    : "";
-                  setFormData((prev) => ({ ...prev, assignee: values }));
-                  if (errors.assignee) setErrors((prev) => ({ ...prev, assignee: "" }));
-                }}
-                className="w-full"
-                styles={{
-                  control: (provided, state) => ({
-                    ...provided,
-                    borderColor: state.isFocused ? "border-orange-300" : "border-orange-300",
-                    boxShadow: state.isFocused ? "0 0 0 1px #F5C99A" : "none",
-                    "&:hover": {
-                      borderColor: "border-orange-300",
-                    },
-                    minHeight: "40px",
-                    borderRadius: "6px",
-                  }),
-                  menu: (provided) => ({ ...provided, borderRadius: "6px", overflow: "hidden" }),
-                  option: (provided, state) => ({
-                    ...provided,
-                    fontSize: "14px",
-                    backgroundColor: state.isSelected || state.isFocused ? "#767676" : "#ffffff",
-                    color: state.isSelected || state.isFocused ? "#ffffff" : "#000000",
-                    cursor: "pointer",
-                    padding: "5px 6px",
-                    ":active": { ...provided[":active"], backgroundColor: "#767676" },
-                  }),
-                  placeholder: (provided) => ({ ...provided, color: "#767676" }),
-                  multiValue: (provided) => ({ ...provided, backgroundColor: "#767676" }),
-                  multiValueLabel: (provided) => ({ ...provided, color: "#fff" }),
-                  multiValueRemove: (provided) => ({
-                    ...provided,
-                    color: "#fff",
-                    "&:hover": { backgroundColor: "#767676", color: "#fff" },
-                  }),
-                }}
-              />
-              {errors.assignee && <p className="text-red-500 text-xs mt-1">{errors.assignee}</p>}
-            </div>
 
             {/* Category */}
             <div>

@@ -59,14 +59,23 @@ function DashboardCard({
   trend,
   trendValue,
   colorClass,
+  bgClass = "bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl hover:to-orange-50/80",
+  glowClass = "bg-orange-100/50",
+  hoverTitleColorClass = "group-hover:text-orange-500",
   onClick,
 }) {
   return (
     <div
       onClick={onClick}
-      className="bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl hover:to-orange-50/80 rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 p-3 sm:p-4 flex flex-col transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group relative overflow-hidden"
+<<<<<<< Updated upstream
+      className="bg-gradient-to-br from-white to-gray-50 backdrop-blur-xl hover:to-gray-50 rounded-xl border border-gray-100 p-3 sm:p-4 flex flex-col transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group relative overflow-hidden"
     >
-      <div className="absolute -right-8 -top-8 w-28 h-28 bg-orange-100/50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+      <div className="absolute -right-8 -top-8 w-28 h-28 bg-gray-100/50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+=======
+      className={`${bgClass} rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 p-3 sm:p-4 flex flex-col transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group relative overflow-hidden`}
+    >
+      <div className={`absolute -right-8 -top-8 w-28 h-28 ${glowClass} rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
+>>>>>>> Stashed changes
       <div className="flex justify-between items-start mb-3 relative z-10">
         <div
           className={`p-2 sm:p-2.5 rounded-xl shadow-sm transition-all duration-300 group-hover:scale-110 ${colorClass}`}
@@ -87,7 +96,11 @@ function DashboardCard({
         )}
       </div>
       <div className="relative z-10 mt-1">
-        <h3 className="text-gray-400 text-[9px] sm:text-[10px] font-bold tracking-wider uppercase mb-0.5 group-hover:text-orange-500 transition-colors">
+<<<<<<< Updated upstream
+        <h3 className="text-gray-400 text-[9px] sm:text-[10px] font-bold tracking-wider uppercase mb-0.5 group-hover:text-black transition-colors">
+=======
+        <h3 className={`text-gray-400 text-[9px] sm:text-[10px] font-bold tracking-wider uppercase mb-0.5 ${hoverTitleColorClass} transition-colors`}>
+>>>>>>> Stashed changes
           {title}
         </h3>
         <h2 className="text-xl sm:text-2xl font-black text-gray-800 tracking-tight group-hover:scale-105 transform origin-left transition-transform duration-300">
@@ -178,11 +191,61 @@ export default function Dashboard() {
         todosRes.data?.result || todosRes.data?.data || todosRes.data;
       setTodos(Array.isArray(fetchedTodos) ? fetchedTodos : []);
 
-      const fetchedQuotations =
+      let fetchedQuotations =
         quotationsRes.data?.result ||
         quotationsRes.data?.data ||
         quotationsRes.data;
-      setQuotations(Array.isArray(fetchedQuotations) ? fetchedQuotations : []);
+      if (!Array.isArray(fetchedQuotations)) {
+        fetchedQuotations = [];
+      }
+      const userRole = localStorage.getItem("role") || "";
+      const userFirstName = (localStorage.getItem("username") || "").split(" ")[0].toLowerCase();
+      if (userRole.toLowerCase() === "sales") {
+        fetchedQuotations = fetchedQuotations.filter((q) => {
+          const qAssignees = q.assignee
+            ? q.assignee.split(",").map((name) => name.trim().toLowerCase())
+            : [];
+          const lAssignees = q.lead_assignee
+            ? q.lead_assignee.split(",").map((name) => name.trim().toLowerCase())
+            : [];
+          const hasBeenAssigned =
+            qAssignees.some(name => name.includes(userFirstName)) ||
+            lAssignees.some(name => name.includes(userFirstName));
+
+          let inLog = false;
+          if (q.assignee_log) {
+            try {
+              const logs = JSON.parse(q.assignee_log);
+              inLog = logs.some(
+                (log) =>
+                  (log.previous_assignee &&
+                    log.previous_assignee.toLowerCase().includes(userFirstName)) ||
+                  (log.new_assignee &&
+                    log.new_assignee.toLowerCase().includes(userFirstName))
+              );
+            } catch { }
+          }
+          return hasBeenAssigned || inLog;
+        });
+      } else if (userRole.toLowerCase() === "estimation") {
+        fetchedQuotations = fetchedQuotations.filter((q) => {
+          const qAssignees = q.assignee
+            ? q.assignee.split(",").map((name) => name.trim().toLowerCase())
+            : [];
+          const lAssignees = q.lead_assignee
+            ? q.lead_assignee.split(",").map((name) => name.trim().toLowerCase())
+            : [];
+
+          const matchesQuotation = qAssignees.some(name => name.includes(userFirstName));
+          const matchesLead = lAssignees.some(name => name.includes(userFirstName));
+
+          if (qAssignees.length === 0) {
+            return matchesLead;
+          }
+          return matchesQuotation;
+        });
+      }
+      setQuotations(fetchedQuotations);
 
       const fetchedPis = piRes.data?.data || piRes.data?.result || piRes.data;
       setPis(Array.isArray(fetchedPis) ? fetchedPis : []);
@@ -202,6 +265,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchData();
+    setRole(localStorage.getItem("role") || "");
   }, [fetchData]);
 
   const handleAddTodo = async (e) => {
@@ -264,8 +328,13 @@ export default function Dashboard() {
     const confirmed = await Swal.fire({
       html: `
         <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0">
+<<<<<<< Updated upstream
           <div style="width:56px; height:56px; background:#fff4ed; border-radius:50%; display:flex; align-items:center; justify-content:center;">
-            <svg width="28" height="28" fill="none" stroke="#f97316" stroke-width="1.8" viewBox="0 0 24 24">
+            <svg width="28" height="28" fill="none" stroke="#000000" stroke-width="1.8" viewBox="0 0 24 24">
+=======
+          <div style="width:56px; height:56px; background:#f4f6fc; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+            <svg width="28" height="28" fill="none" stroke="#3b5e9c" stroke-width="1.8" viewBox="0 0 24 24">
+>>>>>>> Stashed changes
               <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
             </svg>
           </div>
@@ -288,8 +357,13 @@ export default function Dashboard() {
         style.innerHTML = `
           .swal-todo-popup { border-radius: 20px !important; padding: 28px 24px !important; width: 340px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.12) !important; }
           .swal-actions { gap: 10px !important; margin-top: 20px !important; }
-          .swal-confirm-btn { background: #f97316; color: white; padding: 9px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; }
+<<<<<<< Updated upstream
+          .swal-confirm-btn { background: #000000; color: white; padding: 9px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; }
           .swal-confirm-btn:hover { background: #ea6c0a; }
+=======
+          .swal-confirm-btn { background: #3b5e9c; color: white; padding: 9px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; }
+          .swal-confirm-btn:hover { background: #2c4675; }
+>>>>>>> Stashed changes
           .swal-cancel-btn { background: #f3f4f6; color: #6b7280; padding: 9px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; }
           .swal-cancel-btn:hover { background: #e5e7eb; }
         `;
@@ -351,29 +425,66 @@ export default function Dashboard() {
 
         const d = new Date(dateStr);
         let key = "";
+        let sortValue = 0;
 
-        if (salesTimeframe === "monthly") {
+        if (salesTimeframe === "weekly") {
+          const tempDate = new Date(d);
+          const day = tempDate.getDay();
+          const diff = tempDate.getDate() - day; // calculate Sunday start of the week
+          const startOfWeek = new Date(tempDate.getFullYear(), tempDate.getMonth(), diff);
+          key = "W/C " + startOfWeek.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          });
+          sortValue = startOfWeek.getTime();
+        } else if (salesTimeframe === "monthly") {
           key = d.toLocaleDateString("en-US", {
             month: "short",
             year: "numeric",
           });
+          sortValue = new Date(d.getFullYear(), d.getMonth(), 1).getTime();
         } else {
           key = d.getFullYear().toString();
+          sortValue = d.getFullYear();
         }
 
         if (!dataMap[key]) {
-          dataMap[key] = { name: key, sales: 0 };
+          dataMap[key] = { name: key, sales: 0, sortValue };
         }
         dataMap[key].sales += Math.round(Number(q.grand_total) || 0);
       }
     });
 
-    return Object.values(dataMap).sort((a, b) => {
-      if (salesTimeframe === "monthly") {
-        return new Date(a.name) - new Date(b.name);
+    return Object.values(dataMap).sort((a, b) => a.sortValue - b.sortValue);
+  };
+
+  const processEstimationTimeframeData = () => {
+    const dataMap = {};
+    const safeQuotations = Array.isArray(quotations) ? quotations : [];
+
+    safeQuotations.forEach((q) => {
+      const dateStr = q.created_at || q.quotation_date || q.quotation_created_at;
+      if (!dateStr) return;
+
+      const d = new Date(dateStr);
+      const key = d.toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
+      });
+
+      if (!dataMap[key]) {
+        dataMap[key] = { name: key, Draft: 0, Approved: 0 };
       }
-      return parseInt(a.name) - parseInt(b.name);
+
+      const val = Math.round(Number(q.grand_total) || 0);
+      if (q.quotation_status === "Approved") {
+        dataMap[key].Approved += val;
+      } else {
+        dataMap[key].Draft += val;
+      }
     });
+
+    return Object.values(dataMap).sort((a, b) => new Date(a.name) - new Date(b.name));
   };
 
   const processLeadsDonut = () => {
@@ -479,6 +590,50 @@ export default function Dashboard() {
   const quotationStatusData = processQuotationStatus();
   const paymentProgressData = processPaymentProgress();
 
+  const processLeadsTrend = () => {
+    const safeLeads = Array.isArray(leads) ? leads : [];
+    const trendMap = {};
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    
+    const now = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const mName = months[d.getMonth()];
+      trendMap[mName] = 0;
+    }
+
+    safeLeads.forEach((lead) => {
+      try {
+        const d = new Date(lead.created_at);
+        const mName = months[d.getMonth()];
+        if (trendMap[mName] !== undefined) {
+          trendMap[mName] += 1;
+        }
+      } catch (e) {}
+    });
+
+    return Object.keys(trendMap).map((mName) => ({
+      name: mName,
+      leads: trendMap[mName],
+    }));
+  };
+
+  const processLeadsBySource = () => {
+    const sourceCount = {};
+    const safeLeads = Array.isArray(leads) ? leads : [];
+    safeLeads.forEach((lead) => {
+      const src = lead.source || "Unknown";
+      sourceCount[src] = (sourceCount[src] || 0) + 1;
+    });
+
+    const colors = ["#3b5e9c", "#4f75b3", "#668cc9", "#2c4675", "#7fa3e0", "#1e3050"];
+    return Object.keys(sourceCount).map((src, index) => ({
+      name: src,
+      value: sourceCount[src],
+      color: colors[index % colors.length],
+    }));
+  };
+
   // Safety fallbacks to guarantee array variables
   const safeTasks = Array.isArray(tasks) ? tasks : [];
   const safeTodos = Array.isArray(todos) ? todos : [];
@@ -491,7 +646,11 @@ export default function Dashboard() {
   const recentLeadsList = safeLeads.slice(0, 5);
 
   return (
+<<<<<<< Updated upstream
+    <div className="dashboard-page">
+=======
     <div className="min-h-screen bg-slate-50/80 font-sans text-gray-900 pb-12">
+>>>>>>> Stashed changes
       <style jsx global>{`
         @keyframes fadeInUp {
           from {
@@ -513,73 +672,982 @@ export default function Dashboard() {
 
         {/* Top Summary Cards */}
         {loading ? (
+<<<<<<< Updated upstream
+          <div className="dashboard-loading">
+            <span className="dashboard-loading-text">
+=======
           <div className="h-32 flex items-center justify-center bg-white/90 backdrop-blur-xl rounded-2xl border border-slate-100 mb-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <span className="text-gray-400 font-semibold animate-pulse">
+>>>>>>> Stashed changes
               Loading amazing metrics...
             </span>
           </div>
-        ) : (
+        ) : role === 'Estimation' ? (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+            <DashboardCard
+              onClick={() => router.push("/sales/quotation")}
+              title="Total Estimations"
+              value={quotations.length}
+              icon={Activity}
+              bgClass="bg-gradient-to-br from-white to-blue-50/40 backdrop-blur-xl hover:to-blue-50/80"
+              glowClass="bg-blue-100/50"
+              colorClass="bg-blue-50 text-blue-600 border border-blue-100/50 group-hover:bg-blue-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-blue-600"
+            />
+            <DashboardCard
+              onClick={() => router.push("/sales/quotation")}
+              title="Pending Estimations"
+              value={quotations.filter((q) => { const st = (q.quotation_status || "").toLowerCase(); return st !== "won" && st !== "approved" && st !== "lost"; }).length}
+              icon={Clock}
+              bgClass="bg-gradient-to-br from-white to-amber-50/40 backdrop-blur-xl hover:to-amber-50/80"
+              glowClass="bg-amber-100/50"
+              colorClass="bg-amber-50 text-amber-600 border border-amber-100/50 group-hover:bg-amber-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-amber-600"
+            />
+            <DashboardCard
+              onClick={() => router.push("/sales/quotation")}
+              title="Approved Estimations"
+              value={quotations.filter((q) => { const st = (q.quotation_status || "").toLowerCase(); return st === "won" || st === "approved"; }).length}
+              icon={CheckCircle2}
+              bgClass="bg-gradient-to-br from-white to-emerald-50/40 backdrop-blur-xl hover:to-emerald-50/80"
+              glowClass="bg-emerald-100/50"
+              colorClass="bg-emerald-50 text-emerald-600 border border-emerald-100/50 group-hover:bg-emerald-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-emerald-600"
+            />
+            <DashboardCard
+              onClick={() => router.push("/sales/quotation")}
+              title="Lost Estimations"
+              value={quotations.filter((q) => (q.quotation_status || "").toLowerCase() === "lost").length}
+              icon={Trash2}
+              bgClass="bg-gradient-to-br from-white to-rose-50/40 backdrop-blur-xl hover:to-rose-50/80"
+              glowClass="bg-rose-100/50"
+              colorClass="bg-rose-50 text-rose-600 border border-rose-100/50 group-hover:bg-rose-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-rose-600"
+            />
+          </div>
+        ) : role === 'Sales' ? (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
             <DashboardCard
               onClick={() => router.push("/sales/lead")}
               title="Total Leads"
               value={leads.length}
               icon={UserPlus}
-              colorClass="bg-orange-50 text-orange-500 border border-orange-100/50 group-hover:bg-orange-500 group-hover:text-white"
+              bgClass="bg-gradient-to-br from-white to-blue-50/40 backdrop-blur-xl hover:to-blue-50/80"
+              glowClass="bg-blue-100/50"
+              colorClass="bg-blue-50 text-blue-600 border border-blue-100/50 group-hover:bg-blue-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-blue-600"
+            />
+            <DashboardCard
+              onClick={() => router.push("/sales/lead")}
+              title="Won Leads"
+              value={leads.filter((l) => l.status === "Won").length}
+              icon={CheckCircle2}
+              bgClass="bg-gradient-to-br from-white to-emerald-50/40 backdrop-blur-xl hover:to-emerald-50/80"
+              glowClass="bg-emerald-100/50"
+              colorClass="bg-emerald-50 text-emerald-600 border border-emerald-100/50 group-hover:bg-emerald-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-emerald-600"
+            />
+            <DashboardCard
+              onClick={() => router.push("/sales/quotation")}
+              title="Total Estimations"
+              value={quotations.length}
+              icon={Activity}
+              bgClass="bg-gradient-to-br from-white to-purple-50/40 backdrop-blur-xl hover:to-purple-50/80"
+              glowClass="bg-purple-100/50"
+              colorClass="bg-purple-50 text-purple-600 border border-purple-100/50 group-hover:bg-purple-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-purple-600"
+            />
+            <DashboardCard
+              onClick={() => router.push("/sales/quotation")}
+              title="Approved Estimations"
+              value={quotations.filter((q) => { const st = (q.quotation_status || "").toLowerCase(); return st === "won" || st === "approved"; }).length}
+              icon={TrendingUp}
+              bgClass="bg-gradient-to-br from-white to-cyan-50/40 backdrop-blur-xl hover:to-cyan-50/80"
+              glowClass="bg-cyan-100/50"
+              colorClass="bg-cyan-50 text-cyan-600 border border-cyan-100/50 group-hover:bg-cyan-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-cyan-600"
+            />
+          </div>
+        ) : role === 'Leads Management' ? (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+            <DashboardCard
+              onClick={() => router.push("/sales/lead")}
+              title="Total Leads"
+              value={leads.length}
+              icon={UserPlus}
+              bgClass="bg-gradient-to-br from-white to-blue-50/40 backdrop-blur-xl hover:to-blue-50/80"
+              glowClass="bg-blue-100/50"
+              colorClass="bg-blue-50 text-blue-600 border border-blue-100/50 group-hover:bg-blue-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-blue-600"
+            />
+            <DashboardCard
+              onClick={() => router.push("/sales/lead")}
+              title="Pending Leads"
+              value={leads.filter((l) => l.status !== "Won" && l.status !== "Lost").length}
+              icon={Clock}
+              bgClass="bg-gradient-to-br from-white to-amber-50/40 backdrop-blur-xl hover:to-amber-50/80"
+              glowClass="bg-amber-100/50"
+              colorClass="bg-amber-50 text-amber-600 border border-amber-100/50 group-hover:bg-amber-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-amber-600"
+            />
+            <DashboardCard
+              onClick={() => router.push("/sales/lead")}
+              title="Won Leads"
+              value={leads.filter((l) => l.status === "Won").length}
+              icon={CheckCircle2}
+              bgClass="bg-gradient-to-br from-white to-emerald-50/40 backdrop-blur-xl hover:to-emerald-50/80"
+              glowClass="bg-emerald-100/50"
+              colorClass="bg-emerald-50 text-emerald-600 border border-emerald-100/50 group-hover:bg-emerald-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-emerald-600"
+            />
+            <DashboardCard
+              onClick={() => router.push("/sales/lead")}
+              title="Lost Leads"
+              value={leads.filter((l) => l.status === "Lost").length}
+              icon={Trash2}
+              bgClass="bg-gradient-to-br from-white to-rose-50/40 backdrop-blur-xl hover:to-rose-50/80"
+              glowClass="bg-rose-100/50"
+              colorClass="bg-rose-50 text-rose-600 border border-rose-100/50 group-hover:bg-rose-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-rose-600"
+            />
+          </div>
+        ) : (
+          <div className="dashboard-metrics-grid">
+            <DashboardCard
+              onClick={() => router.push("/sales/lead")}
+              title="Total Leads"
+              value={leads.length}
+              icon={UserPlus}
+<<<<<<< Updated upstream
+              colorClass="dashboard-card-icon"
+=======
+              bgClass="bg-gradient-to-br from-white to-blue-50/40 backdrop-blur-xl hover:to-blue-50/80"
+              glowClass="bg-blue-100/50"
+              colorClass="bg-blue-50 text-blue-600 border border-blue-100/50 group-hover:bg-blue-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-blue-600"
+>>>>>>> Stashed changes
             />
             <DashboardCard
               onClick={() => router.push("/customer-list")}
               title="Total Customers"
               value={customers.length}
               icon={Users}
-              colorClass="bg-orange-50 text-orange-500 border border-orange-100/50 group-hover:bg-orange-500 group-hover:text-white"
+<<<<<<< Updated upstream
+              colorClass="dashboard-card-icon"
+=======
+              bgClass="bg-gradient-to-br from-white to-emerald-50/40 backdrop-blur-xl hover:to-emerald-50/80"
+              glowClass="bg-emerald-100/50"
+              colorClass="bg-emerald-50 text-emerald-600 border border-emerald-100/50 group-hover:bg-emerald-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-emerald-600"
+>>>>>>> Stashed changes
             />
             <DashboardCard
               onClick={() => router.push("/tasks")}
               title="Total Tasks"
               value={tasks.length}
               icon={CheckSquare}
-              colorClass="bg-orange-50 text-orange-500 border border-orange-100/50 group-hover:bg-orange-500 group-hover:text-white"
+<<<<<<< Updated upstream
+              colorClass="dashboard-card-icon"
+=======
+              bgClass="bg-gradient-to-br from-white to-purple-50/40 backdrop-blur-xl hover:to-purple-50/80"
+              glowClass="bg-purple-100/50"
+              colorClass="bg-purple-50 text-purple-600 border border-purple-100/50 group-hover:bg-purple-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-purple-600"
+>>>>>>> Stashed changes
             />
             <DashboardCard
               onClick={() => router.push("/todolist")}
               title="Active To-Dos"
               value={todos.filter((t) => !t.is_finished).length}
               icon={ListTodo}
-              colorClass="bg-orange-50 text-orange-500 border border-orange-100/50 group-hover:bg-orange-500 group-hover:text-white"
+<<<<<<< Updated upstream
+              colorClass="dashboard-card-icon"
+=======
+              bgClass="bg-gradient-to-br from-white to-rose-50/40 backdrop-blur-xl hover:to-rose-50/80"
+              glowClass="bg-rose-100/50"
+              colorClass="bg-rose-50 text-rose-600 border border-rose-100/50 group-hover:bg-rose-600 group-hover:text-white"
+              hoverTitleColorClass="group-hover:text-rose-600"
+>>>>>>> Stashed changes
             />
           </div>
         )}
 
         {/* Dashboard Analytics & Widgets */}
-        {!loading && (
+        {!loading && role === 'Leads Management' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6">
+            {/* ROW 1: Charts & Recent Leads (3 Columns) */}
+            {/* Leads by Source Donut Chart (Span 4) */}
+            <div
+              className="lg:col-span-4 bg-gradient-to-br from-white to-purple-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-purple-100/30 p-5 flex flex-col justify-between animate-fade-in-up"
+              style={{ animationDelay: "0.1s" }}
+            >
+              <div className="mb-2">
+                <h3 className="text-sm font-extrabold text-gray-800">
+                  Leads by Source
+                </h3>
+                <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                  Lead source distribution
+                </p>
+              </div>
+              <div className="h-[210px] flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={processLeadsBySource()}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={45}
+                      outerRadius={68}
+                      paddingAngle={4}
+                      dataKey="value"
+                      animationDuration={2000}
+                    >
+                      {processLeadsBySource().map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} stroke="transparent" />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }}
+                      itemStyle={{ fontWeight: "bold", fontSize: "11px" }}
+                    />
+                    <Legend
+                      layout="horizontal"
+                      verticalAlign="bottom"
+                      align="center"
+                      iconType="circle"
+                      wrapperStyle={{ fontSize: "10px", fontWeight: 600, color: "#475569" }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Lead Status Donut Chart (Span 4) */}
+            <div
+              className="lg:col-span-4 bg-gradient-to-br from-white to-emerald-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-emerald-100/30 p-5 flex flex-col justify-between animate-fade-in-up"
+              style={{ animationDelay: "0.2s" }}
+            >
+              <div className="mb-2">
+                <h3 className="text-sm font-extrabold text-gray-800">
+                  Lead Status
+                </h3>
+                <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                  CRM leads distribution
+                </p>
+              </div>
+              <div className="h-[210px] flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={leadsDonutData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={45}
+                      outerRadius={68}
+                      paddingAngle={4}
+                      dataKey="value"
+                      animationDuration={2000}
+                    >
+                      {leadsDonutData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} stroke="transparent" />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }}
+                      itemStyle={{ fontWeight: "bold", fontSize: "11px" }}
+                    />
+                    <Legend
+                      layout="horizontal"
+                      verticalAlign="bottom"
+                      align="center"
+                      iconType="circle"
+                      wrapperStyle={{ fontSize: "10px", fontWeight: 600, color: "#475569" }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Recent Leads List (Span 4) */}
+            <div
+              className="lg:col-span-4 bg-gradient-to-br from-white to-blue-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-blue-100/30 p-5 flex flex-col justify-between animate-fade-in-up"
+              style={{ animationDelay: "0.3s" }}
+            >
+              <div className="flex justify-between items-center mb-2">
+                <div>
+                  <h3 className="text-sm font-extrabold text-gray-800">Recent Leads</h3>
+                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">Your last 4 leads</p>
+                </div>
+                <button
+                  onClick={() => router.push("/sales/lead")}
+                  className="text-[10px] text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-500 px-2.5 py-1.5 rounded-lg font-bold transition-all uppercase tracking-wider"
+                >
+                  View All
+                </button>
+              </div>
+              <div className="space-y-2 overflow-y-auto max-h-[145px] pr-1 custom-scrollbar">
+                {safeLeads.slice(0, 4).map((lead, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white/80 backdrop-blur-sm border border-blue-100 p-2.5 rounded-xl shadow-sm hover:shadow-md transition-all flex justify-between items-center group animate-fade-in"
+                  >
+                    <div className="truncate flex-1 mr-3">
+                      <h4 className="font-bold text-gray-800 text-[11px] mb-0.5 truncate">{lead.reference || "Untitled Lead"}</h4>
+                      <p className="text-blue-600 text-[9px] font-extrabold truncate">{lead.company_name}</p>
+                      <div className="flex gap-2 text-[8px] text-gray-400 font-semibold mt-0.5">
+                        <span className="truncate">{lead.customer_name}</span>
+                        <span>•</span>
+                        <span>{new Date(lead.created_at).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter ${lead.status === "Won" ? "bg-green-100 text-green-700" : lead.status === "Lost" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>
+                        {lead.status}
+                      </span>
+                      <button onClick={() => router.push(`/sales/lead?id=${lead.lead_id}`)} className="text-[9px] font-bold text-gray-400 hover:text-blue-500 transition-colors">Details →</button>
+                    </div>
+                  </div>
+                ))}
+                {safeLeads.length === 0 && (
+                  <div className="py-8 text-center bg-white/40 rounded-xl border border-dashed border-gray-200 w-full">
+                    <p className="text-gray-400 text-[10px] font-semibold">No leads found yet</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ROW 2: Full Width To-Do Split View (Span 12) */}
+            <div
+              className="lg:col-span-12 bg-gradient-to-br from-white to-blue-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-blue-100/30 p-5 flex flex-col animate-fade-in-up"
+              style={{ animationDelay: "0.4s" }}
+            >
+              <div className="flex flex-col md:flex-row justify-between md:items-center gap-3 mb-4">
+                <div>
+                  <h3 className="text-md font-extrabold text-gray-800">
+                    Todo List
+                  </h3>
+                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                    Productivity Checklist
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2 w-full md:w-auto">
+                  <form
+                    onSubmit={handleAddTodo}
+                    className="flex relative flex-1 md:w-56"
+                  >
+                    <input
+                      type="text"
+                      value={newTodoTitle}
+                      onChange={(e) => setNewTodoTitle(e.target.value)}
+                      placeholder={
+                        editingTodoId ? "Update task..." : "Quick add a new task..."
+                      }
+                      className="w-full bg-white border border-gray-200 rounded-lg py-[7px] pl-3 pr-8 text-[12px] focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-gray-800 font-medium placeholder-gray-400"
+                      disabled={addingTodo}
+                    />
+                    <button
+                      type="submit"
+                      disabled={addingTodo || !newTodoTitle.trim()}
+                      className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1.5 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-all"
+                    >
+                      <Plus size={12} strokeWidth={3} />
+                    </button>
+                  </form>
+                  <button
+                    onClick={() => router.push("/todolist")}
+                    className="text-[10px] text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 px-3 py-1.5 rounded-lg font-bold transition-all uppercase tracking-wider"
+                  >
+                    View All
+                  </button>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-auto">
+                <div className="bg-white/60 backdrop-blur-sm border border-gray-100 p-3 rounded-xl shadow-sm flex flex-col">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
+                      Unfinished Tasks
+                    </h3>
+                  </div>
+                  <div className="space-y-1.5 overflow-y-auto h-[120px] custom-scrollbar">
+                    {unfinishedTodos.map((todo) => (
+                      <div
+                        key={todo.id}
+                        className="group flex justify-between items-center bg-blue-50/50 rounded-md px-2.5 py-1.5 animate-fade-in"
+                      >
+                        <div className="flex items-center gap-2 flex-1 truncate">
+                          <input
+                            type="checkbox"
+                            onChange={() => handleToggleTodo(todo.id)}
+                            className="w-3.5 h-3.5 accent-blue-600 cursor-pointer"
+                          />
+                          <p className="text-[12px] font-semibold text-gray-700 truncate">
+                            {todo.title}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <button
+                            onClick={() => startEditTodo(todo)}
+                            className="text-blue-500 hover:text-blue-700 transition-colors"
+                          >
+                            <Pencil size={12} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteTodo(todo.id)}
+                            className="text-red-500 hover:text-red-700 transition-colors"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {unfinishedTodos.length === 0 && (
+                      <p className="text-gray-400 text-xs text-center py-8">No unfinished tasks</p>
+                    )}
+                  </div>
+                </div>
+                <div className="bg-white/60 backdrop-blur-sm border border-gray-100 p-3 rounded-xl shadow-sm flex flex-col">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
+                      Finished Tasks
+                    </h3>
+                  </div>
+                  <div className="space-y-1.5 overflow-y-auto h-[120px] custom-scrollbar">
+                    {finishedTodos.map((todo) => (
+                      <div
+                        key={todo.id}
+                        className="group flex justify-between items-center bg-green-50/50 rounded-md px-2.5 py-1.5 animate-fade-in"
+                      >
+                        <div className="flex items-center gap-2 flex-1 truncate">
+                          <input
+                            type="checkbox"
+                            checked
+                            onChange={() => handleToggleTodo(todo.id)}
+                            className="w-3.5 h-3.5 accent-green-500 cursor-pointer"
+                          />
+                          <p className="text-[12px] font-semibold text-gray-400 line-through truncate">
+                            {todo.title}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <button
+                            onClick={() => handleDeleteTodo(todo.id)}
+                            className="text-red-500"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {finishedTodos.length === 0 && (
+                      <p className="text-gray-400 text-xs text-center py-8">No finished tasks yet</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!loading && role === 'Sales' && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              {/* ROW 1: Symmetrical 3-Column Charts & Recent List */}
+              
+              {/* Leads Status Donut Chart (Span 4) */}
+              <div
+                className="lg:col-span-4 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col justify-between animate-fade-in-up"
+                style={{ animationDelay: "0.1s" }}
+              >
+                <div className="mb-2">
+                  <h3 className="text-sm font-extrabold text-gray-800">
+                    Lead Status Distribution
+                  </h3>
+                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                    Won vs Pending vs Lost leads
+                  </p>
+                </div>
+                <div className="h-[210px] flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={processLeadsDonut()}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={45}
+                        outerRadius={68}
+                        paddingAngle={4}
+                        dataKey="value"
+                        animationDuration={2000}
+                      >
+                        {processLeadsDonut().map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={entry.color}
+                            stroke="transparent"
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          borderRadius: "12px",
+                          border: "none",
+                          boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                        }}
+                        itemStyle={{ fontWeight: "bold", fontSize: "11px" }}
+                      />
+                      <Legend
+                        layout="horizontal"
+                        verticalAlign="bottom"
+                        align="center"
+                        iconType="circle"
+                        wrapperStyle={{
+                          fontSize: "10px",
+                          fontWeight: 600,
+                          color: "#475569",
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Quotation Status Donut Chart (Span 4) */}
+              <div
+                className="lg:col-span-4 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col justify-between animate-fade-in-up"
+                style={{ animationDelay: "0.2s" }}
+              >
+                <div className="mb-2">
+                  <h3 className="text-sm font-extrabold text-gray-800">
+                    Estimation Distribution
+                  </h3>
+                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                    Success vs Pending status
+                  </p>
+                </div>
+                <div className="h-[210px] flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={processQuotationStatus()}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={45}
+                        outerRadius={68}
+                        paddingAngle={4}
+                        dataKey="value"
+                        animationDuration={2000}
+                      >
+                        {processQuotationStatus().map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={entry.color}
+                            stroke="transparent"
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          borderRadius: "12px",
+                          border: "none",
+                          boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                        }}
+                        itemStyle={{ fontWeight: "bold", fontSize: "11px" }}
+                      />
+                      <Legend
+                        layout="horizontal"
+                        verticalAlign="bottom"
+                        align="center"
+                        iconType="circle"
+                        wrapperStyle={{
+                          fontSize: "10px",
+                          fontWeight: 600,
+                          color: "#475569",
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Recent Sales Activities List (Span 4) */}
+              <div
+                className="lg:col-span-4 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100 p-5 flex flex-col justify-between animate-fade-in-up"
+                style={{ animationDelay: "0.3s" }}
+              >
+                <div className="mb-3">
+                  <h3 className="text-sm font-extrabold text-gray-800">
+                    Recent Sales Actions
+                  </h3>
+                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                    Combined activity logs
+                  </p>
+                </div>
+
+                <div className="space-y-2 flex-1 overflow-y-auto max-h-[200px] pr-1 custom-scrollbar">
+                  {(() => {
+                    const activities = [];
+                    const safeLeads = Array.isArray(leads) ? leads : [];
+                    const safeQuotations = Array.isArray(quotations) ? quotations : [];
+
+                    safeLeads.forEach(l => {
+                      activities.push({
+                        id: `lead-${l.lead_id}`,
+                        type: "Lead",
+                        title: l.company_name || l.customer_name || "New Lead",
+                        subtitle: l.reference || "No Reference",
+                        date: l.created_at || l.updated_at,
+                        status: l.status,
+                      });
+                    });
+
+                    safeQuotations.forEach(q => {
+                      activities.push({
+                        id: `quote-${q.latest_quotation_id || q.id}`,
+                        type: "Estimation",
+                        title: q.company_name || q.customer_name || "New Quotation",
+                        subtitle: q.quotation_no || "No Quote No.",
+                        date: q.quotation_created_at || q.quotation_date,
+                        status: q.quotation_status,
+                        amount: q.grand_total || q.amount,
+                      });
+                    });
+
+                    const sorted = activities
+                      .filter(act => act.date)
+                      .sort((a, b) => new Date(b.date) - new Date(a.date))
+                      .slice(0, 4);
+
+                    if (sorted.length === 0) {
+                      return <p className="text-gray-400 text-xs text-center py-10">No recent activity</p>;
+                    }
+
+                    return sorted.map((act) => (
+                      <div
+                        key={act.id}
+                        className="flex items-center justify-between p-2.5 rounded-xl bg-white/70 hover:bg-white border border-slate-100 hover:border-orange-100 transition-all duration-300 shadow-sm"
+                      >
+                        <div className="flex flex-col min-w-0 pr-2">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className={`px-1.5 py-0.5 rounded-md text-[8px] font-black uppercase tracking-tighter ${
+                              act.type === "Lead"
+                                ? "bg-orange-100 text-orange-600 border border-orange-200/50"
+                                : "bg-emerald-100 text-emerald-600 border border-emerald-200/50"
+                            }`}>
+                              {act.type}
+                            </span>
+                            <span className="text-[10px] text-gray-400 font-bold">
+                              {act.date ? new Date(act.date).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : ""}
+                            </span>
+                          </div>
+                          <span className="text-xs font-bold text-gray-700 truncate max-w-[130px] sm:max-w-[170px]">
+                            {act.title}
+                          </span>
+                          <span className="text-[9px] text-gray-400 truncate max-w-[130px] sm:max-w-[170px] font-semibold">
+                            {act.subtitle}
+                          </span>
+                        </div>
+
+                        <div className="flex flex-col items-end shrink-0">
+                          {act.amount !== undefined && (
+                            <span className="text-[11px] font-black text-gray-800">
+                              ₹{Math.round(act.amount).toLocaleString("en-IN")}
+                            </span>
+                          )}
+                          <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tight mt-1 ${
+                            act.status === "Won" || act.status === "Approved"
+                              ? "bg-green-100 text-green-700"
+                              : act.status === "Lost"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-orange-100 text-orange-700"
+                          }`}>
+                            {act.status}
+                          </span>
+                        </div>
+                      </div>
+                    ));
+                  })()}
+                </div>
+              </div>
+            </div>
+
+            {/* ROW 2: Sales Area Chart & Checklist */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              {/* Monthly Estimation Performance Trend (Area Chart) (Span 7) */}
+              <div
+                className="lg:col-span-7 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col justify-between animate-fade-in-up"
+                style={{ animationDelay: "0.4s" }}
+              >
+                <div>
+                  <h3 className="text-sm font-extrabold text-gray-800">
+                    Estimation Performance Trend
+                  </h3>
+                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                    Monthly Approved vs Draft quotation amounts
+                  </p>
+                </div>
+                <div className="h-[210px] mt-4">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart
+                      data={processEstimationTimeframeData()}
+                      margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+                    >
+                      <defs>
+                        <linearGradient id="colorSalesApproved" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
+                          <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="colorSalesDraft" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
+                          <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                      <XAxis
+                        dataKey="name"
+                        stroke="#94a3b8"
+                        fontSize={10}
+                        fontWeight={600}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis
+                        stroke="#94a3b8"
+                        fontSize={9}
+                        fontWeight={600}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => {
+                          if (value >= 100000) return `₹${(value / 100000).toFixed(1)}L`;
+                          if (value >= 1000) return `₹${(value / 1000).toFixed(0)}k`;
+                          return `₹${value}`;
+                        }}
+                      />
+                      <Tooltip
+                        cursor={{ stroke: "#e2e8f0", strokeWidth: 1 }}
+                        contentStyle={{
+                          borderRadius: "12px",
+                          border: "none",
+                          boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                        }}
+                        itemStyle={{ fontWeight: "bold", fontSize: "11px" }}
+                        formatter={(value) => [`₹${Math.round(value).toLocaleString("en-IN")}`]}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="Approved"
+                        stroke="#10b981"
+                        strokeWidth={2}
+                        fillOpacity={1}
+                        fill="url(#colorSalesApproved)"
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="Draft"
+                        stroke="#f59e0b"
+                        strokeWidth={2}
+                        fillOpacity={1}
+                        fill="url(#colorSalesDraft)"
+                      />
+                      <Legend
+                        verticalAlign="top"
+                        height={36}
+                        align="right"
+                        iconType="circle"
+                        wrapperStyle={{ fontSize: "10px", fontWeight: 600, color: "#475569" }}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Todo split list (Span 5) */}
+              <div
+                className="lg:col-span-5 bg-gradient-to-br from-white to-blue-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100 p-5 flex flex-col justify-between animate-fade-in-up"
+                style={{ animationDelay: "0.5s" }}
+              >
+                <div>
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-4">
+                    <div>
+                      <h3 className="text-sm font-extrabold text-gray-800">
+                        Sales checklist
+                      </h3>
+                      <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                        Productivity Checklist
+                      </p>
+                    </div>
+                    <form
+                      onSubmit={handleAddTodo}
+                      className="flex relative w-full sm:w-44"
+                    >
+                      <input
+                        type="text"
+                        value={newTodoTitle}
+                        onChange={(e) => setNewTodoTitle(e.target.value)}
+                        placeholder={
+                          editingTodoId ? "Update task..." : "Quick add task..."
+                        }
+                        className="w-full bg-white border border-gray-200 rounded-lg py-[5px] pl-2 pr-7 text-[11px] focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-gray-800 font-semibold placeholder-gray-400"
+                      />
+                      <button
+                        type="submit"
+                        disabled={addingTodo}
+                        className="absolute right-1 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-600 transition-colors p-1"
+                      >
+                        <Plus size={14} strokeWidth={3} />
+                      </button>
+                    </form>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Unfinished checklist */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between pb-1.5 border-b border-gray-100">
+                        <span className="text-[10px] font-black text-blue-600 uppercase tracking-wider flex items-center gap-1.5">
+                          <Circle size={8} fill="#2563eb" stroke="transparent" />
+                          Pending ({unfinishedTodos.length})
+                        </span>
+                      </div>
+                      <div className="space-y-1.5 overflow-y-auto h-[120px] custom-scrollbar pr-1">
+                        {unfinishedTodos.map((todo) => (
+                          <div
+                            key={todo.id}
+                            className="group flex justify-between items-center bg-blue-50/50 rounded-md px-2 py-1 border border-blue-100/50 hover:border-blue-200/80 transition-all animate-fade-in"
+                          >
+                            <div className="flex items-center gap-2 flex-1 truncate">
+                              <input
+                                type="checkbox"
+                                checked={false}
+                                onChange={() => handleToggleTodo(todo.id)}
+                                className="w-3.5 h-3.5 accent-blue-600 cursor-pointer"
+                              />
+                              <p className="text-[11px] font-bold text-gray-700 truncate">
+                                {todo.title}
+                              </p>
+                            </div>
+                            <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={() => startEditTodo(todo)}
+                                className="text-gray-400 hover:text-blue-500 transition-colors"
+                              >
+                                <Pencil size={10} />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteTodo(todo.id)}
+                                className="text-gray-400 hover:text-red-500 transition-colors"
+                              >
+                                <Trash2 size={10} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                        {unfinishedTodos.length === 0 && (
+                          <p className="text-gray-400 text-xs text-center py-8">All caught up!</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Finished checklist */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between pb-1.5 border-b border-gray-100">
+                        <span className="text-[10px] font-black text-green-600 uppercase tracking-wider flex items-center gap-1.5">
+                          <CheckCircle2 size={10} className="text-green-500" />
+                          Completed ({finishedTodos.length})
+                        </span>
+                      </div>
+                      <div className="space-y-1.5 overflow-y-auto h-[120px] custom-scrollbar pr-1">
+                        {finishedTodos.map((todo) => (
+                          <div
+                            key={todo.id}
+                            className="group flex justify-between items-center bg-green-50/50 rounded-md px-2 py-1 border border-green-100/50 transition-all animate-fade-in"
+                          >
+                            <div className="flex items-center gap-2 flex-1 truncate">
+                              <input
+                                type="checkbox"
+                                checked
+                                onChange={() => handleToggleTodo(todo.id)}
+                                className="w-3.5 h-3.5 accent-green-500 cursor-pointer"
+                              />
+                              <p className="text-[11px] font-bold text-gray-400 line-through truncate">
+                                {todo.title}
+                              </p>
+                            </div>
+                            <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={() => handleDeleteTodo(todo.id)}
+                                className="text-gray-400 hover:text-red-500 transition-colors"
+                              >
+                                <Trash2 size={10} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                        {finishedTodos.length === 0 && (
+                          <p className="text-gray-400 text-xs text-center py-8">No completed tasks yet</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!loading && role !== 'Leads Management' && role !== 'Estimation' && role !== 'Sales' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6">
             {/* ROW 1 */}
             {/* Sales Chart (Span 8) */}
             <div
-              className="lg:col-span-8 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col relative overflow-hidden group animate-fade-in-up"
+<<<<<<< Updated upstream
+              className="sales-card group"
               style={{ animationDelay: "0.1s" }}
             >
-              <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-orange-50/60 to-transparent pointer-events-none transition-opacity opacity-0 group-hover:opacity-100 duration-500"></div>
+              <div className="sales-card-overlay"></div>
+              <div className="flex justify-between items-center mb-4 relative z-10">
+                <div>
+                  <h3 className="dashboard-title">Sales Overview</h3>
+                  <p className="dashboard-subtitle">
+=======
+              className="lg:col-span-8 bg-gradient-to-br from-white to-blue-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col relative overflow-hidden group animate-fade-in-up"
+              style={{ animationDelay: "0.1s" }}
+            >
+              <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-blue-50/60 to-transparent pointer-events-none transition-opacity opacity-0 group-hover:opacity-100 duration-500"></div>
               <div className="flex justify-between items-center mb-4 relative z-10">
                 <div>
                   <h3 className="text-md font-extrabold text-gray-800">
                     Sales Overview
                   </h3>
                   <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+>>>>>>> Stashed changes
                     Approved quotations revenue
                   </p>
                 </div>
                 <div className="flex space-x-1 bg-gray-50 p-0.5 rounded-lg border border-gray-100">
                   <button
+                    onClick={() => setSalesTimeframe("weekly")}
+                    className={`px-3 py-1 text-[10px] rounded-md font-bold transition-all duration-200 ${salesTimeframe === "weekly" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                  >
+                    Weekly
+                  </button>
+                  <button
                     onClick={() => setSalesTimeframe("monthly")}
-                    className={`px-3 py-1 text-[10px] rounded-md font-bold transition-all duration-200 ${salesTimeframe === "monthly" ? "bg-white text-orange-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+<<<<<<< Updated upstream
+                    className={`px-3 py-1 text-[10px] rounded-md font-bold transition-all duration-200 ${salesTimeframe === "monthly" ? "bg-white text-black shadow-sm" : "text-gray-500 hover:text-black"}`}
+=======
+                    className={`px-3 py-1 text-[10px] rounded-md font-bold transition-all duration-200 ${salesTimeframe === "monthly" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+>>>>>>> Stashed changes
                   >
                     Monthly
                   </button>
                   <button
                     onClick={() => setSalesTimeframe("yearly")}
-                    className={`px-3 py-1 text-[10px] rounded-md font-bold transition-all duration-200 ${salesTimeframe === "yearly" ? "bg-white text-orange-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+<<<<<<< Updated upstream
+                    className={`px-3 py-1 text-[10px] rounded-md font-bold transition-all duration-200 ${salesTimeframe === "yearly" ? "bg-white text-black shadow-sm" : "text-gray-500 hover:text-black"}`}
+=======
+                    className={`px-3 py-1 text-[10px] rounded-md font-bold transition-all duration-200 ${salesTimeframe === "yearly" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+>>>>>>> Stashed changes
                   >
                     Yearly
                   </button>
@@ -614,7 +1682,11 @@ export default function Dashboard() {
                     />
                     <Tooltip
                       cursor={{
-                        stroke: "#f97316",
+<<<<<<< Updated upstream
+                        stroke: "#000000",
+=======
+                        stroke: "#3b5e9c",
+>>>>>>> Stashed changes
                         strokeWidth: 1,
                         strokeDasharray: "4 4",
                       }}
@@ -624,7 +1696,11 @@ export default function Dashboard() {
                         boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
                       }}
                       itemStyle={{
-                        color: "#ea580c",
+<<<<<<< Updated upstream
+                        color: "#000000",
+=======
+                        color: "#3b5e9c",
+>>>>>>> Stashed changes
                         fontWeight: 800,
                         fontSize: "12px",
                       }}
@@ -632,13 +1708,21 @@ export default function Dashboard() {
                     <Line
                       type="monotone"
                       dataKey="sales"
-                      stroke="#ea580c"
+<<<<<<< Updated upstream
+                      stroke="#000000"
+=======
+                      stroke="#3b5e9c"
+>>>>>>> Stashed changes
                       strokeWidth={3}
                       dot={{ r: 3, strokeWidth: 2, fill: "#fff" }}
                       activeDot={{
                         r: 6,
                         strokeWidth: 2,
-                        fill: "#f97316",
+<<<<<<< Updated upstream
+                        fill: "#000000",
+=======
+                        fill: "#2c4675",
+>>>>>>> Stashed changes
                         stroke: "#fff",
                       }}
                       animationDuration={2000}
@@ -650,7 +1734,15 @@ export default function Dashboard() {
 
             {/* Leads Donut Chart (Span 4) */}
             <div
-              className="lg:col-span-4 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
+<<<<<<< Updated upstream
+              className="dashboard-widget lg:col-span-4"
+              style={{ animationDelay: "0.2s" }}
+            >
+              <div className="mb-1">
+                <h3 className="dashboard-title"> Lead Status</h3>
+                <p className="dashboard-subtitle">CRM leads distribution</p>
+=======
+              className="lg:col-span-4 bg-gradient-to-br from-white to-emerald-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-emerald-100/30 p-5 flex flex-col animate-fade-in-up"
               style={{ animationDelay: "0.2s" }}
             >
               <div className="mb-1">
@@ -660,6 +1752,7 @@ export default function Dashboard() {
                 <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                   CRM leads distribution
                 </p>
+>>>>>>> Stashed changes
               </div>
               <div className="h-[200px] flex items-center justify-center mt-auto">
                 <ResponsiveContainer width="100%" height="100%">
@@ -709,17 +1802,26 @@ export default function Dashboard() {
             {/* ROW 2 */}
             {/* Split View To-Do List (Span 7) */}
             <div
-              className="lg:col-span-7 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
+<<<<<<< Updated upstream
+              className="dashboard-widget lg:col-span-7"
+=======
+              className="lg:col-span-7 bg-gradient-to-br from-white to-blue-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-blue-100/30 p-5 flex flex-col animate-fade-in-up"
+>>>>>>> Stashed changes
               style={{ animationDelay: "0.3s" }}
             >
               <div className="flex flex-col md:flex-row justify-between md:items-center gap-3 mb-4">
                 <div>
+<<<<<<< Updated upstream
+                  <h3 className="dashboard-title  ">Todo List</h3>
+                  <p className="dashboard-subtitle">Productivity</p>
+=======
                   <h3 className="text-md font-extrabold text-gray-800">
                     Todo List
                   </h3>
                   <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                     Productivity
                   </p>
+>>>>>>> Stashed changes
                 </div>
                 <div className="flex items-center space-x-2 w-full md:w-auto">
                   <form
@@ -733,20 +1835,32 @@ export default function Dashboard() {
                       placeholder={
                         editingTodoId ? "Update task..." : "Quick add..."
                       }
-                      className="w-full bg-white border border-gray-200 rounded-lg py-1.5 pl-3 pr-8 text-[12px] focus:outline-none focus:ring-2 focus:ring-orange-500/20 transition-all text-gray-800 font-medium placeholder-gray-400"
+<<<<<<< Updated upstream
+                      className="w-full bg-white border border-gray-200 rounded-lg py-1.5 pl-3 pr-8 text-[12px] focus:outline-none  transition-all text-gray-800 font-medium placeholder-gray-400"
+=======
+                      className="w-full bg-white border border-gray-200 rounded-lg py-1.5 pl-3 pr-8 text-[12px] focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-gray-800 font-medium placeholder-gray-400"
+>>>>>>> Stashed changes
                       disabled={addingTodo}
                     />
                     <button
                       type="submit"
                       disabled={addingTodo || !newTodoTitle.trim()}
-                      className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 text-white bg-orange-500 rounded-md hover:bg-orange-600 disabled:opacity-50 transition-all"
+<<<<<<< Updated upstream
+                      className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 text-white bg-gray-500 rounded-md hover:bg-gray-600 disabled:opacity-50 transition-all"
+=======
+                      className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-all"
+>>>>>>> Stashed changes
                     >
                       <Plus size={12} strokeWidth={3} />
                     </button>
                   </form>
                   <button
                     onClick={() => router.push("/todolist")}
-                    className="text-[10px] text-orange-600 hover:text-white bg-orange-50 hover:bg-orange-500 px-2.5 py-1.5 rounded-lg font-bold transition-all"
+<<<<<<< Updated upstream
+                    className="text-[10px] text-black hover:text-white bg-gray-200 hover:bg-gray-500 px-2.5 py-1.5 rounded-lg font-bold transition-all"
+=======
+                    className="text-[10px] text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 px-2.5 py-1.5 rounded-lg font-bold transition-all"
+>>>>>>> Stashed changes
                   >
                     View All
                   </button>
@@ -755,7 +1869,11 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-auto">
                 <div className="bg-white/60 backdrop-blur-sm border border-gray-100 p-3 rounded-xl shadow-sm flex flex-col">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="w-2 h-2 rounded-full bg-orange-500"></span>
+<<<<<<< Updated upstream
+                    <span className="w-2 h-2 rounded-full bg-red-500"></span>
+=======
+                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+>>>>>>> Stashed changes
                     <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
                       Unfinished
                     </h3>
@@ -764,13 +1882,21 @@ export default function Dashboard() {
                     {unfinishedTodos.map((todo) => (
                       <div
                         key={todo.id}
-                        className="group flex justify-between items-center bg-orange-50/50 rounded-md px-2.5 py-1.5"
+<<<<<<< Updated upstream
+                        className="group flex justify-between items-center bg-red-50 rounded-md px-2.5 py-1.5"
+=======
+                        className="group flex justify-between items-center bg-blue-50/50 rounded-md px-2.5 py-1.5"
+>>>>>>> Stashed changes
                       >
                         <div className="flex items-center gap-2 flex-1 truncate">
                           <input
                             type="checkbox"
                             onChange={() => handleToggleTodo(todo.id)}
-                            className="w-3.5 h-3.5 accent-orange-500 cursor-pointer"
+<<<<<<< Updated upstream
+                            className="w-3.5 h-3.5 accent-black cursor-pointer"
+=======
+                            className="w-3.5 h-3.5 accent-blue-600 cursor-pointer"
+>>>>>>> Stashed changes
                           />
                           <p className="text-[12px] font-semibold text-gray-700 truncate">
                             {todo.title}
@@ -796,7 +1922,7 @@ export default function Dashboard() {
                 </div>
                 <div className="bg-white/60 backdrop-blur-sm border border-gray-100 p-3 rounded-xl shadow-sm flex flex-col">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span className="w-2 h-2 rounded-full bg-green-600"></span>
                     <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
                       Finished
                     </h3>
@@ -805,14 +1931,14 @@ export default function Dashboard() {
                     {finishedTodos.map((todo) => (
                       <div
                         key={todo.id}
-                        className="group flex justify-between items-center bg-green-50/50 rounded-md px-2.5 py-1.5"
+                        className="group flex justify-between items-center bg-green-50 rounded-md px-2.5 py-1.5"
                       >
                         <div className="flex items-center gap-2 flex-1 truncate">
                           <input
                             type="checkbox"
                             checked
                             onChange={() => handleToggleTodo(todo.id)}
-                            className="w-3.5 h-3.5 accent-green-500 cursor-pointer"
+                            className="w-3.5 h-3.5 accent-green-600 cursor-pointer"
                           />
                           <p className="text-[12px] font-semibold text-gray-400 line-through truncate">
                             {todo.title}
@@ -835,7 +1961,15 @@ export default function Dashboard() {
 
             {/* Payment Due Progress Bar (Span 5) */}
             <div
-              className="lg:col-span-5 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
+<<<<<<< Updated upstream
+              className="dashboard-widget lg:col-span-5"
+              style={{ animationDelay: "0.5s" }}
+            >
+              <div className="mb-6">
+                <h3 className="dashboard-title">Payment Due</h3>
+                <p className="dashboard-subtitle">Proforma Collection</p>
+=======
+              className="lg:col-span-5 bg-gradient-to-br from-white to-rose-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-rose-100/30 p-5 flex flex-col animate-fade-in-up"
               style={{ animationDelay: "0.5s" }}
             >
               <div className="mb-6">
@@ -845,6 +1979,7 @@ export default function Dashboard() {
                 <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                   Proforma Collection
                 </p>
+>>>>>>> Stashed changes
               </div>
               <div className="flex flex-col gap-5 mt-auto">
                 <div className="flex justify-between items-end">
@@ -909,7 +2044,15 @@ export default function Dashboard() {
             {/* ROW 4 */}
             {/* Tasks Priority Donut (Span 6) */}
             <div
-              className="lg:col-span-6 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
+<<<<<<< Updated upstream
+              className="dashboard-widget lg:col-span-6"
+              style={{ animationDelay: "0.6s" }}
+            >
+              <div className="mb-1">
+                <h3 className="dashboard-title">Tasks Priority</h3>
+                <p className="dashboard-subtitle">Focus areas</p>
+=======
+              className="lg:col-span-6 bg-gradient-to-br from-white to-purple-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-purple-100/30 p-5 flex flex-col animate-fade-in-up"
               style={{ animationDelay: "0.6s" }}
             >
               <div className="mb-1">
@@ -919,6 +2062,7 @@ export default function Dashboard() {
                 <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                   Focus areas
                 </p>
+>>>>>>> Stashed changes
               </div>
               <div className="h-[200px] flex items-center justify-center mt-auto">
                 <ResponsiveContainer width="100%" height="100%">
@@ -967,6 +2111,14 @@ export default function Dashboard() {
 
             {/* Quotation Status Chart (Span 6) */}
             <div
+<<<<<<< Updated upstream
+              className="dashboard-widget lg:col-span-6"
+              style={{ animationDelay: "0.7s" }}
+            >
+              <div className="mb-1">
+                <h3 className="dashboard-title">Quotation Status</h3>
+                <p className="dashboard-subtitle">Active vs Won vs Lost</p>
+=======
               className="lg:col-span-6 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
               style={{ animationDelay: "0.7s" }}
             >
@@ -977,6 +2129,7 @@ export default function Dashboard() {
                 <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                   Active vs Won vs Lost
                 </p>
+>>>>>>> Stashed changes
               </div>
               <div className="h-[200px] flex items-center justify-center mt-auto">
                 <ResponsiveContainer width="100%" height="100%">
@@ -1025,11 +2178,23 @@ export default function Dashboard() {
 
             {/* Recent Leads (Last 3) */}
             <div
+<<<<<<< Updated upstream
+              className="dashboard-widget lg:col-span-12"
+=======
               className="lg:col-span-12 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
+>>>>>>> Stashed changes
               style={{ animationDelay: "0.8s" }}
             >
               <div className="flex justify-between items-center mb-4">
                 <div>
+<<<<<<< Updated upstream
+                  <h3 className="dashboard-title">Recent Leads</h3>
+                  <p className="dashboard-subtitle">Last 3 leads added</p>
+                </div>
+                <button
+                  onClick={() => router.push("/sales/lead")}
+                  className="text-[10px] text-gray-600 hover:text-white bg-gray-50 hover:bg-gray-500 px-3 py-1.5 rounded-lg font-bold transition-all uppercase tracking-wider"
+=======
                   <h3 className="text-lg font-extrabold text-gray-800">
                     Recent Leads
                   </h3>
@@ -1040,6 +2205,7 @@ export default function Dashboard() {
                 <button
                   onClick={() => router.push("/sales/lead")}
                   className="text-[10px] text-orange-600 hover:text-white bg-orange-50 hover:bg-orange-500 px-3 py-1.5 rounded-lg font-bold transition-all uppercase tracking-wider"
+>>>>>>> Stashed changes
                 >
                   View All Leads
                 </button>
@@ -1048,15 +2214,19 @@ export default function Dashboard() {
                 {safeLeads.slice(0, 3).map((lead, idx) => (
                   <div
                     key={idx}
+<<<<<<< Updated upstream
+                    className="bg-white/60 backdrop-blur-sm border border-gray200 p-4 rounded-xl shadow-sm hover:shadow-md transition-all group relative overflow-hidden"
+=======
                     className="bg-white/60 backdrop-blur-sm border border-orange-100 p-4 rounded-xl shadow-sm hover:shadow-md transition-all group relative overflow-hidden"
+>>>>>>> Stashed changes
                   >
                     <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                      <UserPlus size={40} className="text-orange-500" />
+                      <UserPlus size={40} className="text-black" />
                     </div>
                     <h4 className="font-bold text-gray-800 text-sm mb-1 truncate pr-8">
                       {lead.lead_title || "Untitled Lead"}
                     </h4>
-                    <p className="text-orange-600 text-xs font-bold mb-3">
+                    <p className="text-black text-xs font-bold mb-3">
                       {lead.company_name}
                     </p>
                     <div className="space-y-2">
@@ -1071,14 +2241,24 @@ export default function Dashboard() {
                         </span>
                       </div>
                     </div>
-                    <div className="mt-4 pt-3 border-t border-orange-50 flex justify-between items-center">
+                    <div className="mt-4 pt-3 border-t border-gray-50 flex justify-between items-center">
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${lead.status === "Won"
+<<<<<<< Updated upstream
+                        className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${
+                          lead.status === "Won"
                             ? "bg-green-100 text-green-700"
                             : lead.status === "Lost"
                               ? "bg-red-100 text-red-700"
-                              : "bg-orange-100 text-orange-700"
+                              : "bg-gray-200 text-gray-800"
+                        }`}
+=======
+                        className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${lead.status === "Won"
+                          ? "bg-green-100 text-green-700"
+                          : lead.status === "Lost"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-orange-100 text-orange-700"
                           }`}
+>>>>>>> Stashed changes
                       >
                         {lead.status}
                       </span>
@@ -1086,7 +2266,7 @@ export default function Dashboard() {
                         onClick={() =>
                           router.push(`/sales/lead?id=${lead.lead_id}`)
                         }
-                        className="text-[10px] font-bold text-gray-400 hover:text-orange-500 transition-colors"
+                        className="text-[10px] font-bold text-gray-400 hover:text-gray-500 transition-colors"
                       >
                         Details →
                       </button>
@@ -1100,6 +2280,415 @@ export default function Dashboard() {
                     </p>
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!loading && role === 'Estimation' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6">
+            {/* ROW 1: Charts & Recent Estimations (3 Columns) */}
+            {/* Quotation Status Distribution Donut Chart (Span 4) */}
+            <div
+              className="lg:col-span-4 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col justify-between animate-fade-in-up"
+              style={{ animationDelay: "0.1s" }}
+            >
+              <div className="mb-2">
+                <h3 className="text-sm font-extrabold text-gray-800">
+                  Estimation Distribution
+                </h3>
+                <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                  Success vs Draft status
+                </p>
+              </div>
+              <div className="h-[210px] flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={processQuotationStatus()}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={45}
+                      outerRadius={68}
+                      paddingAngle={4}
+                      dataKey="value"
+                      animationDuration={2000}
+                    >
+                      {processQuotationStatus().map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={entry.color}
+                          stroke="transparent"
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: "12px",
+                        border: "none",
+                        boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                      }}
+                      itemStyle={{ fontWeight: "bold", fontSize: "11px" }}
+                    />
+                    <Legend
+                      layout="horizontal"
+                      verticalAlign="bottom"
+                      align="center"
+                      iconType="circle"
+                      wrapperStyle={{
+                        fontSize: "10px",
+                        fontWeight: 600,
+                        color: "#475569",
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Quotation Payment Breakdown Donut Chart (Span 4) */}
+            <div
+              className="lg:col-span-4 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col justify-between animate-fade-in-up"
+              style={{ animationDelay: "0.2s" }}
+            >
+              <div className="mb-2">
+                <h3 className="text-sm font-extrabold text-gray-800">
+                  Payment Status
+                </h3>
+                <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                  Paid vs Due breakdown
+                </p>
+              </div>
+              <div className="h-[210px] flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    {(() => {
+                      const pData = [
+                        { name: "Paid Value", value: paymentProgressData.totalPaid || 0, color: "#10B981" },
+                        { name: "Due Value", value: paymentProgressData.paymentDue || 0, color: "#3b5e9c" }
+                      ].filter(item => item.value > 0);
+                      if (pData.length === 0) {
+                        pData.push({ name: "No Payments", value: 1, color: "#cbd5e1" });
+                      }
+                      return (
+                        <Pie
+                          data={pData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={45}
+                          outerRadius={68}
+                          paddingAngle={4}
+                          dataKey="value"
+                          animationDuration={2000}
+                        >
+                          {pData.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={entry.color}
+                              stroke="transparent"
+                            />
+                          ))}
+                        </Pie>
+                      );
+                    })()}
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: "12px",
+                        border: "none",
+                        boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                      }}
+                      itemStyle={{ fontWeight: "bold", fontSize: "11px" }}
+                    />
+                    <Legend
+                      layout="horizontal"
+                      verticalAlign="bottom"
+                      align="center"
+                      iconType="circle"
+                      wrapperStyle={{
+                        fontSize: "10px",
+                        fontWeight: 600,
+                        color: "#475569",
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Recent Estimations List (Span 4) */}
+            <div
+              className="lg:col-span-4 bg-gradient-to-br from-white to-blue-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-blue-100/30 p-5 flex flex-col justify-between animate-fade-in-up"
+              style={{ animationDelay: "0.3s" }}
+            >
+              <div className="flex justify-between items-center mb-2">
+                <div>
+                  <h3 className="text-sm font-extrabold text-gray-800">
+                    Recent Estimations
+                  </h3>
+                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                    Your last 4 active quotations
+                  </p>
+                </div>
+                <button
+                  onClick={() => router.push("/sales/quotation")}
+                  className="text-[10px] text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-500 px-2.5 py-1.5 rounded-lg font-bold transition-all uppercase tracking-wider"
+                >
+                  View All
+                </button>
+              </div>
+              <div className="space-y-2 overflow-y-auto max-h-[145px] pr-1 custom-scrollbar">
+                {quotations.slice(0, 4).map((q, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white/80 backdrop-blur-sm border border-blue-100 p-2.5 rounded-xl shadow-sm hover:shadow-md transition-all flex justify-between items-center group animate-fade-in"
+                  >
+                    <div className="truncate flex-1 mr-3">
+                      <h4 className="font-bold text-gray-800 text-[11px] mb-0.5 truncate">
+                        {q.reference || "Untitled Quotation"}
+                      </h4>
+                      <p className="text-blue-600 text-[9px] font-extrabold truncate">
+                        {q.company_name}
+                      </p>
+                      <div className="flex gap-2 text-[8px] text-gray-400 font-semibold mt-0.5">
+                        <span>₹{Number(q.grand_total || 0).toLocaleString("en-IN")}</span>
+                        <span>•</span>
+                        <span>{new Date(q.created_at || q.quotation_created_at).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter ${
+                          q.quotation_status === "Approved"
+                            ? "bg-green-100 text-green-700"
+                            : q.quotation_status === "Lost"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-amber-100 text-amber-700"
+                        }`}
+                      >
+                        {q.quotation_status || "Pending"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+                {quotations.length === 0 && (
+                  <div className="py-8 text-center bg-white/40 rounded-xl border border-dashed border-gray-200 w-full">
+                    <p className="text-gray-400 text-[10px] font-semibold">
+                      No estimations created yet
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ROW 2: Balanced Layout (Chart Span 7 + Todo List Span 5) */}
+            {/* Estimation Performance Area Chart (Span 7) */}
+            <div
+              className="lg:col-span-7 bg-gradient-to-br from-white to-blue-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-blue-100/30 p-5 flex flex-col justify-between animate-fade-in-up"
+              style={{ animationDelay: "0.4s" }}
+            >
+              <div>
+                <h3 className="text-sm font-extrabold text-gray-800">
+                  Estimation Performance Trend
+                </h3>
+                <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                  Monthly Draft vs Approved Estimation Value
+                </p>
+              </div>
+              <div className="h-[210px] w-full mt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={processEstimationTimeframeData()}
+                    margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient id="colorApproved" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.4}/>
+                        <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorDraft" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.4}/>
+                        <stop offset="95%" stopColor="#F59E0B" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis
+                      dataKey="name"
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fontSize: 10, fontWeight: 600, fill: "#64748b" }}
+                    />
+                    <YAxis
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(val) => `₹${val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val}`}
+                      tick={{ fontSize: 10, fontWeight: 600, fill: "#64748b" }}
+                    />
+                    <Tooltip
+                      formatter={(value) => [`₹${Number(value).toLocaleString("en-IN")}`]}
+                      contentStyle={{
+                        borderRadius: "12px",
+                        border: "none",
+                        boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                      }}
+                    />
+                    <Legend
+                      verticalAlign="top"
+                      height={36}
+                      iconType="circle"
+                      wrapperStyle={{
+                        fontSize: "10px",
+                        fontWeight: 600,
+                        color: "#475569",
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="Approved"
+                      stroke="#10B981"
+                      strokeWidth={2}
+                      fillOpacity={1}
+                      fill="url(#colorApproved)"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="Draft"
+                      stroke="#F59E0B"
+                      strokeWidth={2}
+                      fillOpacity={1}
+                      fill="url(#colorDraft)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Todo List Card (Span 5) */}
+            <div
+              className="lg:col-span-5 bg-gradient-to-br from-white to-blue-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col justify-between animate-fade-in-up"
+              style={{ animationDelay: "0.5s" }}
+            >
+              <div className="flex flex-col md:flex-row justify-between md:items-center gap-2 mb-4">
+                <div>
+                  <h3 className="text-sm font-extrabold text-gray-800">
+                    Todo List
+                  </h3>
+                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
+                    Checklist
+                  </p>
+                </div>
+                <div className="flex items-center space-x-1.5 w-full md:w-auto">
+                  <form
+                    onSubmit={handleAddTodo}
+                    className="flex relative flex-1 md:w-40"
+                  >
+                    <input
+                      type="text"
+                      value={newTodoTitle}
+                      onChange={(e) => setNewTodoTitle(e.target.value)}
+                      placeholder="Add task..."
+                      className="w-full bg-white border border-gray-200 rounded-lg py-[6px] pl-2 pr-6 text-[10px] focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-gray-800 font-medium placeholder-gray-400"
+                      disabled={addingTodo}
+                    />
+                    <button
+                      type="submit"
+                      disabled={addingTodo || !newTodoTitle.trim()}
+                      className="absolute right-0.5 top-1/2 transform -translate-y-1/2 p-1 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-all"
+                    >
+                      <Plus size={10} strokeWidth={3} />
+                    </button>
+                  </form>
+                  <button
+                    onClick={() => router.push("/todolist")}
+                    className="text-[9px] text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 px-2.5 py-1 rounded-md font-bold transition-all uppercase tracking-wider"
+                  >
+                    View All
+                  </button>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-auto">
+                <div className="bg-white/60 backdrop-blur-sm border border-gray-100 p-2.5 rounded-xl shadow-sm flex flex-col">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                    <h3 className="text-[9px] font-bold uppercase tracking-widest text-gray-500">
+                      Unfinished
+                    </h3>
+                  </div>
+                  <div className="space-y-1 overflow-y-auto h-[110px] custom-scrollbar">
+                    {unfinishedTodos.map((todo) => (
+                      <div
+                        key={todo.id}
+                        className="group flex justify-between items-center bg-blue-50/50 rounded-md px-2 py-1 animate-fade-in"
+                      >
+                        <div className="flex items-center gap-1.5 flex-1 truncate">
+                          <input
+                            type="checkbox"
+                            onChange={() => handleToggleTodo(todo.id)}
+                            className="w-3 h-3 accent-blue-600 cursor-pointer"
+                          />
+                          <p className="text-[11px] font-semibold text-gray-700 truncate">
+                            {todo.title}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <button
+                            onClick={() => startEditTodo(todo)}
+                            className="text-blue-500 hover:text-blue-700 transition-colors"
+                          >
+                            <Pencil size={10} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteTodo(todo.id)}
+                            className="text-red-500 hover:text-red-700 transition-colors"
+                          >
+                            <Trash2 size={10} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {unfinishedTodos.length === 0 && (
+                      <p className="text-gray-400 text-[10px] text-center py-6">No unfinished tasks</p>
+                    )}
+                  </div>
+                </div>
+                <div className="bg-white/60 backdrop-blur-sm border border-gray-100 p-2.5 rounded-xl shadow-sm flex flex-col">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    <h3 className="text-[9px] font-bold uppercase tracking-widest text-gray-500">
+                      Finished
+                    </h3>
+                  </div>
+                  <div className="space-y-1 overflow-y-auto h-[110px] custom-scrollbar">
+                    {finishedTodos.map((todo) => (
+                      <div
+                        key={todo.id}
+                        className="group flex justify-between items-center bg-green-50/50 rounded-md px-2 py-1 animate-fade-in"
+                      >
+                        <div className="flex items-center gap-1.5 flex-1 truncate">
+                          <input
+                            type="checkbox"
+                            checked
+                            onChange={() => handleToggleTodo(todo.id)}
+                            className="w-3 h-3 accent-green-500 cursor-pointer"
+                          />
+                          <p className="text-[11px] font-semibold text-gray-400 line-through truncate">
+                            {todo.title}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <button
+                            onClick={() => handleDeleteTodo(todo.id)}
+                            className="text-red-500"
+                          >
+                            <Trash2 size={10} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {finishedTodos.length === 0 && (
+                      <p className="text-gray-400 text-[10px] text-center py-6">No finished tasks</p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

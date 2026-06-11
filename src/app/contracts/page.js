@@ -156,8 +156,10 @@ export default function Page() {
     useEffect(() => {
         const fetchAsignee = async () => {
             try {
+                const tokenVal = localStorage.getItem("token");
                 const res = await axios.get(`${API_BASE}/api/manage-user/asignee`, {
                     params: { status: 1 },
+                    headers: { Authorization: `Bearer ${tokenVal}` },
                 });
 
                 const cleanedData = (res.data.data || []).map(item => ({
@@ -182,8 +184,10 @@ export default function Page() {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
+                const tokenVal = localStorage.getItem("token");
                 const res = await axios.get(`${API_BASE}/api/manage-user/asignee`, {
                     params: { status: 1 },
+                    headers: { Authorization: `Bearer ${tokenVal}` },
                 });
 
                 const data = res.data.data || res.data;

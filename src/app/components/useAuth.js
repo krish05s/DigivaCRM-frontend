@@ -41,10 +41,11 @@ export default function useAuth(allowedRoles = []) {
           return;
         }
 
-        // Role Check
+        // Role Check: always allow Super Admins, otherwise check allowedRoles
         if (
           allowedRoles.length > 0 &&
-          !allowedRoles.includes(role)
+          !allowedRoles.includes(role) &&
+          role !== "Super Admin"
         ) {
           toast.error("Access Denied");
           router.replace("/");
