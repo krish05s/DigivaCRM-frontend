@@ -138,9 +138,11 @@ export default function EditContract() {
 
   // Fetch Assignees
   useEffect(() => {
+    const token = localStorage.getItem("token");
     axios
       .get(`${API_BASE}/api/manage-user/asignee`, {
         params: { status: 1 },
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) =>
         setAsignee(

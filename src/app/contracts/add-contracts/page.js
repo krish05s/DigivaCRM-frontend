@@ -166,8 +166,12 @@ export default function Page() {
   useEffect(() => {
     const fetchAsignee = async () => {
       try {
+        const token = localStorage.getItem("token");
         const res = await axios.get(`${API_BASE}/api/manage-user/asignee`,
-          { params: { status: 1 } }
+          {
+            params: { status: 1 },
+            headers: { Authorization: `Bearer ${token}` }
+          }
         );
 
         const data = res.data.data || res.data;

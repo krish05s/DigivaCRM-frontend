@@ -18,24 +18,38 @@ export default function Page() {
     }, []);
 
     const fetchModules = async () => {
-        const res = await axios.get(`${API_BASE}/api/notifications/read`);
-        setModules(res.data);
+        try {
+            const token = localStorage.getItem("token");
+            const res = await axios.get(`${API_BASE}/api/notifications/read`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setModules(res.data);
+        } catch (err) {
+            console.error("Error reading notification settings:", err);
+        }
     };
 
     const handleToggle = async (id, field, currentValue) => {
         const newValue = !currentValue;
 
-        await axios.patch(`${API_BASE}/api/notifications/update/${id}`, {
-            field,
-            value: newValue,
-        });
+        try {
+            const token = localStorage.getItem("token");
+            await axios.patch(`${API_BASE}/api/notifications/update/${id}`, {
+                field,
+                value: newValue,
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
 
-        // Update UI instantly
-        setModules((prev) =>
-            prev.map((m) =>
-                m.id === id ? { ...m, [field]: newValue } : m
-            )
-        );
+            // Update UI instantly
+            setModules((prev) =>
+                prev.map((m) =>
+                    m.id === id ? { ...m, [field]: newValue } : m
+                )
+            );
+        } catch (err) {
+            console.error("Error updating notification status:", err);
+        }
     };
 
     return (

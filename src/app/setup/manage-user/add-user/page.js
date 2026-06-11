@@ -39,8 +39,10 @@ export default function AddUserForm() {
     const checkEmailExists = async (email) => {
         if (!email) return;
         try {
+            const token = localStorage.getItem("token");
             const res = await axios.get(`${API_BASE}/api/manage-user/read-email`, {
                 params: { email },
+                headers: { Authorization: `Bearer ${token}` }
             });
 
             if (res.data.exists) {
@@ -106,7 +108,10 @@ export default function AddUserForm() {
                 address: formData.address,
             };
 
-            const res = await axios.post(`${API_BASE}/api/manage-user/insert`, payload);
+            const token = localStorage.getItem("token");
+            const res = await axios.post(`${API_BASE}/api/manage-user/insert`, payload, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
 
             if (res.status === 201 || res.status === 200) {
                 toast.success("User added successfully!");
@@ -141,8 +146,10 @@ export default function AddUserForm() {
     useEffect(() => {
         const fetchOrganizations = async () => {
             try {
+                const token = localStorage.getItem("token");
                 const res = await axios.get(`${API_BASE}/api/organizations/organization-name`, {
-                    params: { status: 1 }
+                    params: { status: 1 },
+                    headers: { Authorization: `Bearer ${token}` }
                 });
                 setOrganizations(res.data.data);
             } catch (err) {
@@ -157,8 +164,10 @@ export default function AddUserForm() {
     useEffect(() => {
         const fetchRoles = async () => {
             try {
+                const token = localStorage.getItem("token");
                 const res = await axios.get(`${API_BASE}/api/role-master/role-name`, {
-                    params: { status: 1 }
+                    params: { status: 1 },
+                    headers: { Authorization: `Bearer ${token}` }
                 });
                 setRoles(res.data.data);
             } catch (err) {
@@ -174,8 +183,10 @@ export default function AddUserForm() {
     useEffect(() => {
         const fetchDesignations = async () => {
             try {
+                const token = localStorage.getItem("token");
                 const res = await axios.get(`${API_BASE}/api/contact/read`, {
-                    params: { status: 1 }
+                    params: { status: 1 },
+                    headers: { Authorization: `Bearer ${token}` }
                 });
                 setDesignations(res.data || res.data.data);
             } catch (err) {

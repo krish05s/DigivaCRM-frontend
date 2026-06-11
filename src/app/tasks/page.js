@@ -12,7 +12,7 @@ import useAuth from "../components/useAuth";
 export default function Page() {
   const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-  useAuth();
+  useAuth(["Admin", "Super Admin", "Sales", "Estimation", "Leads Management"]);
 
   const exportRef = useRef(null);
   const [formData, setFormData] = useState({
@@ -455,8 +455,10 @@ export default function Page() {
   useEffect(() => {
     const fetchAsignee = async () => {
       try {
+        const tokenVal = localStorage.getItem("token");
         const res = await axios.get(`${API_BASE}/api/manage-user/asignee`, {
           params: { status: 1 },
+          headers: { Authorization: `Bearer ${tokenVal}` },
         });
 
         const cleanedData = (res.data.data || []).map((item) => ({
@@ -478,8 +480,10 @@ export default function Page() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        const tokenVal = localStorage.getItem("token");
         const res = await axios.get(`${API_BASE}/api/manage-user/asignee`, {
           params: { status: 1 },
+          headers: { Authorization: `Bearer ${tokenVal}` },
         });
 
         setUsers(res.data.data || res.data);

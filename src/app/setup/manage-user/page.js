@@ -8,8 +8,14 @@ import Header from "@/app/components/header";
 import { useRouter } from "next/navigation";
 import useAuth from "@/app/components/useAuth";
 import { hasRoleAccess } from "@/utils/roleAccess";
+import CheckPermission from "@/app/components/CheckPermission";
 
 export default function Page() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [users, setUsers] = useState([]);
   const [scrollOffsets, setScrollOffsets] = useState({});
   const [roles, setRoles] = useState([]);
@@ -42,6 +48,7 @@ export default function Page() {
 
   const fetchData = async () => {
     try {
+      const token = localStorage.getItem("token");
       const res = await axios.get(`${APIBase}/read`, {
         params: {
           search1: filters.name,
@@ -53,6 +60,7 @@ export default function Page() {
           search7: filters.date_of_joining,
           search8: filters.status,
         },
+        headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(res.data);
     } catch (err) {
@@ -126,8 +134,10 @@ export default function Page() {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
+        const token = localStorage.getItem("token");
         const res = await axios.get(`${API_BASE}/api/role-master/role-name`, {
           params: { status: 1 },
+          headers: { Authorization: `Bearer ${token}` }
         });
         setRoles(res.data.data);
       } catch (err) {
@@ -142,8 +152,10 @@ export default function Page() {
   useEffect(() => {
     const fetchDesignations = async () => {
       try {
+        const token = localStorage.getItem("token");
         const res = await axios.get(`${API_BASE}/api/contact/read`, {
           params: { status: 1 },
+          headers: { Authorization: `Bearer ${token}` }
         });
         setDesignations(res.data || res.data.data);
       } catch (err) {
@@ -156,8 +168,11 @@ export default function Page() {
 
   const handleToggle = async (id, currentStatus) => {
     try {
+      const token = localStorage.getItem("token");
       await axios.put(`${APIBase}/status/${id}`, {
         status: currentStatus === 1 ? 0 : 1,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
       setUsers((prevData) =>
         prevData.map((item) =>
@@ -184,10 +199,13 @@ export default function Page() {
     });
   };
 
+  const isSuperAdmin = mounted ? hasRoleAccess(["Super Admin"]) : false;
+
   return (
     <>
       <Header />
-      <div className="bg-gray-100">
+      <CheckPermission allowedRoles={["Super Admin", "Admin"]}>
+        <div className="bg-gray-100">
         {/* Header */}
         <div className="bg-white w-full shadow-lg p-3 mt-1 mb-5 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
           <div className="hidden sm:flex items-center text-gray-700 w-full sm:w-auto">
@@ -216,7 +234,7 @@ export default function Page() {
           </div>
 
           <div className="w-full sm:w-auto">
-            {hasRoleAccess(["Super Admin"]) && (
+            {isSuperAdmin && (
               <Link
                 href="/setup/manage-user/add-user"
                 className="block text-center bg-blue-800 text-white px-5 py-2 rounded-sm shadow hover:bg-blue-900 font-bold text-sm"
@@ -377,10 +395,10 @@ export default function Page() {
                     <th className="py-3 px-4">Role</th>
                     <th className="py-3 px-4">Designation</th>
                     <th className="py-3 px-4">Date of Joining</th>
-                    {hasRoleAccess(["Super Admin"]) && (
+                    {mounted && hasRoleAccess(["Super Admin", "Admin"]) && (
                       <th className="py-3 px-4">Status</th>
                     )}
-                    {hasRoleAccess(["Super Admin"]) && (
+                    {mounted && hasRoleAccess(["Super Admin", "Admin"]) && (
                       <th className="py-3 px-4">Action</th>
                     )}
                   </tr>
@@ -418,30 +436,34 @@ export default function Page() {
                         <td className="py-2 px-4">
                           {formatDate(item.date_of_joining)}
                         </td>
-                        {/* Role Validation */}
-                        {hasRoleAccess(["Super Admin"]) && (
+                        {mounted && hasRoleAccess(["Super Admin", "Admin"]) && (
                           <td className="py-2 px-4">
-                            <label className="inline-flex items-center cursor-pointer">
-                              <input
-                                type="checkbox"
-                                className="sr-only"
-                                checked={item.status === 1}
-                                onChange={() =>
-                                  handleToggle(item.id, item.status)
-                                }
-                              />
-                              <div
-                                className={`relative w-12 h-6 rounded-full transition-all duration-300 ${item.status === 1 ? "bg-blue-800" : "bg-gray-300"}`}
-                              >
+                            {isSuperAdmin ? (
+                              <label className="inline-flex items-center cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  className="sr-only"
+                                  checked={item.status === 1}
+                                  onChange={() =>
+                                    handleToggle(item.id, item.status)
+                                  }
+                                />
                                 <div
-                                  className={`absolute top-1 left-1 w-4 h-3 bg-white rounded-full transition-all duration-300 ${item.status === 1 ? "translate-x-6" : "translate-x-1"}`}
-                                ></div>
-                              </div>
-                            </label>
+                                  className={`relative w-12 h-6 rounded-full transition-all duration-300 ${item.status === 1 ? "bg-green-500" : "bg-gray-300"}`}
+                                >
+                                  <div
+                                    className={`absolute top-1 left-1 w-4 h-3 bg-white rounded-full transition-all duration-300 ${item.status === 1 ? "translate-x-6" : "translate-x-1"}`}
+                                  ></div>
+                                </div>
+                              </label>
+                            ) : (
+                              <span className={`px-2 py-1 rounded text-xs font-semibold ${item.status === 1 ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>
+                                {item.status === 1 ? "Active" : "Inactive"}
+                              </span>
+                            )}
                           </td>
                         )}
-                        {/* Role Validation */}
-                        {hasRoleAccess(["Super Admin"]) && (
+                        {mounted && hasRoleAccess(["Super Admin", "Admin"]) && (
                           <td className="py-2 px-4 text-lg">
                             <button
                               type="button"
@@ -454,17 +476,19 @@ export default function Page() {
                             >
                               <i className="bi bi-eye"></i>
                             </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                localStorage.setItem("edit_user_id", item.id);
-                                router.push("/setup/manage-user/update-user");
-                              }}
-                              className="text-gray-400 hover:text-blue-500 text-lg mx-1"
-                              title="Edit User"
-                            >
-                              <i className="bi bi-pencil-square"></i>
-                            </button>
+                            {isSuperAdmin && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  localStorage.setItem("edit_user_id", item.id);
+                                  router.push("/setup/manage-user/update-user");
+                                }}
+                                className="text-gray-400 hover:text-blue-500 text-lg mx-1"
+                                title="Edit User"
+                              >
+                                <i className="bi bi-pencil-square"></i>
+                              </button>
+                            )}
                           </td>
                         )}
                       </tr>
@@ -553,6 +577,7 @@ export default function Page() {
           </div>
         </form>
       </div>
+      </CheckPermission>
     </>
   );
 }
