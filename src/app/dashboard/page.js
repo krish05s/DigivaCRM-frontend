@@ -67,15 +67,9 @@ function DashboardCard({
   return (
     <div
       onClick={onClick}
-<<<<<<< Updated upstream
-      className="bg-gradient-to-br from-white to-gray-50 backdrop-blur-xl hover:to-gray-50 rounded-xl border border-gray-100 p-3 sm:p-4 flex flex-col transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group relative overflow-hidden"
-    >
-      <div className="absolute -right-8 -top-8 w-28 h-28 bg-gray-100/50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-=======
       className={`${bgClass} rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 p-3 sm:p-4 flex flex-col transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group relative overflow-hidden`}
     >
       <div className={`absolute -right-8 -top-8 w-28 h-28 ${glowClass} rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
->>>>>>> Stashed changes
       <div className="flex justify-between items-start mb-3 relative z-10">
         <div
           className={`p-2 sm:p-2.5 rounded-xl shadow-sm transition-all duration-300 group-hover:scale-110 ${colorClass}`}
@@ -96,11 +90,7 @@ function DashboardCard({
         )}
       </div>
       <div className="relative z-10 mt-1">
-<<<<<<< Updated upstream
-        <h3 className="text-gray-400 text-[9px] sm:text-[10px] font-bold tracking-wider uppercase mb-0.5 group-hover:text-black transition-colors">
-=======
         <h3 className={`text-gray-400 text-[9px] sm:text-[10px] font-bold tracking-wider uppercase mb-0.5 ${hoverTitleColorClass} transition-colors`}>
->>>>>>> Stashed changes
           {title}
         </h3>
         <h2 className="text-xl sm:text-2xl font-black text-gray-800 tracking-tight group-hover:scale-105 transform origin-left transition-transform duration-300">
@@ -328,13 +318,8 @@ export default function Dashboard() {
     const confirmed = await Swal.fire({
       html: `
         <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding: 8px 0">
-<<<<<<< Updated upstream
-          <div style="width:56px; height:56px; background:#fff4ed; border-radius:50%; display:flex; align-items:center; justify-content:center;">
-            <svg width="28" height="28" fill="none" stroke="#000000" stroke-width="1.8" viewBox="0 0 24 24">
-=======
           <div style="width:56px; height:56px; background:#f4f6fc; border-radius:50%; display:flex; align-items:center; justify-content:center;">
             <svg width="28" height="28" fill="none" stroke="#3b5e9c" stroke-width="1.8" viewBox="0 0 24 24">
->>>>>>> Stashed changes
               <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
             </svg>
           </div>
@@ -357,13 +342,8 @@ export default function Dashboard() {
         style.innerHTML = `
           .swal-todo-popup { border-radius: 20px !important; padding: 28px 24px !important; width: 340px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.12) !important; }
           .swal-actions { gap: 10px !important; margin-top: 20px !important; }
-<<<<<<< Updated upstream
-          .swal-confirm-btn { background: #000000; color: white; padding: 9px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; }
-          .swal-confirm-btn:hover { background: #ea6c0a; }
-=======
           .swal-confirm-btn { background: #3b5e9c; color: white; padding: 9px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; }
           .swal-confirm-btn:hover { background: #2c4675; }
->>>>>>> Stashed changes
           .swal-cancel-btn { background: #f3f4f6; color: #6b7280; padding: 9px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; }
           .swal-cancel-btn:hover { background: #e5e7eb; }
         `;
@@ -646,11 +626,7 @@ export default function Dashboard() {
   const recentLeadsList = safeLeads.slice(0, 5);
 
   return (
-<<<<<<< Updated upstream
-    <div className="dashboard-page">
-=======
     <div className="min-h-screen bg-slate-50/80 font-sans text-gray-900 pb-12">
->>>>>>> Stashed changes
       <style jsx global>{`
         @keyframes fadeInUp {
           from {
@@ -672,13 +648,8 @@ export default function Dashboard() {
 
         {/* Top Summary Cards */}
         {loading ? (
-<<<<<<< Updated upstream
-          <div className="dashboard-loading">
-            <span className="dashboard-loading-text">
-=======
           <div className="h-32 flex items-center justify-center bg-white/90 backdrop-blur-xl rounded-2xl border border-slate-100 mb-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <span className="text-gray-400 font-semibold animate-pulse">
->>>>>>> Stashed changes
               Loading amazing metrics...
             </span>
           </div>
@@ -812,62 +783,46 @@ export default function Dashboard() {
             />
           </div>
         ) : (
-          <div className="dashboard-metrics-grid">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
             <DashboardCard
               onClick={() => router.push("/sales/lead")}
               title="Total Leads"
               value={leads.length}
               icon={UserPlus}
-<<<<<<< Updated upstream
-              colorClass="dashboard-card-icon"
-=======
               bgClass="bg-gradient-to-br from-white to-blue-50/40 backdrop-blur-xl hover:to-blue-50/80"
               glowClass="bg-blue-100/50"
               colorClass="bg-blue-50 text-blue-600 border border-blue-100/50 group-hover:bg-blue-600 group-hover:text-white"
               hoverTitleColorClass="group-hover:text-blue-600"
->>>>>>> Stashed changes
             />
             <DashboardCard
               onClick={() => router.push("/customer-list")}
               title="Total Customers"
               value={customers.length}
               icon={Users}
-<<<<<<< Updated upstream
-              colorClass="dashboard-card-icon"
-=======
               bgClass="bg-gradient-to-br from-white to-emerald-50/40 backdrop-blur-xl hover:to-emerald-50/80"
               glowClass="bg-emerald-100/50"
               colorClass="bg-emerald-50 text-emerald-600 border border-emerald-100/50 group-hover:bg-emerald-600 group-hover:text-white"
               hoverTitleColorClass="group-hover:text-emerald-600"
->>>>>>> Stashed changes
             />
             <DashboardCard
               onClick={() => router.push("/tasks")}
               title="Total Tasks"
               value={tasks.length}
               icon={CheckSquare}
-<<<<<<< Updated upstream
-              colorClass="dashboard-card-icon"
-=======
               bgClass="bg-gradient-to-br from-white to-purple-50/40 backdrop-blur-xl hover:to-purple-50/80"
               glowClass="bg-purple-100/50"
               colorClass="bg-purple-50 text-purple-600 border border-purple-100/50 group-hover:bg-purple-600 group-hover:text-white"
               hoverTitleColorClass="group-hover:text-purple-600"
->>>>>>> Stashed changes
             />
             <DashboardCard
               onClick={() => router.push("/todolist")}
               title="Active To-Dos"
               value={todos.filter((t) => !t.is_finished).length}
               icon={ListTodo}
-<<<<<<< Updated upstream
-              colorClass="dashboard-card-icon"
-=======
               bgClass="bg-gradient-to-br from-white to-rose-50/40 backdrop-blur-xl hover:to-rose-50/80"
               glowClass="bg-rose-100/50"
               colorClass="bg-rose-50 text-rose-600 border border-rose-100/50 group-hover:bg-rose-600 group-hover:text-white"
               hoverTitleColorClass="group-hover:text-rose-600"
->>>>>>> Stashed changes
             />
           </div>
         )}
@@ -1600,16 +1555,6 @@ export default function Dashboard() {
             {/* ROW 1 */}
             {/* Sales Chart (Span 8) */}
             <div
-<<<<<<< Updated upstream
-              className="sales-card group"
-              style={{ animationDelay: "0.1s" }}
-            >
-              <div className="sales-card-overlay"></div>
-              <div className="flex justify-between items-center mb-4 relative z-10">
-                <div>
-                  <h3 className="dashboard-title">Sales Overview</h3>
-                  <p className="dashboard-subtitle">
-=======
               className="lg:col-span-8 bg-gradient-to-br from-white to-blue-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col relative overflow-hidden group animate-fade-in-up"
               style={{ animationDelay: "0.1s" }}
             >
@@ -1620,7 +1565,6 @@ export default function Dashboard() {
                     Sales Overview
                   </h3>
                   <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
->>>>>>> Stashed changes
                     Approved quotations revenue
                   </p>
                 </div>
@@ -1633,21 +1577,13 @@ export default function Dashboard() {
                   </button>
                   <button
                     onClick={() => setSalesTimeframe("monthly")}
-<<<<<<< Updated upstream
-                    className={`px-3 py-1 text-[10px] rounded-md font-bold transition-all duration-200 ${salesTimeframe === "monthly" ? "bg-white text-black shadow-sm" : "text-gray-500 hover:text-black"}`}
-=======
                     className={`px-3 py-1 text-[10px] rounded-md font-bold transition-all duration-200 ${salesTimeframe === "monthly" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
->>>>>>> Stashed changes
                   >
                     Monthly
                   </button>
                   <button
                     onClick={() => setSalesTimeframe("yearly")}
-<<<<<<< Updated upstream
-                    className={`px-3 py-1 text-[10px] rounded-md font-bold transition-all duration-200 ${salesTimeframe === "yearly" ? "bg-white text-black shadow-sm" : "text-gray-500 hover:text-black"}`}
-=======
                     className={`px-3 py-1 text-[10px] rounded-md font-bold transition-all duration-200 ${salesTimeframe === "yearly" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
->>>>>>> Stashed changes
                   >
                     Yearly
                   </button>
@@ -1682,11 +1618,7 @@ export default function Dashboard() {
                     />
                     <Tooltip
                       cursor={{
-<<<<<<< Updated upstream
-                        stroke: "#000000",
-=======
                         stroke: "#3b5e9c",
->>>>>>> Stashed changes
                         strokeWidth: 1,
                         strokeDasharray: "4 4",
                       }}
@@ -1696,11 +1628,7 @@ export default function Dashboard() {
                         boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
                       }}
                       itemStyle={{
-<<<<<<< Updated upstream
-                        color: "#000000",
-=======
                         color: "#3b5e9c",
->>>>>>> Stashed changes
                         fontWeight: 800,
                         fontSize: "12px",
                       }}
@@ -1708,21 +1636,13 @@ export default function Dashboard() {
                     <Line
                       type="monotone"
                       dataKey="sales"
-<<<<<<< Updated upstream
-                      stroke="#000000"
-=======
                       stroke="#3b5e9c"
->>>>>>> Stashed changes
                       strokeWidth={3}
                       dot={{ r: 3, strokeWidth: 2, fill: "#fff" }}
                       activeDot={{
                         r: 6,
                         strokeWidth: 2,
-<<<<<<< Updated upstream
-                        fill: "#000000",
-=======
                         fill: "#2c4675",
->>>>>>> Stashed changes
                         stroke: "#fff",
                       }}
                       animationDuration={2000}
@@ -1734,14 +1654,6 @@ export default function Dashboard() {
 
             {/* Leads Donut Chart (Span 4) */}
             <div
-<<<<<<< Updated upstream
-              className="dashboard-widget lg:col-span-4"
-              style={{ animationDelay: "0.2s" }}
-            >
-              <div className="mb-1">
-                <h3 className="dashboard-title"> Lead Status</h3>
-                <p className="dashboard-subtitle">CRM leads distribution</p>
-=======
               className="lg:col-span-4 bg-gradient-to-br from-white to-emerald-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-emerald-100/30 p-5 flex flex-col animate-fade-in-up"
               style={{ animationDelay: "0.2s" }}
             >
@@ -1752,7 +1664,6 @@ export default function Dashboard() {
                 <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                   CRM leads distribution
                 </p>
->>>>>>> Stashed changes
               </div>
               <div className="h-[200px] flex items-center justify-center mt-auto">
                 <ResponsiveContainer width="100%" height="100%">
@@ -1802,26 +1713,17 @@ export default function Dashboard() {
             {/* ROW 2 */}
             {/* Split View To-Do List (Span 7) */}
             <div
-<<<<<<< Updated upstream
-              className="dashboard-widget lg:col-span-7"
-=======
               className="lg:col-span-7 bg-gradient-to-br from-white to-blue-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-blue-100/30 p-5 flex flex-col animate-fade-in-up"
->>>>>>> Stashed changes
               style={{ animationDelay: "0.3s" }}
             >
               <div className="flex flex-col md:flex-row justify-between md:items-center gap-3 mb-4">
                 <div>
-<<<<<<< Updated upstream
-                  <h3 className="dashboard-title  ">Todo List</h3>
-                  <p className="dashboard-subtitle">Productivity</p>
-=======
                   <h3 className="text-md font-extrabold text-gray-800">
                     Todo List
                   </h3>
                   <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                     Productivity
                   </p>
->>>>>>> Stashed changes
                 </div>
                 <div className="flex items-center space-x-2 w-full md:w-auto">
                   <form
@@ -1835,32 +1737,20 @@ export default function Dashboard() {
                       placeholder={
                         editingTodoId ? "Update task..." : "Quick add..."
                       }
-<<<<<<< Updated upstream
-                      className="w-full bg-white border border-gray-200 rounded-lg py-1.5 pl-3 pr-8 text-[12px] focus:outline-none  transition-all text-gray-800 font-medium placeholder-gray-400"
-=======
                       className="w-full bg-white border border-gray-200 rounded-lg py-1.5 pl-3 pr-8 text-[12px] focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-gray-800 font-medium placeholder-gray-400"
->>>>>>> Stashed changes
                       disabled={addingTodo}
                     />
                     <button
                       type="submit"
                       disabled={addingTodo || !newTodoTitle.trim()}
-<<<<<<< Updated upstream
-                      className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 text-white bg-gray-500 rounded-md hover:bg-gray-600 disabled:opacity-50 transition-all"
-=======
                       className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-all"
->>>>>>> Stashed changes
                     >
                       <Plus size={12} strokeWidth={3} />
                     </button>
                   </form>
                   <button
                     onClick={() => router.push("/todolist")}
-<<<<<<< Updated upstream
-                    className="text-[10px] text-black hover:text-white bg-gray-200 hover:bg-gray-500 px-2.5 py-1.5 rounded-lg font-bold transition-all"
-=======
                     className="text-[10px] text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 px-2.5 py-1.5 rounded-lg font-bold transition-all"
->>>>>>> Stashed changes
                   >
                     View All
                   </button>
@@ -1869,11 +1759,7 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-auto">
                 <div className="bg-white/60 backdrop-blur-sm border border-gray-100 p-3 rounded-xl shadow-sm flex flex-col">
                   <div className="flex items-center gap-2 mb-2">
-<<<<<<< Updated upstream
-                    <span className="w-2 h-2 rounded-full bg-red-500"></span>
-=======
                     <span className="w-2 h-2 rounded-full bg-blue-500"></span>
->>>>>>> Stashed changes
                     <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
                       Unfinished
                     </h3>
@@ -1882,21 +1768,13 @@ export default function Dashboard() {
                     {unfinishedTodos.map((todo) => (
                       <div
                         key={todo.id}
-<<<<<<< Updated upstream
-                        className="group flex justify-between items-center bg-red-50 rounded-md px-2.5 py-1.5"
-=======
                         className="group flex justify-between items-center bg-blue-50/50 rounded-md px-2.5 py-1.5"
->>>>>>> Stashed changes
                       >
                         <div className="flex items-center gap-2 flex-1 truncate">
                           <input
                             type="checkbox"
                             onChange={() => handleToggleTodo(todo.id)}
-<<<<<<< Updated upstream
-                            className="w-3.5 h-3.5 accent-black cursor-pointer"
-=======
                             className="w-3.5 h-3.5 accent-blue-600 cursor-pointer"
->>>>>>> Stashed changes
                           />
                           <p className="text-[12px] font-semibold text-gray-700 truncate">
                             {todo.title}
@@ -1922,7 +1800,7 @@ export default function Dashboard() {
                 </div>
                 <div className="bg-white/60 backdrop-blur-sm border border-gray-100 p-3 rounded-xl shadow-sm flex flex-col">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="w-2 h-2 rounded-full bg-green-600"></span>
+                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
                     <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
                       Finished
                     </h3>
@@ -1931,14 +1809,14 @@ export default function Dashboard() {
                     {finishedTodos.map((todo) => (
                       <div
                         key={todo.id}
-                        className="group flex justify-between items-center bg-green-50 rounded-md px-2.5 py-1.5"
+                        className="group flex justify-between items-center bg-green-50/50 rounded-md px-2.5 py-1.5"
                       >
                         <div className="flex items-center gap-2 flex-1 truncate">
                           <input
                             type="checkbox"
                             checked
                             onChange={() => handleToggleTodo(todo.id)}
-                            className="w-3.5 h-3.5 accent-green-600 cursor-pointer"
+                            className="w-3.5 h-3.5 accent-green-500 cursor-pointer"
                           />
                           <p className="text-[12px] font-semibold text-gray-400 line-through truncate">
                             {todo.title}
@@ -1961,14 +1839,6 @@ export default function Dashboard() {
 
             {/* Payment Due Progress Bar (Span 5) */}
             <div
-<<<<<<< Updated upstream
-              className="dashboard-widget lg:col-span-5"
-              style={{ animationDelay: "0.5s" }}
-            >
-              <div className="mb-6">
-                <h3 className="dashboard-title">Payment Due</h3>
-                <p className="dashboard-subtitle">Proforma Collection</p>
-=======
               className="lg:col-span-5 bg-gradient-to-br from-white to-rose-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-rose-100/30 p-5 flex flex-col animate-fade-in-up"
               style={{ animationDelay: "0.5s" }}
             >
@@ -1979,7 +1849,6 @@ export default function Dashboard() {
                 <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                   Proforma Collection
                 </p>
->>>>>>> Stashed changes
               </div>
               <div className="flex flex-col gap-5 mt-auto">
                 <div className="flex justify-between items-end">
@@ -2044,14 +1913,6 @@ export default function Dashboard() {
             {/* ROW 4 */}
             {/* Tasks Priority Donut (Span 6) */}
             <div
-<<<<<<< Updated upstream
-              className="dashboard-widget lg:col-span-6"
-              style={{ animationDelay: "0.6s" }}
-            >
-              <div className="mb-1">
-                <h3 className="dashboard-title">Tasks Priority</h3>
-                <p className="dashboard-subtitle">Focus areas</p>
-=======
               className="lg:col-span-6 bg-gradient-to-br from-white to-purple-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-purple-100/30 p-5 flex flex-col animate-fade-in-up"
               style={{ animationDelay: "0.6s" }}
             >
@@ -2062,7 +1923,6 @@ export default function Dashboard() {
                 <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                   Focus areas
                 </p>
->>>>>>> Stashed changes
               </div>
               <div className="h-[200px] flex items-center justify-center mt-auto">
                 <ResponsiveContainer width="100%" height="100%">
@@ -2111,14 +1971,6 @@ export default function Dashboard() {
 
             {/* Quotation Status Chart (Span 6) */}
             <div
-<<<<<<< Updated upstream
-              className="dashboard-widget lg:col-span-6"
-              style={{ animationDelay: "0.7s" }}
-            >
-              <div className="mb-1">
-                <h3 className="dashboard-title">Quotation Status</h3>
-                <p className="dashboard-subtitle">Active vs Won vs Lost</p>
-=======
               className="lg:col-span-6 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
               style={{ animationDelay: "0.7s" }}
             >
@@ -2129,7 +1981,6 @@ export default function Dashboard() {
                 <p className="text-[10px] text-gray-500 font-semibold mt-0.5 uppercase tracking-wider">
                   Active vs Won vs Lost
                 </p>
->>>>>>> Stashed changes
               </div>
               <div className="h-[200px] flex items-center justify-center mt-auto">
                 <ResponsiveContainer width="100%" height="100%">
@@ -2178,23 +2029,11 @@ export default function Dashboard() {
 
             {/* Recent Leads (Last 3) */}
             <div
-<<<<<<< Updated upstream
-              className="dashboard-widget lg:col-span-12"
-=======
               className="lg:col-span-12 bg-gradient-to-br from-white to-orange-50/40 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 border border-slate-100 p-5 flex flex-col animate-fade-in-up"
->>>>>>> Stashed changes
               style={{ animationDelay: "0.8s" }}
             >
               <div className="flex justify-between items-center mb-4">
                 <div>
-<<<<<<< Updated upstream
-                  <h3 className="dashboard-title">Recent Leads</h3>
-                  <p className="dashboard-subtitle">Last 3 leads added</p>
-                </div>
-                <button
-                  onClick={() => router.push("/sales/lead")}
-                  className="text-[10px] text-gray-600 hover:text-white bg-gray-50 hover:bg-gray-500 px-3 py-1.5 rounded-lg font-bold transition-all uppercase tracking-wider"
-=======
                   <h3 className="text-lg font-extrabold text-gray-800">
                     Recent Leads
                   </h3>
@@ -2205,7 +2044,6 @@ export default function Dashboard() {
                 <button
                   onClick={() => router.push("/sales/lead")}
                   className="text-[10px] text-orange-600 hover:text-white bg-orange-50 hover:bg-orange-500 px-3 py-1.5 rounded-lg font-bold transition-all uppercase tracking-wider"
->>>>>>> Stashed changes
                 >
                   View All Leads
                 </button>
@@ -2214,19 +2052,15 @@ export default function Dashboard() {
                 {safeLeads.slice(0, 3).map((lead, idx) => (
                   <div
                     key={idx}
-<<<<<<< Updated upstream
-                    className="bg-white/60 backdrop-blur-sm border border-gray200 p-4 rounded-xl shadow-sm hover:shadow-md transition-all group relative overflow-hidden"
-=======
                     className="bg-white/60 backdrop-blur-sm border border-orange-100 p-4 rounded-xl shadow-sm hover:shadow-md transition-all group relative overflow-hidden"
->>>>>>> Stashed changes
                   >
                     <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                      <UserPlus size={40} className="text-black" />
+                      <UserPlus size={40} className="text-orange-500" />
                     </div>
                     <h4 className="font-bold text-gray-800 text-sm mb-1 truncate pr-8">
                       {lead.lead_title || "Untitled Lead"}
                     </h4>
-                    <p className="text-black text-xs font-bold mb-3">
+                    <p className="text-orange-600 text-xs font-bold mb-3">
                       {lead.company_name}
                     </p>
                     <div className="space-y-2">
@@ -2241,24 +2075,14 @@ export default function Dashboard() {
                         </span>
                       </div>
                     </div>
-                    <div className="mt-4 pt-3 border-t border-gray-50 flex justify-between items-center">
+                    <div className="mt-4 pt-3 border-t border-orange-50 flex justify-between items-center">
                       <span
-<<<<<<< Updated upstream
-                        className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${
-                          lead.status === "Won"
-                            ? "bg-green-100 text-green-700"
-                            : lead.status === "Lost"
-                              ? "bg-red-100 text-red-700"
-                              : "bg-gray-200 text-gray-800"
-                        }`}
-=======
                         className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter ${lead.status === "Won"
                           ? "bg-green-100 text-green-700"
                           : lead.status === "Lost"
                             ? "bg-red-100 text-red-700"
                             : "bg-orange-100 text-orange-700"
                           }`}
->>>>>>> Stashed changes
                       >
                         {lead.status}
                       </span>
@@ -2266,7 +2090,7 @@ export default function Dashboard() {
                         onClick={() =>
                           router.push(`/sales/lead?id=${lead.lead_id}`)
                         }
-                        className="text-[10px] font-bold text-gray-400 hover:text-gray-500 transition-colors"
+                        className="text-[10px] font-bold text-gray-400 hover:text-orange-500 transition-colors"
                       >
                         Details →
                       </button>
