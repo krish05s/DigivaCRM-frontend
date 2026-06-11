@@ -4,6 +4,7 @@ import axios from "redaxios";
 import Link from "next/link";
 import { toast } from "react-toastify";
 
+
 export default function CommonMasterPage({
   title,
   listApi,
@@ -37,6 +38,7 @@ export default function CommonMasterPage({
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+
   const fetchData = useCallback(
     async (parentDesignation = "", name = "", status = "") => {
       try {
@@ -50,9 +52,7 @@ export default function CommonMasterPage({
       } catch (err) {
         console.error("Fetch error:", err);
       }
-    },
-    [listApi],
-  );
+    }, [listApi]);
 
   useEffect(() => {
     fetchData();
@@ -84,6 +84,7 @@ export default function CommonMasterPage({
   useEffect(() => {
     if (showForm && showRadio && parentListApi) fetchParentOptions();
   }, [showForm, showRadio, parentListApi, fetchParentOptions]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -129,10 +130,8 @@ export default function CommonMasterPage({
       });
       setData((prevData) =>
         prevData.map((item) =>
-          item.id === id
-            ? { ...item, status: currentStatus === 1 ? 0 : 1 }
-            : item,
-        ),
+          item.id === id ? { ...item, status: currentStatus === 1 ? 0 : 1 } : item
+        )
       );
     } catch (err) {
       console.error("Error updating status:", err);
@@ -157,8 +156,8 @@ export default function CommonMasterPage({
       await axios.put(`${saveApi}/default/${id}`, { default: newDefault });
       setData((prev) =>
         prev.map((item) =>
-          item.id === id ? { ...item, default: newDefault } : item,
-        ),
+          item.id === id ? { ...item, default: newDefault } : item
+        )
       );
     } catch (err) {
       console.error("Error updating checkbox:", err);
@@ -194,23 +193,33 @@ export default function CommonMasterPage({
     setCurrentPage(1);
   }, [parentDesignation, name, statusFilter, itemsPerPage]);
 
+
   return (
     <>
       <div className="bg-gray-100">
         {/* Header */}
-        <div className="breadcrumb-container">
-          <div className="breadcrumb-left">
-            <p className="breadcrumb-path">
-              <Link href="/dashboard" className="breadcrumb-home">
+        <div className="bg-white w-full shadow-lg p-3 mt-1 mb-5 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
+          <div className="hidden sm:flex items-center text-gray-700 w-full sm:w-auto">
+            <p className="flex items-center flex-wrap">
+              <Link
+                href="/dashboard"
+                className="mx-2 text-xl text-gray-400 hover:text-indigo-600"
+              >
                 <i className="bi bi-house"></i>
               </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>{" "}
-              <Link href="/setup" className="breadcrumb-link">
+              <i className="bi bi-chevron-right text-[10px]"></i>
+              <Link
+                href="/setup"
+                className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
+              >
                 Setup
               </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>{" "}
+              <i className="bi bi-chevron-right text-[10px]"></i>
               {breadcrumbs.map((b, i) => (
-                <span key={i} className="breadcrumb-link">
+                <span
+                  key={i}
+                  className="flex items-center text-gray-700 hover:text-orange-500 font-semibold"
+                >
                   <span className="mx-2">{b}</span>
                   {i < breadcrumbs.length - 1 && (
                     <i className="bi bi-chevron-right text-[10px]"></i>
@@ -224,7 +233,7 @@ export default function CommonMasterPage({
             <button
               type="button"
               onClick={() => setShowForm(true)}
-              className="add-btn "
+              className="w-full sm:w-auto bg-orange-500 text-white px-5 py-2 rounded-sm shadow hover:bg-orange-600 font-bold text-sm"
             >
               + Add {title}
             </button>
@@ -233,26 +242,16 @@ export default function CommonMasterPage({
 
         {/* Filters */}
         <div className="mx-6 md:hidden mt-3 relative z-40">
-          <button
-            type="button"
-            onClick={() => setShowMobileFilters(!showMobileFilters)}
-            className="w-full flex items-center justify-between text-orange-500 font-semibold bg-orange-50 px-4 py-2 rounded-sm border border-orange-200 shadow-sm transition-all"
-          >
-            <span className="flex items-center gap-2">
-              <i className="bi bi-funnel"></i> Filters
-            </span>
-            <i
-              className={`bi bi-chevron-down transition-transform ${showMobileFilters ? "rotate-180" : ""}`}
-            ></i>
+          <button type="button" onClick={() => setShowMobileFilters(!showMobileFilters)} className="w-full flex items-center justify-between text-orange-500 font-semibold bg-orange-50 px-4 py-2 rounded-sm border border-orange-200 shadow-sm transition-all">
+             <span className="flex items-center gap-2"><i className="bi bi-funnel"></i> Filters</span>
+             <i className={`bi bi-chevron-down transition-transform ${showMobileFilters ? "rotate-180" : ""}`}></i>
           </button>
         </div>
 
-        <div
-          className={`
+        <div className={`
           ${showMobileFilters ? "absolute left-6 right-6 top-50 bg-white p-5 shadow-2xl border border-gray-100 z-50 rounded-lg grid grid-cols-2 gap-3 mt-1" : "hidden"} 
           md:mx-6 md:flex md:flex-wrap md:items-center md:gap-y-2 md:relative md:bg-transparent md:p-0 md:shadow-none md:border-none md:z-auto
-        `}
-        >
+        `}>
           {extraColumn && (
             <select
               value={parentDesignation}
@@ -272,13 +271,13 @@ export default function CommonMasterPage({
           <input
             type="text"
             placeholder={`Enter ${title}`}
-            className="filter-input md:w-56 md:mx-2"
+            className="p-2 w-full md:w-50 mb-0 md:mb-3 border text-gray-400 bg-white border-orange-300 rounded-sm outline-none text-sm"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
 
           <select
-            className="filter-input md:w-56 md:mx-2 text-gray-500"
+            className="w-full md:w-48 md:mx-3 md:mb-3 p-2 border text-gray-400 bg-white rounded-sm border-orange-300 outline-none text-sm"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -297,14 +296,14 @@ export default function CommonMasterPage({
                 setShowMobileFilters(false);
                 fetchData();
               }}
-              className="filter-clear-btn w-full md:w-auto"
+              className="border border-gray-300 w-full md:w-auto cursor-pointer rounded-sm p-2 bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm text-center font-semibold"
             >
               Clear
             </button>
             <button
               type="button"
               onClick={() => setShowMobileFilters(false)}
-              className="filter-apply-btn w-full"
+              className="md:hidden border border-orange-300 w-full cursor-pointer rounded-sm p-2 bg-orange-100 text-orange-700 hover:bg-orange-200 text-sm text-center font-semibold"
             >
               Apply
             </button>
@@ -313,42 +312,42 @@ export default function CommonMasterPage({
 
         {/* Table */}
         <form className="p-1 mx-5">
-          <div className="table-scroll" style={{ overflowX: "scroll" }}>
-            <table className="custom-table min-w-[1400px]">
-              <thead>
-                    <tr className="table-head-row">
-                  <th className="table-head w-10">#</th>
+          <div className="overflow-x-auto overflow-y-auto max-h-[500px] custom-scroll bg-white shadow-md rounded-sm p-1 border border-gray-200">
+            <table className="w-full text-sm text-left text-gray-700 border-collapse mt-2 mb-2 whitespace-nowrap">
+              <thead className="bg-gray-50 text-gray-900 uppercase text-xs">
+                <tr>
+                  <th className="py-3 px-5 w-10">#</th>
                   {extraColumn && (
-                    <th className="table-head text-center">
+                    <th className="py-3 px-4 text-center">
                       {extraColumn.label}
                     </th>
                   )}
-                  <th className="table-head ">{title} Name</th>
+                  <th className="py-3 px-4">{title} Name</th>
                   {showCheckboxColumn && (
-                    <th className="table-head text-center">Select</th>
+                    <th className="py-3 px-4 text-center">Select</th>
                   )}
-                  <th className="table-head text-center">Status</th>
-                  <th className="table-head text-center">Action</th>
+                  <th className="py-3 px-4 text-center">Status</th>
+                  <th className="py-3 px-4 text-center">Action</th>
                 </tr>
               </thead>
 
               <tbody>
                 {currentData.map((item, i) => (
-                  <tr key={item.id} className="table-row">
-                    <td className="table-cell text-center">
+                  <tr key={item.id} className={`hover:bg-gray-50 transition`}>
+                    <td className="py-1 px-4 text-gray-600">
                       {(currentPage - 1) * itemsPerPage + i + 1}
                     </td>
                     {extraColumn && (
-                      <td className="table-cell text-center">
+                      <td className="py-2 px-4 text-center">
                         {item[extraColumn.key] || "-"}
                       </td>
                     )}
-                    <td className="table-cell-bold ">
+                    <td className="py-1 px-4 font-medium text-gray-800">
                       {item.name}
                     </td>
 
                     {showCheckboxColumn && (
-                      <td className="table-cell text-center">
+                      <td className="py-2 px-4 text-center">
                         <input
                           type="checkbox"
                           checked={item.default === 1}
@@ -360,7 +359,7 @@ export default function CommonMasterPage({
                       </td>
                     )}
 
-                    <td className="table-cell text-center">
+                    <td className="py-1 px-4 text-center">
                       <label className="inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
@@ -369,7 +368,7 @@ export default function CommonMasterPage({
                           onChange={() => handleToggle(item.id, item.status)}
                         />
                         <div
-                          className={`relative w-12 h-6 rounded-full transition-all duration-300 ${item.status === 1 ? "bg-orange-500" : "bg-gray-300"}`}
+                          className={`relative w-12 h-6 rounded-full transition-all duration-300 ${item.status === 1 ? "bg-green-500" : "bg-gray-300"}`}
                         >
                           <div
                             className={`absolute top-1 left-1 w-4 h-3 bg-white rounded-full transition-all duration-300 ${item.status === 1 ? "translate-x-6" : "translate-x-1"}`}
@@ -378,7 +377,7 @@ export default function CommonMasterPage({
                       </label>
                     </td>
 
-                    <td className="table-cell text-center">
+                    <td className="py-1 px-4 text-center">
                       <button
                         type="button"
                         onClick={() => handleEdit(item)}
@@ -415,15 +414,14 @@ export default function CommonMasterPage({
                 </select>
               </div>
 
+
               {/* Right side: Navigation buttons (only if totalPages > 1) */}
               {totalPages > 1 && (
                 <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
                   {/* Previous Button */}
                   <button
                     type="button"
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
                     className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
@@ -451,9 +449,7 @@ export default function CommonMasterPage({
                   {/* Next Button */}
                   <button
                     type="button"
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
                     className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
@@ -462,6 +458,7 @@ export default function CommonMasterPage({
                 </div>
               )}
             </div>
+
           </div>
         </form>
 
@@ -561,9 +558,9 @@ export default function CommonMasterPage({
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`common-btn w-24 flex items-center justify-center px-4 py-1.5 rounded-sm
-${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}
-`}
+                    className={`w-24 flex items-center justify-center bg-orange-500 text-white px-4 py-1.5 rounded-sm
+    ${isSubmitting ? "opacity-70 cursor-not-allowed" : "hover:bg-orange-600"}
+  `}
                   >
                     {isSubmitting ? (
                       <svg

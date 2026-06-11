@@ -11,27 +11,22 @@ import Image from "next/image";
 const SLIDES = [
   {
     id: 1,
-    imageSrc: "/crm1.jpg", // ← replace with your image path
+    imageSrc: "/Fix-Window.jpg", // ← replace with your image path
     imageAlt: "Explore with Yetti",
-    width: 1200,
     // headline: "EXPLORE.",
     // subtext: "LEARN. GROW.",
   },
   {
     id: 2,
-    imageSrc: "/crm2.jpg", // ← replace with your image path
+    imageSrc: "/Fix-Window.jpg", // ← replace with your image path
     imageAlt: "Learn with Yetti",
-    width: 1200,
-
     // headline: "LEARN.",
     // subtext: "DISCOVER. GROW.",
   },
   {
     id: 3,
-    imageSrc: "/crm3.jpg", // ← replace with your image path
+    imageSrc: "/hybride-scaled-1.jpg", // ← replace with your image path
     imageAlt: "Grow with Yetti",
-    width: 1200,
-
     // headline: "GROW.",
     // subtext: "EXPLORE. SUCCEED.",
   },
@@ -246,9 +241,9 @@ export default function Page() {
       <div className="absolute top-1/3 right-10 w-[300px] h-[300px] bg-gray-200 opacity-30 rounded-full blur-[120px]"></div>
       <div className="absolute bottom-20 left-1/4 w-[300px] h-[300px] bg-green-200 opacity-30 rounded-full blur-[120px]"></div>
       {/* ── NEW: Outer card wrapper — holds carousel + login side by side ─── */}
-      <div className="relative z-10 w-[100%] sm:w-full max-w-4xl flex flex-col md:flex-row overflow-hidden shadow-2xl rounded-xl  min-h-[500px] md:h-[520px]">
+      <div className="relative z-10 w-[95%] sm:w-full max-w-3xl flex flex-col md:flex-row overflow-hidden shadow-2xl rounded-xl border border-white/30 min-h-[500px] md:h-[520px]">
         {/* ── NEW: Left side — Image Carousel (hidden on mobile) ───────────── */}
-        <div className="hidden md:block md:w-[60%] flex-shrink-0 h-full">
+        <div className="hidden md:block md:w-[45%] flex-shrink-0 h-full">
           <div className="relative w-full h-full">
             <ImageCarousel />
           </div>
@@ -266,10 +261,10 @@ export default function Page() {
               {/* Logo */}
               <div className="mb-4 flex flex-col items-center">
                 <Image
-                  src="/DigivaLogo.png"
+                  src="/Logo.png"
                   alt="Company Logo"
-                  width={80}
-                  height={80}
+                  width={150}
+                  height={150}
                   className="object-contain"
                 />
               </div>
@@ -289,7 +284,7 @@ export default function Page() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="p-3 border border-black focus:outline-none rounded-sm"
+                  className="p-3 border border-gray-300 rounded-sm"
                   required
                 />
 
@@ -300,7 +295,7 @@ export default function Page() {
                     placeholder="Password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="p-3 border border-black focus:outline-none rounded-sm w-full"
+                    className="p-3 border border-gray-300 rounded-sm w-full"
                   />
                   <span
                     onClick={() => setShowPassword(!showPassword)}
@@ -321,8 +316,8 @@ export default function Page() {
                   type="submit"
                   disabled={loading}
                   className={`p-3 rounded-sm text-white flex items-center justify-center gap-2 transition-all cursor-pointer duration-300 ${loading
-                      ? "bg-black cursor-not-allowed opacity-80"
-                      : "bg-black "
+                      ? "bg-orange-400 cursor-not-allowed opacity-80"
+                      : "bg-orange-500 hover:bg-orange-600"
                     }`}
                 >
                   {loading ? (
@@ -350,11 +345,11 @@ export default function Page() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="p-3 border border-black focus:outline-none rounded-sm"
+                  className="p-3 border rounded-sm"
                   required
                 />
 
-                <button className="p-3 bg-black text-white rounded-sm">
+                <button className="p-3 bg-orange-500 text-white rounded-sm">
                   Send OTP
                 </button>
               </form>
@@ -383,10 +378,10 @@ export default function Page() {
                   inputMode="numeric"
                   name="otp"
                   maxLength={6}
-                  className="p-3 border border-black focus:outline-none rounded-sm text-center text-lg tracking-widest"
+                  className="p-3 border rounded-sm text-center text-lg tracking-widest"
                 />
 
-                <button className="p-3 bg-black  text-white rounded-sm">
+                <button className="p-3 bg-orange-500 text-white rounded-sm">
                   Verify OTP
                 </button>
               </form>
@@ -397,7 +392,7 @@ export default function Page() {
                 ) : (
                   <button
                     onClick={handleForgotPassword}
-                    className="text-black hover:underline"
+                    className="text-orange-500 hover:underline"
                   >
                     Resend OTP
                   </button>
@@ -417,7 +412,7 @@ export default function Page() {
                   name="password"
                   placeholder="New Password"
                   onChange={handleChange}
-                  className="p-3 border border-black focus:outline-none rounded-sm"
+                  className="p-3 border rounded-sm"
                 />
 
                 <input
@@ -428,7 +423,7 @@ export default function Page() {
                   className="p-3 border rounded-sm"
                 />
 
-                <button className="p-3 bg-black text-white rounded-sm">
+                <button className="p-3 bg-orange-500 text-white rounded-sm">
                   Update Password
                 </button>
               </form>
@@ -436,7 +431,7 @@ export default function Page() {
           )}
 
           {message && (
-            <p className="mt-6 text-black font-medium">{message}</p>
+            <p className="mt-6 text-red-500 font-medium">{message}</p>
           )}
         </div>
         {/* ── END right side ─────────────────────────────────────────────────── */}

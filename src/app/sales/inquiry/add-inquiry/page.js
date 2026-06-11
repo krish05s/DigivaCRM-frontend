@@ -175,8 +175,10 @@ export default function AddInquiry() {
     useEffect(() => {
         const fetchAsignee = async () => {
             try {
+                const token = localStorage.getItem("token");
                 const res = await axios.get(`${API_BASE}/api/manage-user/asignee`, {
                     params: { status: 1 },
+                    headers: { Authorization: `Bearer ${token}` },
                 });
 
                 const cleanedData = (res.data.data || []).map(item => ({

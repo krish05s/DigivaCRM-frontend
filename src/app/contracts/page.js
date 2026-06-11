@@ -156,8 +156,10 @@ export default function Page() {
     useEffect(() => {
         const fetchAsignee = async () => {
             try {
+                const tokenVal = localStorage.getItem("token");
                 const res = await axios.get(`${API_BASE}/api/manage-user/asignee`, {
                     params: { status: 1 },
+                    headers: { Authorization: `Bearer ${tokenVal}` },
                 });
 
                 const cleanedData = (res.data.data || []).map(item => ({
@@ -182,8 +184,10 @@ export default function Page() {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
+                const tokenVal = localStorage.getItem("token");
                 const res = await axios.get(`${API_BASE}/api/manage-user/asignee`, {
                     params: { status: 1 },
+                    headers: { Authorization: `Bearer ${tokenVal}` },
                 });
 
                 const data = res.data.data || res.data;
@@ -393,12 +397,10 @@ export default function Page() {
                                 created_at: "",
                             });
                             setShowMobileFilters(false);
-                        }} 
-                        className="filter-clear-btn w-full md:w-auto"
-                        >
+                        }} className="border border-gray-300 w-full md:w-auto cursor-pointer rounded-md p-2 bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm text-center font-semibold">
                             Clear
                         </button>
-                        <button onClick={() => setShowMobileFilters(false)} className="filter-apply-btn w-full">
+                        <button onClick={() => setShowMobileFilters(false)} className="md:hidden border border-orange-300 w-full cursor-pointer rounded-sm p-2 bg-orange-100 text-orange-700 hover:bg-orange-200 text-sm text-center font-semibold">
                             Apply
                         </button>
                     </div>
@@ -406,40 +408,40 @@ export default function Page() {
 
                 {/* Table */}
                 <form className="p-1 mx-4">
-                    <div className="table-wrapper">
+                    <div className="bg-white shadow-md rounded-2xl p-1 border border-gray-200">
                         <h3 className="mx-2 text-md mt-2">Contract Listing</h3>
                         <hr className="text-gray-300 mx-2 mt-2 mb-3" />
-                        <div  className="table-scroll" style={{ overflowX: "scroll" }}>
-                            <table className=" custom-table min-w-[1400px]">
-                            <thead >
-                                <tr className="table-head-row">
-                                    <th className="table-head w-10">#</th>
-                                    <th className="table-head">
+                        <div className="overflow-x-auto overflow-y-auto max-h-[500px] custom-scroll">
+                            <table className=" w-full text-sm text-left text-gray-700 border-collapse mt-2 mb-2 whitespace-nowrap">
+                            <thead className="bg-gray-50 text-gray-900  text-xs">
+                                <tr>
+                                    <th className="py-3 px-5 w-10">#</th>
+                                    <th className="py-3 px-4">
                                         Customer
                                     </th>
 
-                                    <th className="table-head">
+                                    <th className="py-3 px-4">
                                         Contract Name
                                         
                                     </th>
-                                    <th className="table-head ">Contract Type
+                                    <th className="py-3 px-4 ">Contract Type
                                        
                                     </th>
-                                    <th className="table-head ">Contract Value
-                                        
-                                        </th>
-                                        <th className="table-head ">Start Date
+                                    <th className="py-3 px-4 ">Contract Value
                                         
                                     </th>
-                                    <th className="table-head ">End Date
+                                    <th className="py-3 px-4 ">Start Date
+                                        
+                                    </th>
+                                    <th className="py-3 px-4 ">End Date
                                      
                                     </th>
-                                    <th className="table-head ">Assignee
+                                    <th className="py-3 px-4 ">Assignee
                                     
                                     </th>
-                                    <th className="table-head ">Created
+                                    <th className="py-3 px-4 ">Created
                                     </th>
-                                    <th className="table-head ">Action
+                                    <th className="py-3 px-4 ">Action
                                     </th>
                                 </tr>
                             </thead>
@@ -447,29 +449,29 @@ export default function Page() {
                             <tbody>
                                 {currentData.length > 0 ? (
                                     currentData.map((item, index) => (
-                                        <tr key={item.id} className="table-row">
-                                            <td className="table-cell">
+                                        <tr key={item.id} className={`hover:bg-gray-50 transition font-medium`}>
+                                            <td className="py-1 px-4 text-gray-600">
                                                 {index + 1}
                                             </td>
-                                            <td className="table-customer">
+                                            <td className="py-2 px-5 text-gray-800">
                                                 {item.customer_name}
                                             </td>
-                                            <td className="table-cell">
+                                            <td className="py-2 px-5 text-gray-800">
                                                 {item.contract_name}
                                             </td>
-                                            <td className="table-cell">
+                                            <td className="py-2 px-5 text-gray-800">
                                                 {item.contract_type}
                                             </td>
-                                            <td className="table-cell">
+                                            <td className="py-2 px-5 text-gray-800">
                                                 {item.contract_value}
                                             </td>
-                                            <td className="table-cell">
+                                            <td className="py-1 px-4">
                                                 {item.start_date
                                                     ? new Date(item.start_date).toLocaleDateString("en-GB").replace(/\//g, "-")
                                                     : "-"}
                                             </td>
 
-                                            <td className="table-cell">
+                                            <td className="py-2 px-4 ">
                                                 {item.end_date
                                                     ? new Date(item.end_date).toLocaleDateString("en-GB").replace(/\//g, "-")
                                                     : "-"}
@@ -491,11 +493,11 @@ export default function Page() {
                                                     })}
                                             </td>
 
-                                            <td className="table-cell">
+                                            <td className="py-2 px-4 w-50">
                                                 {item.created_by_name} | {formatDateTime(item.created_at)}
                                             </td>
 
-                                            <td className="table-cell text-center">
+                                            <td className="py-2 px-4  text-lg">
                                                 <button type="button" onClick={() => { localStorage.setItem("view_contract_data", JSON.stringify(item)); router.push("/contracts/view-contracts"); }} className="text-gray-400 hover:text-green-600">
                                                     <i className="bi bi-eye text-xl"></i>
                                                 </button>
@@ -510,7 +512,7 @@ export default function Page() {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="9" className="table-empty">
+                                        <td colSpan="9" className="text-center text-gray-500 py-3">
                                             No records found
                                         </td>
                                     </tr>

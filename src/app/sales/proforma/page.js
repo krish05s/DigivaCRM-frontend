@@ -22,6 +22,9 @@ export default function ProformaPage() {
   const exportRef = useRef(null);
   const debounceRef = useRef(null);
 
+  // ── TAB STATE ─────────────────────────────────────────────
+  const [activeTab, setActiveTab] = useState("pending");
+
   // ── FILTER STATE ──────────────────────────────────────────
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [filters, setFilters] = useState({
@@ -41,9 +44,9 @@ export default function ProformaPage() {
     (value) => value !== "" && value !== null && value !== undefined,
   );
 
-  const [assigneeList, setAssigneeList] = useState([]);
+  // Assignee state removed
 
-  useAuth();
+  useAuth(["Admin", "Super Admin", "Proforma invoices"]);
 
   const API = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -51,6 +54,9 @@ export default function ProformaPage() {
   const fetchPI = async () => {
     try {
       const res = await axios.get(`${API}/api/pi/list`);
+
+      console.log("PI DATA =>", res.data.data);
+
       setPiData(res.data.data || []);
       setCurrentPage(1);
     } catch (err) {
@@ -111,25 +117,7 @@ export default function ProformaPage() {
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ── FETCH ASSIGNEE DROPDOWN ───────────────────────────────
-  useEffect(() => {
-    const fetchAssignee = async () => {
-      try {
-        const res = await axios.get(`${API}/api/manage-user/asignee`, {
-          params: { status: 1 },
-        });
-        const cleaned = (res.data?.data || res.data || []).map((item) => ({
-          ...item,
-          name: item.name ? item.name.split(" ")[0] : "",
-        }));
-        setAssigneeList(cleaned);
-      } catch (err) {
-        console.error(err);
-        setAssigneeList([]);
-      }
-    };
-    fetchAssignee();
-  }, []);
+  // Fetch assignee dropdown removed
 
   useEffect(() => {
     fetchPI();
@@ -144,6 +132,21 @@ export default function ProformaPage() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // ── UPDATE STAGE ──────────────────────────────────────────
+  const updateStage = async (pi_id, stage) => {
+    try {
+      await axios.put(`${API}/api/pi/update-stage/${pi_id}`, { stage });
+      // Local state update - backend fix ન થાય ત્યાં સુધી
+      setPiData(prev => prev.map(item =>
+        item.pi_id === pi_id ? { ...item, stage } : item
+      ));
+      toast.success(stage === "completed" ? "Completed ma move thay gayu!" : "Pending ma move thay gayu!");
+      fetchPI();
+    } catch (err) {
+      toast.error("Stage update failed");
+    }
+  };
 
   // ── PI NUMBER FORMAT ──────────────────────────────────────
   const formatPINumber = (index) => {
@@ -249,10 +252,10 @@ export default function ProformaPage() {
           : "",
         "Customer Name": item.customer_name || "",
         "Quotation No": item.quotation_no || "",
-        Assignee: item.assignee || "",
         Total: item.total || "",
         "Proforma %": item.proforma_percentage || "",
         Status: item.status || "",
+        Stage: item.stage || "pending",
         "Created At": item.created_at
           ? new Date(item.created_at).toLocaleDateString()
           : "",
@@ -298,10 +301,10 @@ export default function ProformaPage() {
         item.pi_date ? new Date(item.pi_date).toLocaleDateString() : "",
         item.customer_name || "",
         item.quotation_no || "",
-        item.assignee || "",
         item.total ? `Rs.${Number(item.total).toLocaleString()}` : "",
         item.proforma_percentage ? `${item.proforma_percentage}%` : "",
         item.status || "",
+        item.stage || "pending",
         item.created_at ? new Date(item.created_at).toLocaleDateString() : "",
       ]);
       autoTable(doc, {
@@ -313,10 +316,10 @@ export default function ProformaPage() {
             "PI Date",
             "Customer",
             "Quotation",
-            "Assignee",
             "Total",
             "PI %",
             "Status",
+            "Stage",
             "Created",
           ],
         ],
@@ -324,12 +327,12 @@ export default function ProformaPage() {
         theme: "grid",
         styles: { fontSize: 8, cellPadding: 3, textColor: [40, 40, 40] },
         headStyles: {
-          fillColor: [234, 88, 12],
+          fillColor: [59, 94, 156],
           textColor: [255, 255, 255],
           fontStyle: "bold",
           fontSize: 8,
         },
-        alternateRowStyles: { fillColor: [255, 247, 237] },
+        alternateRowStyles: { fillColor: [244, 246, 252] },
         columnStyles: { 0: { cellWidth: 8 } },
       });
       const now = new Date();
@@ -344,7 +347,7 @@ export default function ProformaPage() {
   };
 
   // ════════════════════════════════════════════════════════════════════
-  // ── DOWNLOAD SINGLE PI PDF — Fixed Alignment Version ────────────────
+  // ── DOWNLOAD SINGLE PI PDF
   // ════════════════════════════════════════════════════════════════════
   const downloadPIPdf = async (item, globalIndex) => {
     try {
@@ -360,8 +363,7 @@ export default function ProformaPage() {
       const pageW = doc.internal.pageSize.getWidth();
       const pageH = doc.internal.pageSize.getHeight();
 
-      // ── Colours ──────────────────────────────────────────────────────
-      const orange = [255, 132, 0];
+      const orange = [59, 94, 156];
       const darkGray = [40, 40, 40];
       const lightBg = [248, 248, 248];
       const borderC = [220, 220, 220];
@@ -373,39 +375,22 @@ export default function ProformaPage() {
       const grandTotal = getGrandTotal(item);
       const followUps = item.follow_ups || [];
 
-      // ── Helper: horizontal rule ───────────────────────────────────────
       const hRule = (y, r = 220, g = 220, b = 220, lw = 0.2) => {
         doc.setDrawColor(r, g, b);
         doc.setLineWidth(lw);
         doc.line(14, y, pageW - 14, y);
       };
 
-      // ════════════════════════════════════════════════════════════════
-      // 1. HEADER BANNER
-      // ════════════════════════════════════════════════════════════════
       doc.setFillColor(...white);
       doc.rect(0, 0, pageW, 30, "F");
 
-      // Company name
       const logo = new Image();
-      logo.src = "/venster_logo.png";
-
+      logo.src = "/Logo.png";
       await new Promise((resolve) => {
         logo.onload = resolve;
       });
-
       doc.addImage(logo, "PNG", 14, 6, 38, 18);
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(7.5);
-      doc.setTextColor(...darkGray);
-      // doc.text("A QUALITY BUSINESS SOLUTIONS BRAND", 14, 27);
 
-      doc.setFont("helvetica", "italic");
-      doc.setFontSize(7);
-      doc.setTextColor(...darkGray);
-      // doc.text("Where Excellence Meets Professionalism", 14, 26);
-
-      // Title right side
       doc.setTextColor(...orange);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(18);
@@ -419,13 +404,9 @@ export default function ProformaPage() {
         : new Date().toLocaleDateString("en-IN");
       doc.text(`Date: ${piDateStr}`, pageW - 14, 21, { align: "right" });
 
-      // Accent line
       doc.setFillColor(...darkGray);
       doc.rect(0, 30, pageW, 1.2, "F");
 
-      // ════════════════════════════════════════════════════════════════
-      // 2. PI NUMBER + STATUS BADGE STRIP
-      // ════════════════════════════════════════════════════════════════
       doc.setFillColor(...lightBg);
       doc.rect(0, 31.2, pageW, 13, "F");
 
@@ -434,43 +415,52 @@ export default function ProformaPage() {
       doc.setFontSize(10);
       doc.text(`PI No: ${piNumber}`, 14, 40);
 
-      // ── WON badge ────────────────────────────────────────────────
       const badgeW = 32;
       const badgeH = 8;
       const badgeX = pageW - 14 - badgeW;
       const badgeY = 33.5;
 
-      doc.setFillColor(...green);
+      let statusText = "DRAFT";
+      let badgeColor = [100, 100, 100]; // gray
+      if (item.status === "paid") {
+        statusText = "WON / PAID";
+        badgeColor = green;
+      } else if (item.status === "partial") {
+        statusText = `${parseFloat(Number(item.proforma_percentage).toFixed(2))}% PAID`;
+        badgeColor = [249, 115, 22]; // orange/amber
+      } else if (item.status === "sent") {
+        statusText = "SENT";
+        badgeColor = [59, 130, 246]; // blue
+      } else if (item.status === "cancelled") {
+        statusText = "CANCELLED";
+        badgeColor = [239, 68, 68]; // red
+      }
+
+      doc.setFillColor(...badgeColor);
       doc.roundedRect(badgeX, badgeY, badgeW, badgeH, 1.5, 1.5, "F");
 
       doc.setTextColor(...white);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(8);
-      doc.text("WON / PAID", badgeX + badgeW / 2, badgeY + 5.3, {
+      doc.text(statusText, badgeX + badgeW / 2, badgeY + 5.3, {
         align: "center",
       });
 
-      // ════════════════════════════════════════════════════════════════
-      // 3. COMPANY INFO + ORDER DETAILS (two-column card)
-      // ════════════════════════════════════════════════════════════════
       const cardTop = 48;
       const cardH = 52;
       const colLeft = 14;
       const colMid = pageW / 2 + 2;
       const colRight = pageW - 14;
 
-      // Card background
       doc.setFillColor(252, 252, 252);
       doc.setDrawColor(...borderC);
       doc.setLineWidth(0.3);
       doc.roundedRect(colLeft, cardTop, colRight - colLeft, cardH, 2, 2, "FD");
 
-      // Column divider
       doc.setDrawColor(...borderC);
       doc.setLineWidth(0.3);
       doc.line(colMid, cardTop + 5, colMid, cardTop + cardH - 5);
 
-      // ── LEFT: Bill To ─────────────────────────────────────────────
       doc.setTextColor(...orange);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(8);
@@ -485,7 +475,6 @@ export default function ProformaPage() {
 
       const companyRows = [
         ["Customer:", item.customer_name || "N/A"],
-        ["Assignee:", item.assignee || "N/A"],
         ["Quotation:", item.quotation_no || "N/A"],
         [
           "Created:",
@@ -501,14 +490,12 @@ export default function ProformaPage() {
         doc.setFontSize(8);
         doc.setTextColor(...darkGray);
         doc.text(label, leftLabelX, cy);
-
         doc.setFont("helvetica", "normal");
         doc.setTextColor(...textGray);
         doc.text(String(val), leftValueX, cy);
         cy += 8;
       });
 
-      // ── RIGHT: Order Details ──────────────────────────────────────
       const rightLabelX = colMid + 6;
       const rightValueX = colMid + 40;
 
@@ -540,16 +527,12 @@ export default function ProformaPage() {
         doc.setFontSize(8);
         doc.setTextColor(...darkGray);
         doc.text(label, rightLabelX, oy);
-
         doc.setFont("helvetica", "normal");
         doc.setTextColor(...textGray);
         doc.text(String(val), rightValueX, oy);
         oy += 8;
       });
 
-      // ════════════════════════════════════════════════════════════════
-      // 4. PAYMENT HISTORY TABLE
-      // ════════════════════════════════════════════════════════════════
       const tableTop = cardTop + cardH + 8;
 
       doc.setFont("helvetica", "bold");
@@ -560,7 +543,6 @@ export default function ProformaPage() {
       doc.setFillColor(...orange);
       doc.rect(14, tableTop + 1.5, 40, 0.8, "F");
 
-      // Build rows
       const tableRows = [];
 
       const basePct = Number(item.proforma_percentage) || 0;
@@ -622,9 +604,7 @@ export default function ProformaPage() {
           cellPadding: { top: 4, bottom: 4, left: 4, right: 4 },
           halign: "left",
         },
-        alternateRowStyles: {
-          fillColor: [255, 250, 244],
-        },
+        alternateRowStyles: { fillColor: [244, 246, 252] },
         columnStyles: {
           0: { cellWidth: 10, halign: "center" },
           1: { cellWidth: 28, halign: "left" },
@@ -641,12 +621,8 @@ export default function ProformaPage() {
         margin: { left: 14, right: 14 },
       });
 
-      // ════════════════════════════════════════════════════════════════
-      // 5. SUMMARY SECTION
-      // ════════════════════════════════════════════════════════════════
       const summaryY = doc.lastAutoTable.finalY + 10;
 
-      // ── Left: Thank you note ──────────────────────────────────────
       doc.setTextColor(...darkGray);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(11);
@@ -658,7 +634,6 @@ export default function ProformaPage() {
       doc.text("This is a system-generated document.", 14, summaryY + 17);
       doc.text("No signature is required.", 14, summaryY + 24);
 
-      // ── Right: Summary card ───────────────────────────────────────
       const sCardW = 80;
       const sCardX = pageW - 14 - sCardW;
       const labelX = sCardX + 6;
@@ -690,56 +665,61 @@ export default function ProformaPage() {
         doc.setFontSize(8.5);
         doc.setTextColor(...darkGray);
         doc.text(label, labelX, sY);
-
         doc.setFont("helvetica", "bold");
         doc.setTextColor(...darkGray);
         doc.text(val, valueX, sY, { align: "right" });
-
         doc.setDrawColor(...borderC);
         doc.setLineWidth(0.2);
         doc.line(sCardX + 4, sY + 3, sCardX + sCardW - 4, sY + 3);
-
         sY += 10;
       });
 
-      // Final Status row — full orange highlight
       const finalRowY = summaryY + sCardH - 1;
-      doc.setFillColor(...orange);
+      let bottomStatusText = "DRAFT";
+      let bottomBadgeColor = orange;
+      if (item.status === "paid") {
+        bottomStatusText = "WON / PAID";
+        bottomBadgeColor = orange;
+      } else if (item.status === "partial") {
+        bottomStatusText = `${parseFloat(Number(item.proforma_percentage).toFixed(2))}% PAID`;
+        bottomBadgeColor = [249, 115, 22];
+      } else if (item.status === "sent") {
+        bottomStatusText = "SENT";
+        bottomBadgeColor = [59, 130, 246];
+      } else if (item.status === "cancelled") {
+        bottomStatusText = "CANCELLED";
+        bottomBadgeColor = [239, 68, 68];
+      }
+
+      doc.setFillColor(...bottomBadgeColor);
       doc.roundedRect(sCardX, finalRowY - 7, sCardW, 10, 2, 2, "F");
 
       doc.setTextColor(...white);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(8.5);
       doc.text("Final Status", labelX, finalRowY - 0.5);
-      doc.text("WON / PAID", valueX, finalRowY - 0.5, { align: "right" });
+      doc.text(bottomStatusText, valueX, finalRowY - 0.5, { align: "right" });
 
-      // ════════════════════════════════════════════════════════════════
-      // 6. FOOTER
-      // ════════════════════════════════════════════════════════════════
       doc.setFillColor(...orange);
       doc.rect(0, pageH - 12, 60, 12, "F");
-
       doc.setFillColor(...darkGray);
       doc.rect(60, pageH - 12, pageW - 60, 12, "F");
 
       doc.setTextColor(...white);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(8.5);
-      doc.text("Venster Pvt. Ltd.", 8, pageH - 4.5);
+      doc.text("Guru Tech Packaging Solution", 8, pageH - 4.5);
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(7);
       doc.setTextColor(200, 200, 200);
       doc.text(
-        `© ${new Date().getFullYear()} Venster Pvt. Ltd. — All rights reserved.   |   Generated: ${new Date().toLocaleDateString("en-IN")}`,
+        `© ${new Date().getFullYear()} Guru Tech Packaging Solution — All rights reserved.   |   Generated: ${new Date().toLocaleDateString("en-IN")}`,
         pageW - 14,
         pageH - 4.5,
         { align: "right" },
       );
 
-      // ════════════════════════════════════════════════════════════════
-      // 7. SAVE
-      // ════════════════════════════════════════════════════════════════
       const safeName = (item.customer_name || "Invoice")
         .replace(/[^a-zA-Z0-9]/g, "_")
         .slice(0, 30);
@@ -754,32 +734,43 @@ export default function ProformaPage() {
   // ── ADD FOLLOW-UP ─────────────────────────────────────────
   const handleSubmitFollowUp = async () => {
     const newPercent = Number(percentage);
+
     if (!newPercent || newPercent <= 0) {
       toast.error("Please enter percentage");
       return;
     }
+
     const followUps = selectedPI.follow_ups || [];
     const existingTotal = followUps.reduce(
       (sum, f) => sum + Number(f.proforma_percentage),
       0,
     );
+
     const newTotal = existingTotal + newPercent;
+
     if (newTotal > 100) {
       toast.error("Total percentage cannot exceed 100%");
       return;
     }
+
     try {
+      setSubmitLoading(true); // START SPINNER
+
       const res = await axios.post(
         `${API}/api/pi/add-followup/${selectedPI.pi_id}`,
         { percentage: newPercent },
       );
+
       const confirmedTotal = res.data?.total_percentage ?? newTotal;
+
       await updateStatus(selectedPI.pi_id, confirmedTotal);
+
       toast.success(
         confirmedTotal >= 100
           ? "Follow-up added & marked as Won!"
           : "Follow-up added successfully",
       );
+
       setShowModal(false);
       setPercentage("");
       setRupees("");
@@ -788,7 +779,7 @@ export default function ProformaPage() {
     } catch (err) {
       toast.error(err.response?.data?.message || "Error");
     } finally {
-      setSubmitLoading(false);
+      setSubmitLoading(false); // STOP SPINNER
     }
   };
 
@@ -837,20 +828,56 @@ export default function ProformaPage() {
     setPercentage(item.proforma_percentage);
   };
 
-  // ================= PAGINATION =================
-
+  // ── PAGINATION ────────────────────────────────────────────
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Reset page when filters or items per page changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [filters, itemsPerPage]);
+  }, [filters, itemsPerPage, activeTab]);
+
+  // ── TAB FILTERED DATA ─────────────────────────────────────
+  const tabFilteredData = piData.filter((item) => {
+    const stage = String(item.stage || "pending")
+      .trim()
+      .toLowerCase();
+
+    if (activeTab === "pending") {
+      return stage !== "completed";
+    }
+
+    if (activeTab === "completed") {
+      return stage === "completed";
+    }
+
+    return true;
+  });
+
+  const pendingCount = piData.filter((d) => {
+    const stage = String(d.stage || "pending")
+      .trim()
+      .toLowerCase();
+
+    return stage !== "completed";
+  }).length;
+
+  const completedCount = piData.filter((d) => {
+    const stage = String(d.stage || "")
+      .trim()
+      .toLowerCase();
+
+    return stage === "completed";
+  }).length;
+
+
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const paginatedData = piData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(piData.length / itemsPerPage);
+  const paginatedData = tabFilteredData.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
+  const totalPages = Math.ceil(tabFilteredData.length / itemsPerPage);
 
   const getSlidingPages = () => {
     const visibleCount = 5;
@@ -874,31 +901,39 @@ export default function ProformaPage() {
     <>
       <Header />
 
-      <div className="bg-gray-100 ">
+      <div className="bg-gray-100 min-h-screen">
         {/* ── BREADCRUMB + EXPORT ─────────────────────────── */}
-
-        <div className="breadcrumb-container">
-          <div className="breadcrumb-left">
-            <p className="breadcrumb-path">
-              <Link href="/dashboard" className="breadcrumb-home">
+        <div className="bg-white w-full border-gray-100 p-3 mt-1 mb-5 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
+          <div className="hidden sm:flex items-center text-gray-700 w-full sm:w-auto">
+            <p className="flex items-center flex-wrap">
+              <Link
+                href="/dashboard"
+                className="mx-2 text-xl text-gray-400 hover:text-indigo-600"
+              >
                 <i className="bi bi-house"></i>
               </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>{" "}
-              <Link href="#" className="breadcrumb-link">
+              <i className="bi bi-chevron-right text-[10px]"></i>
+              <Link
+                href="#"
+                className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
+              >
                 Sales
               </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>{" "}
-              <Link href="/sales/proforma" className="breadcrumb-link">
+              <i className="bi bi-chevron-right text-[10px]"></i>
+              <Link
+                href="/sales/proforma"
+                className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
+              >
                 Proforma
               </Link>
             </p>
           </div>
 
-          <div className="breadcrumb-actions">
-            <div className="relative " ref={exportRef}>
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <div className="relative w-full sm:w-auto" ref={exportRef}>
               <button
                 onClick={() => setShowExportMenu((prev) => !prev)}
-                className="export-btn"
+                className="w-full flex items-center justify-center gap-2 bg-orange-50 text-orange-500 px-4 py-2 rounded-sm text-sm font-bold tracking-wide transition-all shadow-sm border border-orange-100"
               >
                 <i className="bi bi-download text-base"></i>
                 Export
@@ -907,13 +942,19 @@ export default function ProformaPage() {
                 ></i>
               </button>
               {showExportMenu && (
-                <div className="export-dropdown ">
-                  <button onClick={exportToExcel} className="export-item">
+                <div className="absolute right-0 top-full mt-1.5 w-44 bg-white rounded-sm shadow-lg border border-gray-100 overflow-hidden z-50">
+                  <button
+                    onClick={exportToExcel}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-all text-left"
+                  >
                     <i className="bi bi-file-earmark-excel text-green-600 text-base"></i>
                     Export Excel
                   </button>
                   <div className="h-px bg-gray-100 mx-3"></div>
-                  <button onClick={exportToPDF} className="export-item">
+                  <button
+                    onClick={exportToPDF}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 transition-all text-left"
+                  >
                     <i className="bi bi-file-earmark-pdf text-red-600 text-base"></i>
                     Export PDF
                   </button>
@@ -940,10 +981,9 @@ export default function ProformaPage() {
 
         <div
           className={`
-            ${
-              showMobileFilters
-                ? "absolute left-6 right-6 top-[170px] bg-white p-5 shadow-2xl rounded-lg grid grid-cols-2 gap-3 mt-1 z-[999] ring-2 ring-orange-300"
-                : "hidden"
+            ${showMobileFilters
+              ? "absolute left-6 right-6 top-[170px] bg-white p-5 shadow-2xl rounded-lg grid grid-cols-2 gap-3 mt-1 z-[999] ring-2 ring-orange-300"
+              : "hidden"
             }
             md:mx-6 md:flex md:flex-wrap md:items-center md:gap-x-3 md:gap-y-2 md:mt-3 md:mb-5 md:relative md:bg-transparent md:p-0 md:shadow-none md:ring-0
           `}
@@ -953,59 +993,45 @@ export default function ProformaPage() {
             value={filters.customer_name}
             onChange={handleFilterChange}
             placeholder="Customer"
-            className="filter-input md:w-56 md:mx-2"
+            className="p-2 w-full md:w-45 bg-white border border-orange-300 md:border rounded-sm focus:outline-none text-gray-600 text-sm"
           />
           <input
             name="quotation_no"
             value={filters.quotation_no}
             onChange={handleFilterChange}
             placeholder="Quotation No"
-            className="filter-input md:w-56 md:mx-2"
+            className="p-2 w-full md:w-45 bg-white border border-orange-300 md:border rounded-sm focus:outline-none text-gray-600 text-sm"
           />
-          <select
-            name="assignee"
-            value={filters.assignee}
-            onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2 text-gray-500"
-          >
-            <option value="">Assignee</option>
-            {assigneeList.map((item) => (
-              <option key={item.id} value={item.name}>
-                {item.name}
-              </option>
-            ))}
-          </select>
+
           <select
             name="status"
             value={filters.status}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2 text-gray-500"
+            className="p-2 w-full md:w-45 bg-white border border-orange-300 md:border rounded-sm focus:outline-none text-gray-400 text-sm"
           >
             <option value="">Status</option>
             <option value="draft">Draft</option>
             <option value="partial">Pending</option>
             <option value="paid">Won</option>
           </select>
-          <div className="filter-date-box w-full md:w-60 col-span-2 md:col-span-1">
-            <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
-              From
-            </span>
+          <div className="flex items-center px-2 w-full md:w-58 bg-white border border-orange-300 md:border rounded-sm text-gray-400 text-sm col-span-2 md:col-span-1">
+            <span className="mx-1 text-gray-400 whitespace-nowrap">From</span>
             <input
               type="date"
               name="from_date"
               value={filters.from_date}
               onChange={handleFilterChange}
-              className="p-1 w-full md:w-35 outline-none bg-transparent"
+              className="p-2 w-full md:w-35 outline-none"
             />
           </div>
-          <div className="filter-date-box w-full md:w-60 col-span-2 md:col-span-1">
-            <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">To</span>
+          <div className="flex items-center px-2 w-full md:w-53 bg-white border border-orange-300 md:border rounded-sm text-gray-400 text-sm col-span-2 md:col-span-1">
+            <span className="mx-1 text-gray-400 whitespace-nowrap">To</span>
             <input
               type="date"
               name="to_date"
               value={filters.to_date}
               onChange={handleFilterChange}
-              className="p-1 w-full md:w-35 outline-none bg-transparent"
+              className="p-2 w-full md:w-35 outline-none"
             />
           </div>
           <input
@@ -1016,7 +1042,7 @@ export default function ProformaPage() {
             placeholder="Min %"
             min="0"
             max="100"
-            className="filter-input md:w-56 md:mx-2"
+            className="p-2 w-full md:w-24 bg-white border border-orange-300 md:border rounded-sm focus:outline-none text-gray-600 text-sm"
           />
           <input
             type="number"
@@ -1026,7 +1052,7 @@ export default function ProformaPage() {
             placeholder="Max %"
             min="0"
             max="100"
-            className="filter-input md:w-56 md:mx-2"
+            className="p-2 w-full md:w-24 bg-white border border-orange-300 md:border rounded-sm focus:outline-none text-gray-600 text-sm"
           />
           <input
             type="number"
@@ -1034,7 +1060,7 @@ export default function ProformaPage() {
             value={filters.min_total}
             onChange={handleFilterChange}
             placeholder="Min Rs."
-            className="filter-input md:w-56 md:mx-2"
+            className="p-2 w-full md:w-32 bg-white border border-orange-300 md:border rounded-sm focus:outline-none text-gray-600 text-sm"
           />
           <input
             type="number"
@@ -1042,7 +1068,7 @@ export default function ProformaPage() {
             value={filters.max_total}
             onChange={handleFilterChange}
             placeholder="Max Rs."
-            className="filter-input md:w-56 md:mx-2"
+            className="p-2 w-full md:w-32 bg-white border border-orange-300 md:border rounded-sm focus:outline-none text-gray-600 text-sm"
           />
           <div className="flex gap-2 col-span-2 md:col-span-1">
             <button
@@ -1050,41 +1076,120 @@ export default function ProformaPage() {
                 resetFilters();
                 setShowMobileFilters(false);
               }}
-              className="filter-clear-btn w-full md:w-auto"
+              className="border border-gray-300 w-full md:w-auto cursor-pointer rounded-sm p-2 bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm font-semibold text-center px-6"
             >
               Clear
             </button>
             <button
               onClick={() => setShowMobileFilters(false)}
-              className="filter-apply-btn w-full"
+              className="md:hidden border border-orange-300 w-full cursor-pointer rounded-sm p-2 bg-orange-100 text-orange-700 hover:bg-orange-200 text-sm font-semibold text-center px-6"
             >
               Apply
             </button>
           </div>
         </div>
 
+        {/* ── TABS ────────────────────────────────────────── */}
+        <div className="mx-7 mt-2 mb-0 flex items-center gap-0 border-b border-gray-200 bg-white px-2 pt-2 rounded-t-sm">
+          <button
+            onClick={() => {
+              setActiveTab("pending");
+              setCurrentPage(1);
+            }}
+            className={`px-5 py-2.5 text-sm font-semibold transition-all relative rounded-t-md
+              ${activeTab === "pending"
+                ? "text-blue-600 border-b-2 border-blue-500 bg-white"
+                : "text-gray-400 hover:text-gray-600 border-b-2 border-transparent"
+              }`}
+          >
+            Pending
+            <span
+              className={`ml-2 text-xs px-2 py-0.5 rounded-full font-bold
+                ${activeTab === "pending"
+                  ? "bg-blue-100 text-blue-600"
+                  : "bg-gray-100 text-gray-400"
+                }`}
+            >
+              {pendingCount}
+            </span>
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab("completed");
+              setCurrentPage(1);
+            }}
+            className={`px-5 py-2.5 text-sm font-semibold transition-all relative rounded-t-md
+              ${activeTab === "completed"
+                ? "text-green-600 border-b-2 border-green-500 bg-white"
+                : "text-gray-400 hover:text-gray-600 border-b-2 border-transparent"
+              }`}
+          >
+            Completed
+            <span
+              className={`ml-2 text-xs px-2 py-0.5 rounded-full font-bold
+                ${activeTab === "completed"
+                  ? "bg-green-100 text-green-600"
+                  : "bg-gray-100 text-gray-400"
+                }`}
+            >
+              {completedCount}
+            </span>
+          </button>
+        </div>
+
         {/* ── TABLE ────────────────────────────────────────── */}
-        <div className="table-wrapper">
-          <div className="py-2">
+        <div className="bg-white rounded-b-sm rounded-tr-sm border border-gray-100 mx-7 py-2">
+          <div className="py-1">
             {loading ? (
               <div className="text-center py-10 text-gray-400">Loading...</div>
             ) : (
-              <div className="table-scroll" style={{ overflowX: "scroll" }}>
-                <table className="custom-table min-w-[1400px]">
+              <div
+                className="overflow-x-auto overflow-y-scroll max-h-[500px] custom-scroll"
+                style={{ overflowX: "scroll" }}
+              >
+                <table className="w-full text-sm whitespace-nowrap">
                   <thead>
-                    <tr className="table-head-row">
-                      <th className="table-head">#</th>
-                      <th className="table-head">PI No</th>
-                      <th className="table-head">PI Date</th>
-                      <th className="table-head">Customer Name</th>
-                      <th className="table-head">Quotation No</th>
-                      <th className="table-head">Assignee</th>
-                      <th className="table-head">Total</th>
-                      <th className="table-head">PI %</th>
-                      <th className="table-head">Status</th>
-                      <th className="table-head">Follow-Up</th>
-                      <th className="table-head">Download</th>
-                      <th className="table-head">Created</th>
+                    <tr className="bg-gray-50 border-b border-gray-100">
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        #
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        PI No
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        PI Date
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Customer Name
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Quotation No
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Source
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Reference
+                      </th>
+
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Total
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        PI %
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Stage
+                      </th>
+                      <th className="py-3 px-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Follow-Up
+                      </th>
+                      <th className="py-3 px-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Download
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1092,65 +1197,62 @@ export default function ProformaPage() {
                       paginatedData.map((item, index) => {
                         const globalIndex = indexOfFirstItem + index;
                         const isWon = item.status === "paid";
+                        const currentStage = item.stage || "pending";
                         return (
-                          <tr key={item.pi_id} className="table-row">
-                            <td className="table-cell">{globalIndex + 1}</td>
-                            <td className="table-cell-bold ">
+                          <tr
+                            key={item.pi_id}
+                            className="border-b border-gray-50 hover:bg-indigo-50/30 transition-colors"
+                          >
+                            <td className="py-3 px-3">{globalIndex + 1}</td>
+                            <td className="py-3 px-3 font-medium text-gray-800">
                               {formatPINumber(globalIndex)}
                             </td>
-                            <td className="table-cell">
+                            <td className="py-3 px-3 text-gray-500">
                               {item.pi_date
                                 ? new Date(item.pi_date).toLocaleDateString(
-                                    "en-IN",
-                                  )
+                                  "en-IN",
+                                )
                                 : "-"}
                             </td>
-                            <td className="table-customer ">
+                            <td className="py-3 px-3 text-orange-500">
                               {item.customer_name || "-"}
                             </td>
-                            <td className="table-cell">
+                            <td className="py-3 px-3 text-gray-600">
                               {item.quotation_no || "-"}
                             </td>
-                            <td className="table-cell">
-                              {item.assignee ? (
-                                <div className="table-assignee ">
-                                  {String(item.assignee)
-                                    .split(",")
-                                    .map((name, i) => (
-                                      <div
-                                        key={i}
-                                        title={name.trim()}
-                                        className="table-assignee-badge"
-                                      >
-                                        {name.trim().charAt(0).toUpperCase()}
-                                      </div>
-                                    ))}
-                                </div>
-                              ) : (
-                                "-"
-                              )}
+                            <td className="py-3 px-3 text-gray-500">
+                              {item.source || "-"}
                             </td>
-                            <td className="table-cell-bold ">
+                            <td className="py-3 px-3 text-gray-500">
+                              {item.reference || "-"}
+                            </td>
+
+                            <td className="py-3 px-3 font-medium text-gray-800">
                               Rs.{Number(item.total).toLocaleString()}
                             </td>
-                            <td className="table-cell">
-                              <div className="table-progress-wrapper">
-                                <div className="table-progress-bg">
+                            <td className="py-3 px-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-16 bg-gray-100 rounded-full h-1.5">
                                   <div
-                                    className={`h-1.5 rounded-full transition-all ${Number(item.proforma_percentage) >= 100 ? "bg-green-500" : Number(item.proforma_percentage) >= 50 ? "bg-orange-400" : "bg-blue-400"}`}
+                                    className={`h-1.5 rounded-full transition-all ${Number(item.proforma_percentage) >= 100
+                                        ? "bg-green-500"
+                                        : Number(item.proforma_percentage) >= 50
+                                          ? "bg-orange-400"
+                                          : "bg-blue-400"
+                                      }`}
                                     style={{
                                       width: `${Math.min(Number(item.proforma_percentage), 100)}%`,
                                     }}
                                   ></div>
                                 </div>
-                                <span className="table-progress-text">
+                                <span className="font-semibold text-gray-800 text-xs">
                                   {item.proforma_percentage}%
                                 </span>
                               </div>
                             </td>
-                            <td className="table-cell">
+                            <td className="py-3 px-3">
                               <span
-                                className={`table-status
+                                className={`border rounded-sm px-3 py-1 text-xs font-semibold
                                   ${item.status === "paid" ? "border-green-200 bg-green-50 text-green-700" : ""}
                                   ${item.status === "partial" ? "border-orange-200 bg-orange-50 text-orange-700" : ""}
                                   ${item.status === "draft" ? "border-gray-200 bg-gray-50 text-gray-700" : ""}
@@ -1169,7 +1271,26 @@ export default function ProformaPage() {
                                         : "Draft"}
                               </span>
                             </td>
-                            <td className="table-cell text-center">
+
+                            {/* ── STAGE DROPDOWN ── */}
+                            <td className="py-3 px-3">
+                              <select
+                                value={currentStage}
+                                onChange={(e) =>
+                                  updateStage(item.pi_id, e.target.value)
+                                }
+                                className={`text-xs font-semibold px-2 py-1.5 rounded-sm border cursor-pointer outline-none transition-all
+                                  ${currentStage === "completed"
+                                    ? "bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                                    : "bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                                  }`}
+                              >
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                              </select>
+                            </td>
+
+                            <td className="py-3 px-3 text-center">
                               <button
                                 onClick={() => {
                                   setSelectedPI(item);
@@ -1179,45 +1300,36 @@ export default function ProformaPage() {
                                   setActiveIndex(null);
                                   setShowModal(true);
                                 }}
-                                className="table-action-btn "
+                                className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center mx-auto hover:bg-gray-100 cursor-pointer"
                               >
                                 <i className="bi bi-plus text-lg"></i>
                               </button>
                             </td>
 
-                            {/* DOWNLOAD BUTTON — only for Won PIs */}
+                            {/* DOWNLOAD BUTTON */}
                             <td className="py-3 px-3 text-center">
-                              {isWon ? (
-                                <button
-                                  onClick={() =>
-                                    downloadPIPdf(item, globalIndex)
-                                  }
-                                  title="Download PI PDF"
-                                  className="table-download-btn "
-                                >
-                                  <i className="bi bi-file-earmark-pdf text-green-600 group-hover:table-download-icon transition-all"></i>
-                                  <span className="table-tooltip">
-                                    Download PDF
-                                  </span>
-                                </button>
-                              ) : (
-                                <span className="text-gray-300 text-xs">—</span>
-                              )}
-                            </td>
-
-                            <td className="table-cell">
-                              {item.created_at
-                                ? new Date(item.created_at).toLocaleDateString(
-                                    "en-IN",
-                                  )
-                                : "-"}
+                              <button
+                                onClick={() =>
+                                  downloadPIPdf(item, globalIndex)
+                                }
+                                title="Download PI PDF"
+                                className="group relative w-9 h-9 rounded-full border border-green-200 bg-green-50 flex items-center justify-center mx-auto hover:bg-green-500 hover:border-green-500 transition-all cursor-pointer"
+                              >
+                                <i className="bi bi-file-earmark-pdf text-green-600 group-hover:text-white text-base transition-all"></i>
+                                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-2 py-0.5 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                  Download PDF
+                                </span>
+                              </button>
                             </td>
                           </tr>
                         );
                       })
                     ) : (
                       <tr>
-                        <td colSpan="12" className="table-empty">
+                        <td
+                          colSpan="13"
+                          className="text-center py-10 text-gray-400"
+                        >
                           No Data Found
                         </td>
                       </tr>
@@ -1226,18 +1338,18 @@ export default function ProformaPage() {
                 </table>
 
                 {/* ── PAGINATION BAR ────────────────────────── */}
-                {/* ✅ STANDARDIZED MICARA IMS PAGINATION */}
-                <div className="pagination-wrapper">
-                  {/* Left side: Rows per page selector */}
-                  <div className="pagination-left ">
-                    <span className="pagination-label ">Rows per page:</span>
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-200 bg-white">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-slate-500 font-medium">
+                      Rows per page:
+                    </span>
                     <select
                       value={itemsPerPage}
                       onChange={(e) => {
                         setItemsPerPage(Number(e.target.value));
                         setCurrentPage(1);
                       }}
-                      className="pagination-select"
+                      className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-slate-100 transition-all cursor-pointer font-medium"
                     >
                       {[10, 20, 100, 200].map((size) => (
                         <option key={size} value={size}>
@@ -1247,38 +1359,33 @@ export default function ProformaPage() {
                     </select>
                   </div>
 
-                  {/* Right side: Navigation buttons (only if totalPages > 1) */}
                   {totalPages > 1 && (
-                    <div className="pagination-right ">
-                      {/* Previous Button */}
+                    <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
                       <button
                         onClick={() =>
                           setCurrentPage((prev) => Math.max(prev - 1, 1))
                         }
                         disabled={currentPage === 1}
-                        className="pagination-btn "
+                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                       >
                         <i className="bi bi-chevron-left text-sm"></i>
                       </button>
 
-                      {/* Page Buttons */}
                       <div className="flex items-center gap-1.5">
                         {getSlidingPages().map((page) => (
                           <button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            className={`pagination-btn-active ${
-                              currentPage === page
+                            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${currentPage === page
                                 ? "bg-[#212121] text-white shadow-md shadow-black/10"
                                 : "border border-slate-200 text-slate-600 hover:bg-slate-50"
-                            }`}
+                              }`}
                           >
                             {page}
                           </button>
                         ))}
                       </div>
 
-                      {/* Next Button */}
                       <button
                         onClick={() =>
                           setCurrentPage((prev) =>
@@ -1286,7 +1393,7 @@ export default function ProformaPage() {
                           )
                         }
                         disabled={currentPage === totalPages}
-                        className="pagination-btn "
+                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                       >
                         <i className="bi bi-chevron-right text-sm"></i>
                       </button>
@@ -1306,12 +1413,12 @@ export default function ProformaPage() {
           const grandTotal = getGrandTotal(selectedPI);
           const basePaidPercentage = editing
             ? (selectedPI.follow_ups || []).reduce(
-                (sum, f) =>
-                  f.id === editing.id
-                    ? sum
-                    : sum + Number(f.proforma_percentage),
-                0,
-              )
+              (sum, f) =>
+                f.id === editing.id
+                  ? sum
+                  : sum + Number(f.proforma_percentage),
+              0,
+            )
             : Number(selectedPI.proforma_percentage) || 0;
           const basePaidAmount = (grandTotal * basePaidPercentage) / 100;
           const baseRemainingPercentage = 100 - basePaidPercentage;
@@ -1399,13 +1506,12 @@ export default function ProformaPage() {
 
                     {/* Remaining Card */}
                     <div
-                      className={`rounded-xl p-3 mb-4 border transition-all ${
-                        afterRemainingPct < 0
+                      className={`rounded-xl p-3 mb-4 border transition-all ${afterRemainingPct < 0
                           ? "bg-red-50 border-red-200"
                           : afterRemainingPct === 0 && enteredPct > 0
                             ? "bg-green-50 border-green-200"
                             : "bg-blue-50 border-blue-100"
-                      }`}
+                        }`}
                     >
                       <p className="text-xs font-bold uppercase tracking-wider mb-2 text-gray-500">
                         Remaining After This Entry
@@ -1413,13 +1519,12 @@ export default function ProformaPage() {
                       <div className="flex justify-between items-center">
                         <div className="text-center">
                           <p
-                            className={`text-xl font-bold ${
-                              afterRemainingPct < 0
+                            className={`text-xl font-bold ${afterRemainingPct < 0
                                 ? "text-red-600"
                                 : afterRemainingPct === 0 && enteredPct > 0
                                   ? "text-green-600"
                                   : "text-blue-600"
-                            }`}
+                              }`}
                           >
                             {enteredPct > 0
                               ? afterRemainingPct < 0
@@ -1432,13 +1537,12 @@ export default function ProformaPage() {
                         <div className="w-px h-10 bg-gray-200"></div>
                         <div className="text-center">
                           <p
-                            className={`text-xl font-bold ${
-                              afterRemainingPct < 0
+                            className={`text-xl font-bold ${afterRemainingPct < 0
                                 ? "text-red-600"
                                 : afterRemainingPct === 0 && enteredPct > 0
                                   ? "text-green-600"
                                   : "text-blue-600"
-                            }`}
+                              }`}
                           >
                             {enteredPct > 0
                               ? afterRemainingPct < 0
@@ -1452,13 +1556,12 @@ export default function ProformaPage() {
                       <div className="mt-3">
                         <div className="w-full bg-white rounded-full h-2 border border-gray-200 overflow-hidden">
                           <div
-                            className={`h-2 rounded-full transition-all duration-300 ${
-                              afterRemainingPct < 0
+                            className={`h-2 rounded-full transition-all duration-300 ${afterRemainingPct < 0
                                 ? "bg-red-500"
                                 : paidPercentage + enteredPct >= 100
                                   ? "bg-green-500"
                                   : "bg-orange-400"
-                            }`}
+                              }`}
                             style={{
                               width: `${Math.min(paidPercentage + enteredPct, 100)}%`,
                             }}
@@ -1552,7 +1655,7 @@ export default function ProformaPage() {
                     </div>
                     <div className="space-y-2 overflow-y-auto max-h-80">
                       {!selectedPI.follow_ups ||
-                      selectedPI.follow_ups.length === 0 ? (
+                        selectedPI.follow_ups.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-8 text-gray-300">
                           <i className="bi bi-clock-history text-3xl mb-2"></i>
                           <p className="text-sm">No history found</p>
@@ -1568,11 +1671,10 @@ export default function ProformaPage() {
                                     index === activeIndex ? null : index,
                                   )
                                 }
-                                className={`border rounded-xl p-3 cursor-pointer transition-all select-none ${
-                                  isLatest
+                                className={`border rounded-xl p-3 cursor-pointer transition-all select-none ${isLatest
                                     ? "border-orange-400 bg-orange-50 shadow-sm"
                                     : "hover:bg-gray-50 border-gray-200"
-                                }`}
+                                  }`}
                               >
                                 <div className="flex justify-between items-center">
                                   <div className="flex items-center gap-2">
@@ -1679,11 +1781,28 @@ export default function ProformaPage() {
                   </button>
                   <button
                     onClick={editing ? handleUpdate : handleSubmitFollowUp}
-                    disabled={afterRemainingPct < 0 && enteredPct > 0}
-                    className={`common-btn px-6 py-2 rounded-xl text-sm font-semibold text-white transition-all shadow-md
-  ${afterRemainingPct < 0 && enteredPct > 0 ? "opacity-50 cursor-not-allowed shadow-none" : ""}`}
+                    disabled={
+                      (afterRemainingPct < 0 && enteredPct > 0) ||
+                      submitLoading ||
+                      updateLoading
+                    }
+                    className={`px-6 py-2 rounded-xl text-sm font-semibold text-white transition-all shadow-md flex items-center justify-center gap-2 ${(afterRemainingPct < 0 && enteredPct > 0) ||
+                        submitLoading ||
+                        updateLoading
+                        ? "bg-gray-300 cursor-not-allowed shadow-none"
+                        : "bg-orange-500 hover:bg-orange-600 shadow-orange-200"
+                      }`}
                   >
-                    {editing ? "Update Follow-Up" : "Add Follow-Up"}
+                    {(submitLoading || updateLoading) ? (
+                      <>
+                        <i className="bi bi-arrow-repeat animate-spin"></i>
+                        Processing...
+                      </>
+                    ) : editing ? (
+                      "Update Follow-Up"
+                    ) : (
+                      "Add Follow-Up"
+                    )}
                   </button>
                 </div>
               </div>

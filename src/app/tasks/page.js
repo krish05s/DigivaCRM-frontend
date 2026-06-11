@@ -12,7 +12,7 @@ import useAuth from "../components/useAuth";
 export default function Page() {
   const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-  useAuth();
+  useAuth(["Admin", "Super Admin", "Sales", "Estimation", "Leads Management"]);
 
   const exportRef = useRef(null);
   const [formData, setFormData] = useState({
@@ -55,6 +55,7 @@ export default function Page() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+
   const fetchData = async () => {
     try {
       const res = await axios.get(`${APIBase}/read`, {
@@ -83,6 +84,7 @@ export default function Page() {
   useEffect(() => {
     setCurrentPage(1);
   }, [filters, itemsPerPage]);
+
 
   // ✅ Close export menu when clicking outside
   useEffect(() => {
@@ -448,12 +450,15 @@ export default function Page() {
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
 
+
   // Asignee dropdown api calling
   useEffect(() => {
     const fetchAsignee = async () => {
       try {
+        const tokenVal = localStorage.getItem("token");
         const res = await axios.get(`${API_BASE}/api/manage-user/asignee`, {
           params: { status: 1 },
+          headers: { Authorization: `Bearer ${tokenVal}` },
         });
 
         const cleanedData = (res.data.data || []).map((item) => ({
@@ -475,8 +480,10 @@ export default function Page() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        const tokenVal = localStorage.getItem("token");
         const res = await axios.get(`${API_BASE}/api/manage-user/asignee`, {
           params: { status: 1 },
+          headers: { Authorization: `Bearer ${tokenVal}` },
         });
 
         setUsers(res.data.data || res.data);
@@ -667,22 +674,27 @@ export default function Page() {
     <div className="bg-gray-100">
       <Header />
       {/* Breadcrumb */}
-      <div className="breadcrumb-container">
-          <div className="breadcrumb-left">
-            <p className="breadcrumb-path">
-              <Link href="/dashboard" className="breadcrumb-home">
-                <i className="bi bi-house"></i>
-              </Link>
-            <i className="bi bi-chevron-right text-[10px]"></i>{" "}
+      <div className="bg-white w-full shadow-lg p-3 mt-1 mb-5 flex flex-col lg:flex-row justify-between items-center gap-4 lg:gap-0">
+        <div className="hidden sm:flex items-center text-gray-700 w-full lg:w-auto">
+          <p className="flex items-center flex-wrap">
+            <Link
+              href="/dashboard"
+              className="mx-2 text-xl text-gray-400 hover:text-indigo-600"
+            >
+              <i className="bi bi-house"></i>
+            </Link>
+            <i className="bi bi-chevron-right text-[10px]"></i>
             <Link
               href="#"
- className="breadcrumb-link"            >
+              className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
+            >
               Tasks
             </Link>
-            <i className="bi bi-chevron-right text-[10px]"></i>{" "}
+            <i className="bi bi-chevron-right text-[10px]"></i>
             <Link
               href="#"
- className="breadcrumb-link"            >
+              className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
+            >
               Tasks List
             </Link>
           </p>
@@ -694,15 +706,15 @@ export default function Page() {
             placeholder="🔍 Search..."
             value={filters.search || ""}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            className="search-input"
+            className="border w-full sm:w-64 p-2 px-3 border-gray-300 text-gray-700 placeholder-gray-400 rounded-sm focus:ring-1 outline-none focus:ring-orange-200 transition-all text-sm"
           />
 
-          <div className="breadcrumb-actions">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             {/* Export Button */}
             <div className="relative flex-1 sm:flex-none" ref={exportRef}>
               <button
                 onClick={() => setShowExportMenu((prev) => !prev)}
-                className="export-btn"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-sm bg-orange-50 text-orange-500 text-sm font-bold tracking-wide transition-all shadow-sm border border-orange-100"
               >
                 <i className="bi bi-download text-base"></i>
                 Export
@@ -714,10 +726,11 @@ export default function Page() {
               </button>
 
               {showExportMenu && (
-                <div className="export-dropdown ">
+                <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-sm shadow-xl border border-gray-100 overflow-hidden z-50">
                   <button
                     onClick={exportToExcel}
-className="export-item"                  >
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-all text-left"
+                  >
                     <i className="bi bi-file-earmark-excel text-green-600 text-base"></i>
                     Export Excel
                   </button>
@@ -726,7 +739,8 @@ className="export-item"                  >
 
                   <button
                     onClick={exportToPDF}
-className="export-item"                  >
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 transition-all text-left"
+                  >
                     <i className="bi bi-file-earmark-pdf text-red-600 text-base"></i>
                     Export PDF
                   </button>
@@ -738,7 +752,7 @@ className="export-item"                  >
             <button
               type="button"
               onClick={() => setShowForm(true)}
-              className="add-btn"
+              className="flex-1 sm:flex-none bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-sm text-sm font-bold shadow-md transition-all text-center"
             >
               + ADD TASK
             </button>
@@ -775,7 +789,7 @@ className="export-item"                  >
           onChange={(e) =>
             setFilters({ ...filters, task_name: e.target.value })
           }
-          className="filter-input md:w-56 md:mx-2"
+          className="p-2 w-full md:w-52 border border-orange-300 md:border text-gray-600 bg-white rounded-sm  transition-all outline-none text-sm"
         />
 
         {/* Status */}
@@ -783,7 +797,7 @@ className="export-item"                  >
           name="status"
           value={filters.status || ""}
           onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-          className="filter-input md:w-56 md:mx-2 text-gray-500"
+          className="p-2 w-full md:w-52 border border-orange-300 md:border text-gray-400 bg-white rounded-sm  transition-all outline-none text-sm"
         >
           <option value="">Status</option>
 
@@ -799,7 +813,7 @@ className="export-item"                  >
           name="priority"
           value={filters.priority || ""}
           onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-          className="filter-input md:w-56 md:mx-2 text-gray-500"
+          className="p-2 w-full md:w-52 border border-orange-300 md:border text-gray-400 bg-white rounded-sm  transition-all outline-none text-sm"
         >
           <option value="">Priority</option>
           <option value="High">High</option>
@@ -812,7 +826,7 @@ className="export-item"                  >
           name="assignee"
           value={filters.assignee || "-"}
           onChange={(e) => setFilters({ ...filters, assignee: e.target.value })}
-          className="filter-input md:w-56 md:mx-2 text-gray-500"
+          className="p-2 w-full md:w-52 border border-orange-300 md:border text-gray-400 bg-white rounded-sm  transition-all outline-none text-sm"
         >
           <option value="">Assignee</option>
 
@@ -824,8 +838,8 @@ className="export-item"                  >
         </select>
 
         {/* Start Date Range */}
-        <div className="filter-date-box w-full md:w-60 col-span-2 md:col-span-1">
-          <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
+        <div className="p-1 w-full md:w-54 border border-orange-300 md:border  text-gray-400 bg-white rounded-sm  transition-all outline-none">
+          <span className="text-[10px] text-gray-400 uppercase font-bold pt-1 mx-2">
             Start Date
           </span>
           <input
@@ -834,12 +848,12 @@ className="export-item"                  >
             onChange={(e) =>
               setFilters({ ...filters, start_date: e.target.value })
             }
-            className="p-1 w-full md:w-35 outline-none bg-transparent"
+            className="p-1 w-full md:w-32 outline-none text-sm"
           />
         </div>
         {/* Due Date Range */}
-        <div className="filter-date-box w-full md:w-60 col-span-2 md:col-span-1">
-          <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
+        <div className="p-1 w-full md:w-54 border border-orange-300 md:border  text-gray-400 bg-white rounded-sm  transition-all outline-none">
+          <span className="text-[10px] text-gray-400 uppercase font-bold pt-1 mx-2">
             Due Date
           </span>
           <input
@@ -848,9 +862,10 @@ className="export-item"                  >
             onChange={(e) =>
               setFilters({ ...filters, end_date: e.target.value })
             }
-            className="p-1 w-full md:w-35 outline-none bg-transparent"
+            className="p-1 w-full md:w-32 outline-none text-sm"
           />
         </div>
+
 
         {/* Created By - dynamic API */}
         <select
@@ -859,7 +874,7 @@ className="export-item"                  >
           onChange={(e) =>
             setFilters({ ...filters, created_by_name: e.target.value })
           }
-          className="filter-input md:w-56 md:mx-2 text-gray-500"
+          className="p-2 w-full md:w-52 border border-orange-300 md:border text-gray-400 bg-white rounded-sm  transition-all outline-none text-sm"
         >
           <option value="">Select Created By</option>
 
@@ -871,8 +886,8 @@ className="export-item"                  >
         </select>
 
         {/* created Date Range */}
-        <div className="filter-date-box w-full md:w-60 col-span-2 md:col-span-1">
-          <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
+        <div className="p-1 w-full md:w-62 border border-orange-300 md:border  text-gray-400 bg-white rounded-sm  transition-all outline-none">
+          <span className="text-[10px] text-gray-400 uppercase font-bold pt-1 mx-2">
             Created Date
           </span>
           <input
@@ -881,7 +896,7 @@ className="export-item"                  >
             onChange={(e) =>
               setFilters({ ...filters, created_at: e.target.value })
             }
-            className="p-1 w-full md:w-35 outline-none bg-transparent"
+            className="p-1 w-full md:w-32 outline-none text-sm"
           />
         </div>
 
@@ -901,13 +916,13 @@ className="export-item"                  >
               });
               setShowMobileFilters(false);
             }}
-            className="filter-clear-btn w-full md:w-auto"
+            className="border border-gray-300 w-full md:w-auto cursor-pointer rounded-sm p-1.5 bg-gray-200 text-gray-700 hover:bg-gray-300 text-md text-center px-6"
           >
             Clear
           </button>
           <button
             onClick={() => setShowMobileFilters(false)}
-            className="filter-apply-btn w-full"
+            className="md:hidden border border-orange-300 w-full cursor-pointer rounded-sm p-1.5 bg-orange-100 text-orange-700 hover:bg-orange-200 text-md text-center px-6"
           >
             Apply
           </button>
@@ -1080,15 +1095,14 @@ className="export-item"                  >
               </select>
             </div>
 
+
             {/* Right side: Navigation buttons (only if totalPages > 1) */}
             {totalPages > 1 && (
               <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
                 {/* Previous Button */}
                 <button
                   type="button"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
                   className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                 >
@@ -1116,9 +1130,7 @@ className="export-item"                  >
                 {/* Next Button */}
                 <button
                   type="button"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
                   className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                 >
@@ -1127,6 +1139,7 @@ className="export-item"                  >
               </div>
             )}
           </div>
+
         </div>
       </form>
 
@@ -1630,9 +1643,9 @@ className="export-item"                  >
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                   className={`common-btn w-28 px-5 py-2 rounded-sm flex items-center justify-center
-${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}
-`}
+                    className={`w-28 px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-sm flex items-center justify-center
+      ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}
+    `}
                   >
                     {isSubmitting ? (
                       <svg
@@ -1709,13 +1722,13 @@ ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}
                 >
                   Cancel
                 </button>
-              <button
-  type="button"
-  onClick={confirmTaskDelete}
-  className="common-btn flex-1 py-2.5 rounded-md text-sm font-bold transition-all"
->
-  Delete
-</button>
+                <button
+                  type="button"
+                  onClick={confirmTaskDelete}
+                  className="flex-1 py-2.5 rounded-md bg-orange-500 text-white hover:bg-orange-600 transition-all text-sm font-bold"
+                >
+                  Delete
+                </button>
               </div>
             </div>
           </div>

@@ -277,24 +277,27 @@ export default function Page() {
       <Header />
       <div className="bg-gray-100">
         {/* breadcrumb */}
-  <div className="breadcrumb-container">
-          <div className="breadcrumb-left">
-            <p className="breadcrumb-path">
+        <div className="bg-white w-full shadow-lg p-3 mt-1 mb-5 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
+          <div className="hidden sm:flex items-center text-gray-700 w-full sm:w-auto">
+            <p className="flex items-center flex-wrap">
               <Link
                 href="/dashboard"
-className="breadcrumb-home"              >
+                className="mx-2 text-xl text-gray-400 hover:text-indigo-600"
+              >
                 <i className="bi bi-house"></i>
               </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>{" "}
+              <i className="bi bi-chevron-right text-[10px]"></i>
               <Link
                 href="#"
-className="breadcrumb-link"              >
+                className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
+              >
                 Customer
               </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>{" "}
+              <i className="bi bi-chevron-right text-[10px]"></i>
               <Link
                 href="/contacts"
-className="breadcrumb-link"              >
+                className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
+              >
                 Contacts
               </Link>
             </p>
@@ -304,7 +307,8 @@ className="breadcrumb-link"              >
             <button
               type="button"
               onClick={() => setShowForm(true)}
-className="add-btn "            >
+              className="w-full sm:w-auto bg-orange-500 text-white px-5 py-2 rounded-sm shadow hover:bg-orange-600 font-bold text-sm"
+            >
               + ADD CONTACT
             </button>
           </div>
@@ -335,7 +339,7 @@ className="add-btn "            >
             name="company_name"
             value={filters.company_name}
             onChange={handleFilterCompanyChange}
-            className="filter-input md:w-56 md:mx-2 text-gray-500"
+            className="border bg-white border-orange-300 rounded-sm px-3 py-2 w-full md:w-54 md:mx-2 outline-none text-gray-500 text-sm"
           >
             <option value="">Company</option>
             {companyname.map((item) => (
@@ -349,7 +353,7 @@ className="add-btn "            >
             name="customer_name"
             value={filters.customer_name}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2 text-gray-500"
+            className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:flex-1 md:min-w-0 outline-none text-gray-500 text-sm"
           >
             <option value="">Customer</option>
             {filterCustomernames.map((item) =>
@@ -365,7 +369,7 @@ className="add-btn "            >
             type="text"
             name="contact_person"
             placeholder="Person"
-            className="filter-input md:w-56 md:mx-2"
+            className="border bg-white border-orange-300 rounded-sm px-3 py-2 w-full md:w-54 md:mx-2 outline-none text-sm"
             value={filters.contact_person}
             onChange={handleFilterChange}
           />
@@ -374,7 +378,7 @@ className="add-btn "            >
             type="text"
             name="contact_number"
             placeholder="Number"
-           className="filter-input md:w-56 md:mx-2"
+            className="border bg-white border-orange-300 rounded-sm px-3 py-2 w-full md:w-54 md:mx-2 outline-none text-sm"
             value={filters.contact_number}
             onChange={handleFilterChange}
           />
@@ -383,7 +387,7 @@ className="add-btn "            >
             type="text"
             name="email"
             placeholder="Email"
-            className="filter-input md:w-56 md:mx-2"
+            className="border bg-white border-orange-300 rounded-sm px-3 py-2 w-full md:w-54 md:mx-2 outline-none text-sm"
             value={filters.email}
             onChange={handleFilterChange}
           />
@@ -392,7 +396,7 @@ className="add-btn "            >
             name="contact_designation"
             value={filters.contact_designation}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2 text-gray-500"
+            className="border bg-white border-orange-300 rounded-sm px-3 py-2 w-full md:w-54 md:mx-2 outline-none text-gray-500 text-sm"
           >
             <option value="">Designation</option>
             {designations.map((item) => (
@@ -421,7 +425,7 @@ className="add-btn "            >
             </button>
             <button
               onClick={() => setShowMobileFilters(false)}
-              className="filter-apply-btn w-full"
+              className="md:hidden border border-orange-300 w-full cursor-pointer rounded-sm p-2 bg-orange-100 text-orange-700 hover:bg-orange-200 text-sm text-center font-semibold"
             >
               Apply
             </button>
@@ -457,7 +461,7 @@ className="add-btn "            >
                     <td className="py-2 px-4 text-center">
                       {item.company_name}
                     </td>
-                    <td className="py-1 px-4 font-medium text-gray-500">
+                    <td className="py-1 px-4 font-medium text-orange-500">
                       {item.customer_name}
                     </td>
                     <td className="py-2 px-4 text-center">
@@ -699,7 +703,7 @@ className="add-btn "            >
                   </button>
                   <button
                     type="submit"
-                    className="common-btn w-full sm:w-auto text-center text-sm"
+                    className="bg-orange-500  hover:bg-orange-600 text-white px-4 py-1.5 rounded-sm"
                   >
                     Save
                   </button>
@@ -711,81 +715,78 @@ className="add-btn "            >
       )}
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-  <div className="delete-overlay">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30">
+          <div className="bg-white rounded-sm shadow-xl w-full max-w-sm border border-gray-100 overflow-hidden">
+            {/* Header */}
+            <div className="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-orange-100 to-white">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-orange-500 inline-block"></span>
 
-    <div className="delete-modal">
+                <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                  Delete Contact
+                </span>
+              </div>
 
-      {/* Header */}
-      <div className="delete-header">
+              <button
+                type="button"
+                onClick={handleDeleteCancel}
+                className="w-7 h-7 flex items-center justify-center text-orange-500 text-md"
+              >
+                ✕
+              </button>
+            </div>
 
-        <div className="delete-header-left">
+            {/* Body */}
+            <div className="p-6 text-center">
+              {/* Icon */}
+              <div className="w-16 h-16 rounded-full bg-orange-50 flex items-center justify-center mx-auto mb-4">
+                <svg
+                  className="w-8 h-8 text-orange-400"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.8}
+                  viewBox="0 0 24 24"
+                >
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                  <path d="M10 11v6M14 11v6" />
+                  <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+                </svg>
+              </div>
 
-          <span className="delete-dot"></span>
+              {/* Name */}
+              <p className="font-semibold text-gray-800 text-base mb-1 uppercase">
+                {contacts.find((c) => c.id === deleteId)?.contact_person ||
+                  "This Contact"}
+              </p>
 
-          <span className="delete-title">
-            Delete Contact
-          </span>
+              {/* Message */}
+              <p className="text-sm text-gray-400">
+                This action cannot be undone. Are you sure?
+              </p>
+            </div>
 
+            {/* Footer Buttons */}
+            <div className="flex gap-3 px-5 pb-5">
+              <button
+                type="button"
+                onClick={handleDeleteCancel}
+                className="flex-1 px-4 py-2 text-sm text-gray-500 border border-gray-200 rounded-sm hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDeleteConfirm}
+                className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-sm transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
-
-        <button
-          type="button"
-          onClick={handleDeleteCancel}
-          className="delete-close"
-        >
-          ✕
-        </button>
-
-      </div>
-
-      {/* Body */}
-      <div className="delete-body">
-
-        {/* Icon */}
-        <div className="delete-icon-wrap">
-
-          <i className="bi bi-trash3 delete-icon"></i>
-
-        </div>
-
-        {/* Name */}
-        <h3 className="delete-name">
-          {contacts.find((c) => c.id === deleteId)?.contact_person ||
-            "This Contact"}
-        </h3>
-
-        {/* Subtitle */}
-        <p className="delete-subtitle">
-          This action cannot be undone. Are you sure?
-        </p>
-
-      </div>
-
-      {/* Footer */}
-      <div className="delete-footer">
-
-        <button
-          type="button"
-          onClick={handleDeleteCancel}
-          className="delete-cancel-btn"
-        >
-          Cancel
-        </button>
-
-        <button
-          type="button"
-          onClick={handleDeleteConfirm}
-          className="delete-delete-btn"
-        >
-          Delete
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-)}
+      )}
     </>
   );
 }

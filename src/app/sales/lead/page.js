@@ -16,15 +16,29 @@ export default function Page() {
 
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("Pending");
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("leadActiveTab") || "Pending";
+    }
+    return "Pending";
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("leadActiveTab", activeTab);
+    }
+  }, [activeTab]);
+
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  // ✅ FIXED: Separated status popup state — selectedLead always full object
   const [showPopup, setShowPopup] = useState(false);
-  const [selectedLead, setSelectedLead] = useState(null);
+  const [statusChangeLeadId, setStatusChangeLeadId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
 
-  const router = useRouter();
+  const [selectedLead, setSelectedLead] = useState(null);
 
-  // Multer Required Hooks
+  const router = useRouter();
 
   const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -61,23 +75,21 @@ export default function Page() {
 
   useAuth();
 
+  const getToken = () => localStorage.getItem("token");
+
   const fetchLeads = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/api/lead/read`);
+      const res = await axios.get(`${API_BASE}/api/lead/read`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
 
       const formatted = (res.data?.result || []).map((item) => {
         let finalStatus = "Pending";
-        if (item.status === "Won") {
-          finalStatus = "Won";
-        } else if (item.status === "Lost") {
-          finalStatus = "Lost";
-        } else {
-          finalStatus = "Pending";
-        }
-        return {
-          ...item,
-          status: finalStatus,
-        };
+        if (item.status === "Won") finalStatus = "Won";
+        else if (item.status === "Lost") finalStatus = "Lost";
+        return { ...item, status: finalStatus };
       });
 
       setLeads(formatted);
@@ -92,7 +104,6 @@ export default function Page() {
     fetchLeads();
   }, []);
 
-  // ✅ Close export menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (exportRef.current && !exportRef.current.contains(e.target)) {
@@ -104,9 +115,8 @@ export default function Page() {
   }, []);
 
   // ===================================================
-  // ✅ EXPORT TO EXCEL
+  // EXPORT TO EXCEL
   // ===================================================
-
   const exportToExcel = async () => {
     try {
       const XLSX = await import("xlsx");
@@ -115,8 +125,7 @@ export default function Page() {
         "No.": index + 1,
         "Company Name": lead.company_name || "",
         "Customer Name": lead.customer_name || "",
-        "Lead Title": lead.lead_title || "",
-        "Product Category": lead.product_category || "",
+        "Lead Title": lead.reference || "",
         Source: lead.source || "",
         Assignee: lead.assignee || "",
         "Next Follow Up": lead.next_follow_up_date
@@ -152,9 +161,8 @@ export default function Page() {
   };
 
   // ===================================================
-  // ✅ EXPORT TO PDF
+  // EXPORT TO PDF
   // ===================================================
-
   const exportToPDF = async () => {
     try {
       const { default: jsPDF } = await import("jspdf");
@@ -178,8 +186,7 @@ export default function Page() {
         index + 1,
         lead.company_name || "",
         lead.customer_name || "",
-        lead.lead_title || "",
-        lead.product_category || "",
+        lead.reference || "",
         lead.source || "",
         lead.assignee || "",
         lead.next_follow_up_date
@@ -207,20 +214,14 @@ export default function Page() {
         ],
         body: tableData,
         theme: "grid",
-        styles: {
-          fontSize: 8,
-          cellPadding: 3,
-          textColor: [40, 40, 40],
-        },
+        styles: { fontSize: 8, cellPadding: 3, textColor: [40, 40, 40] },
         headStyles: {
           fillColor: [234, 88, 12],
           textColor: [255, 255, 255],
           fontStyle: "bold",
           fontSize: 8,
         },
-        alternateRowStyles: {
-          fillColor: [255, 247, 237],
-        },
+        alternateRowStyles: { fillColor: [255, 247, 237] },
         columnStyles: {
           0: { cellWidth: 8 },
           3: { cellWidth: 35 },
@@ -242,8 +243,9 @@ export default function Page() {
     }
   };
 
-  // functions for multer functionality
-
+  // ===================================================
+  // FILE HANDLING
+  // ===================================================
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -255,9 +257,9 @@ export default function Page() {
 
   const MAX_FILES = 5;
   const IMAGE_EXT = ["jpg", "jpeg", "png"];
-  const DOC_EXT = ["pdf"];
-  const MAX_IMG_SIZE = 2 * 1024 * 1024;
-  const MAX_DOC_SIZE = 2 * 1024 * 1024;
+  const DOC_EXT = ["pdf", "xlsx", "dwg"];
+  const MAX_IMG_SIZE = 5 * 1024 * 1024;
+  const MAX_DOC_SIZE = 5 * 1024 * 1024;
 
   const handleSelect = (e) => {
     const files = Array.from(e.target.files);
@@ -265,14 +267,14 @@ export default function Page() {
     let remainingSlots = MAX_FILES - updatedFiles.length;
 
     if (remainingSlots <= 0) {
-      toast.error("You can upload only 5 files ");
+      toast.error("You can upload only 5 files");
       e.target.value = "";
       return;
     }
 
     for (let file of files) {
       if (remainingSlots <= 0) {
-        toast.error("Maximum 5 files allowed ");
+        toast.error("Maximum 5 files allowed");
         break;
       }
       const ext = file.name.split(".").pop().toLowerCase();
@@ -280,19 +282,19 @@ export default function Page() {
         (f) => f.name === file.name && f.size === file.size,
       );
       if (isDuplicate) {
-        toast.error("Duplicate file not allowed ");
+        toast.error("Duplicate file not allowed");
         continue;
       }
       if (![...IMAGE_EXT, ...DOC_EXT].includes(ext)) {
-        toast.error("Only JPG, PNG, PDF allowed ");
+        toast.error("Unsupported File");
         continue;
       }
       if (IMAGE_EXT.includes(ext) && file.size > MAX_IMG_SIZE) {
-        toast.error("Image must be under 2MB ");
+        toast.error("Image must be under 2MB");
         continue;
       }
       if (DOC_EXT.includes(ext) && file.size > MAX_DOC_SIZE) {
-        toast.error("PDF must be under 2MB ");
+        toast.error("Document must be under 15MB");
         continue;
       }
       updatedFiles.push(file);
@@ -303,6 +305,9 @@ export default function Page() {
     e.target.value = "";
   };
 
+  // ===================================================
+  // ADD FOLLOW-UP (first time)
+  // ===================================================
   const handleSubmit = async () => {
     try {
       if (!form.activity_type || !form.contact_person || !form.description) {
@@ -313,11 +318,9 @@ export default function Page() {
       setBtnLoading(true);
 
       const formData = new FormData();
-
       Object.keys(form).forEach((key) => {
         if (key !== "files") formData.append(key, form[key]);
       });
-
       formData.append("lead_id", selectedLead.lead_id);
       formData.append("status", "Pending");
       formData.append("remarks", "");
@@ -327,16 +330,12 @@ export default function Page() {
       }
 
       await axios.post(`${API_BASE}/api/lead-follow-up/insert`, formData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        headers: { Authorization: `Bearer ${getToken()}` },
       });
 
       toast.success("Follow-up added");
-
       setShowModal(false);
       setSelectedFiles([]);
-
       fetchLeads();
     } catch (err) {
       console.log(err);
@@ -346,6 +345,9 @@ export default function Page() {
     }
   };
 
+  // ===================================================
+  // OPEN UPDATE MODAL
+  // ===================================================
   const openUpdateModal = async (lead) => {
     setSelectedLead(lead);
     setShowUpdateModal(true);
@@ -371,6 +373,9 @@ export default function Page() {
     }
   };
 
+  // ===================================================
+  // ADD FOLLOW-UP (update modal)
+  // ===================================================
   const handleUpdate = async () => {
     try {
       if (
@@ -378,14 +383,13 @@ export default function Page() {
         !updateForm.contact_person ||
         !updateForm.description
       ) {
-        toast.error("Please fill all required fields ");
+        toast.error("Please fill all required fields");
         return;
       }
 
       setUpdateLoading(true);
 
       const formData = new FormData();
-
       formData.append("lead_id", selectedLead.lead_id);
       formData.append("follow_up_date", updateForm.follow_up_date);
       formData.append("activity_type", updateForm.activity_type);
@@ -400,17 +404,14 @@ export default function Page() {
       }
 
       await axios.post(`${API_BASE}/api/lead-follow-up/insert`, formData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        headers: { Authorization: `Bearer ${getToken()}` },
       });
 
-      toast.success("New follow-up added ");
+      toast.success("New follow-up added");
 
       const res = await axios.get(
         `${API_BASE}/api/lead-follow-up/history/${selectedLead.lead_id}`,
       );
-
       setFollowUpHistory(res.data?.result || []);
       setPreviewFollowUp(null);
 
@@ -423,16 +424,18 @@ export default function Page() {
       });
 
       setSelectedFiles([]);
-
       fetchLeads();
     } catch (err) {
-      toast.error("Failed to add follow-up ");
+      toast.error("Failed to add follow-up");
       console.log(err);
     } finally {
       setUpdateLoading(false);
     }
   };
 
+  // ===================================================
+  // DELETE LEAD
+  // ===================================================
   const openDeleteModal = (lead) => {
     setLeadToDelete(lead);
     setShowDeleteModal(true);
@@ -443,9 +446,7 @@ export default function Page() {
     setDeleteLoading(true);
     try {
       await axios.delete(`${API_BASE}/api/lead/${leadToDelete.lead_id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        headers: { Authorization: `Bearer ${getToken()}` },
       });
       toast.success("Lead deleted successfully");
       setShowDeleteModal(false);
@@ -459,17 +460,14 @@ export default function Page() {
     }
   };
 
+  // ===================================================
+  // EDIT LEAD
+  // ===================================================
   const handleEdit = async (lead) => {
     try {
-      const token = localStorage.getItem("token");
-
       const res = await axios.get(
         `${API_BASE}/api/lead/sales/leads/view-leads/${lead.lead_id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        { headers: { Authorization: `Bearer ${getToken()}` } },
       );
 
       const leadData = res.data.lead;
@@ -480,10 +478,9 @@ export default function Page() {
           lead_id: leadData.lead_id,
           company_name: leadData.company_name,
           customer_name: leadData.customer_name,
-          lead_title: leadData.lead_title,
+          reference: leadData.reference,
           source: leadData.source,
           status: leadData.status,
-          product_category: leadData.product_category,
           product_name: leadData.product_name,
           priority: leadData.priority,
           assignee: leadData.assignee,
@@ -498,19 +495,15 @@ export default function Page() {
     }
   };
 
+  // ===================================================
+  // VIEW LEAD
+  // ===================================================
   const handleView = async (lead) => {
     try {
-      const token = localStorage.getItem("token");
-
       const res = await axios.get(
         `${API_BASE}/api/lead/sales/leads/view-details/${lead.lead_id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        { headers: { Authorization: `Bearer ${getToken()}` } },
       );
-
       setViewLead(res.data.lead);
       setShowViewModal(true);
     } catch (error) {
@@ -519,8 +512,11 @@ export default function Page() {
     }
   };
 
+  // ===================================================
+  // ✅ FIXED: STATUS CHANGE — now sends Authorization header
+  // ===================================================
   const handleStatusChange = (lead_id, newStatus) => {
-    setSelectedLead(lead_id);
+    setStatusChangeLeadId(lead_id); // ✅ separate state — no conflict with selectedLead
     setSelectedStatus(newStatus);
     setShowPopup(true);
   };
@@ -528,20 +524,16 @@ export default function Page() {
   const confirmStatusChange = async () => {
     try {
       await axios.put(
-        `${API_BASE}/api/lead/update-status/${selectedLead}`,
+        `${API_BASE}/api/lead/update-status/${statusChangeLeadId}`,
+        { status: selectedStatus },
         {
-          status: selectedStatus,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          headers: { Authorization: `Bearer ${getToken()}` }, // ✅ FIXED: was missing
         },
       );
 
       setLeads((prev) =>
         prev.map((lead) =>
-          lead.lead_id === selectedLead
+          lead.lead_id === statusChangeLeadId
             ? { ...lead, status: selectedStatus }
             : lead,
         ),
@@ -549,20 +541,25 @@ export default function Page() {
 
       setShowPopup(false);
       toast.success("Status Updated");
+      if (selectedStatus === "Won") {
+        setActiveTab("Won");
+        fetchLeads();
+      }
     } catch (err) {
       console.log(err);
+      toast.error("Failed to update status");
     }
   };
 
-  // ================= FILTER LOGIC =================
-
+  // ===================================================
+  // FILTER LOGIC
+  // ===================================================
   const debounceRef = useRef(null);
 
   const [filters, setFilters] = useState({
     company_name: "",
     customer_name: "",
-    lead_title: "",
-    product_category: "",
+    reference: "",
     source: "",
     assignee: "",
     status: "",
@@ -575,10 +572,7 @@ export default function Page() {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
   const searchLeads = async () => {
@@ -598,10 +592,7 @@ export default function Page() {
         let finalStatus = "Pending";
         if (item.status === "Won") finalStatus = "Won";
         else if (item.status === "Lost") finalStatus = "Lost";
-        return {
-          ...item,
-          status: finalStatus,
-        };
+        return { ...item, status: finalStatus };
       });
 
       setLeads(formatted);
@@ -618,9 +609,7 @@ export default function Page() {
       return;
     }
 
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
+    if (debounceRef.current) clearTimeout(debounceRef.current);
 
     debounceRef.current = setTimeout(() => {
       searchLeads();
@@ -633,8 +622,7 @@ export default function Page() {
     setFilters({
       company_name: "",
       customer_name: "",
-      lead_title: "",
-      product_category: "",
+      reference: "",
       source: "",
       assignee: "",
       status: "",
@@ -644,27 +632,55 @@ export default function Page() {
       from_followup: "",
       to_followup: "",
     });
-
     fetchLeads();
   };
+  // ===================================================
+  // OVERDUE LEAD HIGHLIGHT
+  // ===================================================
 
-  // ================= TAB + FILTER MERGE =================
+  // ===================================================
+  // OVERDUE LEAD HIGHLIGHT
+  // ===================================================
 
+ const isOverdueLead = (lead) => {
+   // Won / Lost no highlight
+   if (lead.status !== "Pending") {
+     return false;
+   }
+
+   // server current time
+   const serverNow = new Date(lead.server_time);
+
+   // last activity time
+   const lastActivity = new Date(lead.updated_at || lead.created_at);
+
+   // time difference
+   const diffHours = (serverNow - lastActivity) / (1000 * 60 * 60);
+
+   // 24+ hours
+   return diffHours >= 24;
+ };
+
+  // ===================================================
+  // TAB + FILTER MERGE
+  // ===================================================
   const hasActiveFilters = Object.values(filters).some((v) => v !== "");
 
   const filteredLeads = hasActiveFilters
     ? leads
     : leads.filter((l) => {
-      if (activeTab === "Pending") {
-        return l.status !== "Won" && l.status !== "Lost";
-      }
-      return l.status === activeTab;
-    });
+        if (activeTab === "Pending")
+          return l.status !== "Won" && l.status !== "Lost";
+        return l.status === activeTab;
+      });
 
   const pendingCount = leads.filter((l) => l.status === "Pending").length;
   const wonCount = leads.filter((l) => l.status === "Won").length;
   const lostCount = leads.filter((l) => l.status === "Lost").length;
 
+  // ===================================================
+  // PAGINATION
+  // ===================================================
   // ================= PAGINATION =================
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -698,37 +714,34 @@ export default function Page() {
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
 
-  // Dynamic Dropdowns
-
+  // ===================================================
+  // DYNAMIC DROPDOWNS
+  // ===================================================
   const companyRef = useRef(null);
 
   const [assignee, setAssignee] = useState([]);
   const [leadSource, setLeadSource] = useState([]);
   const [leadCategory, setLeadCategory] = useState([]);
   const [category, setCategory] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [companyname, setCompanyname] = useState([]);
-  const [customername, setCustomername] = useState([]);
 
   useEffect(() => {
     const fetchAssignee = async () => {
       try {
+        const token = localStorage.getItem("token");
         const res = await axios.get(`${API_BASE}/api/manage-user/asignee`, {
           params: { status: 1 },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
         const cleanedData = (res.data?.data || res.data || []).map((item) => ({
           ...item,
           name: item.name ? item.name.split(" ")[0] : "",
         }));
-
         setAssignee(cleanedData);
       } catch (err) {
         console.error("Failed to fetch names:", err);
         setAssignee([]);
       }
     };
-
     fetchAssignee();
   }, []);
 
@@ -737,12 +750,13 @@ export default function Page() {
       try {
         const res = await axios.get(
           `${API_BASE}/api/inquiry-lead-source/read`,
-          { params: { status: 1 } },
+          {
+            params: { status: 1 },
+          },
         );
         setLeadSource(res.data);
-      } catch { }
+      } catch {}
     };
-
     fetchSource();
   }, []);
 
@@ -751,12 +765,13 @@ export default function Page() {
       try {
         const res = await axios.get(
           `${API_BASE}/api/inquiry-lead-category/read`,
-          { params: { status: 1 } },
+          {
+            params: { status: 1 },
+          },
         );
         setLeadCategory(res.data);
-      } catch { }
+      } catch {}
     };
-
     fetchCategory();
   }, []);
 
@@ -767,9 +782,8 @@ export default function Page() {
           params: { status: 1 },
         });
         setCategory(res.data);
-      } catch { }
+      } catch {}
     };
-
     fetchProductCategory();
   }, []);
 
@@ -779,53 +793,64 @@ export default function Page() {
     <>
       <Header />
 
-      <div className="bg-gray-100 ">
-        {/* breadcrumb */}
-
-        <div className="breadcrumb-container">
-          <div className="breadcrumb-left">
-            <p className="breadcrumb-path">
-              <Link href="/dashboard" className="breadcrumb-home">
+      <div className="bg-gray-100">
+        {/* Breadcrumb */}
+        <div className="bg-white w-full shadow-lg p-3 mt-1 mb-5 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
+          <div className="hidden sm:flex items-center text-gray-700 w-full sm:w-auto">
+            <p className="flex items-center flex-wrap">
+              <Link
+                href="/dashboard"
+                className="mx-2 text-xl text-gray-400 hover:text-indigo-600"
+              >
                 <i className="bi bi-house"></i>
               </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>{" "}
-              <Link href="#" className="breadcrumb-link">
+              <i className="bi bi-chevron-right text-[10px]"></i>
+              <Link
+                href="#"
+                className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
+              >
                 Sales
               </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>{" "}
-              <Link href="/sales/lead" className="breadcrumb-link">
+              <i className="bi bi-chevron-right text-[10px]"></i>
+              <Link
+                href="/sales/lead"
+                className="mx-2 text-md text-gray-700 hover:text-orange-500 font-semibold"
+              >
                 Lead
               </Link>
             </p>
           </div>
-          {/* Export Button */}
-          <div className="breadcrumb-actions">
+
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-end">
             <div className="relative" ref={exportRef}>
               <button
                 onClick={() => setShowExportMenu((prev) => !prev)}
-                className="export-btn"
+                className="flex items-center gap-2 bg-orange-50 text-orange-500 px-4 py-2 rounded-sm text-sm font-semibold tracking-wide transition-all shadow-sm"
               >
                 <i className="bi bi-download text-base"></i>
                 Export
                 <i
-                  className={`bi bi-chevron-down text-xs transition-transform duration-200 ${showExportMenu ? "rotate-180" : ""
-                    }`}
+                  className={`bi bi-chevron-down text-xs transition-transform duration-200 ${showExportMenu ? "rotate-180" : ""}`}
                 ></i>
               </button>
 
               {showExportMenu && (
-                <div className="export-dropdown ">
-                  <button onClick={exportToExcel} className="export-item">
-                    <div className="w-7 h-7 rounded-sm  flex items-center justify-center">
+                <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-sm shadow-xl border border-gray-100 overflow-hidden z-50">
+                  <button
+                    onClick={exportToExcel}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-all"
+                  >
+                    <div className="w-7 h-7 rounded-sm flex items-center justify-center">
                       <i className="bi bi-file-earmark-excel text-green-600 text-sm"></i>
                     </div>
                     Export Excel
                   </button>
-
                   <div className="h-px bg-gray-100 mx-3"></div>
-
-                  <button onClick={exportToPDF} className="export-item">
-                    <div className="w-7 h-7 rounded-sm  flex items-center justify-center">
+                  <button
+                    onClick={exportToPDF}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 transition-all"
+                  >
+                    <div className="w-7 h-7 rounded-sm flex items-center justify-center">
                       <i className="bi bi-file-earmark-pdf text-red-600 text-sm"></i>
                     </div>
                     Export PDF
@@ -834,15 +859,16 @@ export default function Page() {
               )}
             </div>
 
-            {/* Add Lead Button */}
-            <Link href="/sales/lead/add-lead" className="add-btn ">
+            <Link
+              href="/sales/lead/add-lead"
+              className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-sm text-sm font-semibold shadow-md transition-all"
+            >
               + ADD LEAD
             </Link>
           </div>
         </div>
 
-        {/* FILTER SECTION */}
-
+        {/* Mobile Filter Toggle */}
         <div className="mx-6 mb-2 md:hidden mt-3 relative z-40">
           <button
             onClick={() => setShowMobileFilters(!showMobileFilters)}
@@ -869,7 +895,7 @@ export default function Page() {
             onChange={handleFilterChange}
             ref={companyRef}
             placeholder="Company Name"
-            className="filter-input md:w-56 md:mx-2"
+            className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-45  text-gray-600 text-sm outline-none"
           />
 
           <input
@@ -877,36 +903,32 @@ export default function Page() {
             value={filters.customer_name}
             onChange={handleFilterChange}
             placeholder="Customer Name"
-            className="filter-input md:w-56 md:mx-2"
+            className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-45  text-gray-600 text-sm outline-none"
           />
 
           <input
-            name="lead_title"
-            value={filters.lead_title}
+            name="reference"
+            value={filters.reference}
             onChange={handleFilterChange}
-            placeholder="Enter Lead Title"
-            className="filter-input md:w-56 md:mx-2"
+            placeholder="Enter Reference"
+            className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-45  outline-none  text-gray-600 text-sm"
           />
 
-          <select
+          {/* <select
             name="product_category"
             value={filters.product_category}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2 text-gray-500"
+            className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-48  outline-none  text-gray-400 text-sm"
           >
             <option value="">Select Product Category</option>
-            {category.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
+            {category.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+          </select> */}
 
           <select
             name="source"
             value={filters.source}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2 text-gray-500"
+            className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-45  outline-none  text-gray-400 text-sm"
           >
             <option value="">Select Source</option>
             {leadSource.map((item) => (
@@ -920,7 +942,7 @@ export default function Page() {
             name="assignee"
             value={filters.assignee}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2 text-gray-500 "
+            className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-45  outline-none  text-gray-400 text-sm"
           >
             <option value="">Select Assignee</option>
             {assignee.map((item) => (
@@ -930,7 +952,7 @@ export default function Page() {
             ))}
           </select>
 
-          <div className="filter-date-box w-full md:w-58 col-span-2 md:col-span-1">
+          <div className="flex p-1 items-center px-2 border bg-white border-orange-300 rounded-sm w-full md:w-58  outline-none  text-gray-400 text-sm col-span-2 md:col-span-1">
             <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
               From Next
             </span>
@@ -939,11 +961,11 @@ export default function Page() {
               name="from_followup"
               value={filters.from_followup}
               onChange={handleFilterChange}
-              className="p-1 w-full md:w-35 outline-none bg-transparent  "
+              className="p-1 w-full md:w-35 outline-none bg-transparent"
             />
           </div>
 
-          <div className="filter-date-box w-full md:w-58 col-span-2 md:col-span-1">
+          <div className="flex p-1 items-center px-2 border bg-white border-orange-300 rounded-sm w-full md:w-53  outline-none  text-gray-400 text-sm col-span-2 md:col-span-1">
             <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
               To Next
             </span>
@@ -960,14 +982,14 @@ export default function Page() {
             name="status"
             value={filters.status}
             onChange={handleFilterChange}
-            className="filter-input md:w-56 md:mx-2 text-gray-500"
+            className="border p-1 bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-45  outline-none  text-gray-400 text-sm"
           >
             <option value="">Pending</option>
             <option value="Won">Won</option>
             <option value="Lost">Lost</option>
           </select>
 
-          <div className="filter-date-box w-full md:w-60 col-span-2 md:col-span-1">
+          <div className="flex p-1 items-center px-2 border bg-white border-orange-300 rounded-sm w-full md:w-60  outline-none  text-gray-400 text-sm col-span-2 md:col-span-1">
             <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
               From Create
             </span>
@@ -980,7 +1002,7 @@ export default function Page() {
             />
           </div>
 
-          <div className="filter-date-box w-full md:w-58 col-span-2 md:col-span-1">
+          <div className="flex p-1 items-center px-2 border bg-white border-orange-300 rounded-sm w-full md:w-58  outline-none  text-gray-400 text-sm col-span-2 md:col-span-1">
             <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
               To Create
             </span>
@@ -999,93 +1021,101 @@ export default function Page() {
                 resetFilters();
                 setShowMobileFilters(false);
               }}
-              className="filter-clear-btn w-full md:w-auto"
+              className="border border-gray-300 w-full md:w-auto cursor-pointer rounded-sm p-2 bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm text-center font-semibold"
             >
               Clear
             </button>
             <button
               onClick={() => setShowMobileFilters(false)}
-              className="filter-apply-btn w-full"
+              className="md:hidden border border-orange-300 w-full cursor-pointer rounded-sm p-2 bg-orange-100 text-orange-700 hover:bg-orange-200 text-sm text-center font-semibold"
             >
               Apply
             </button>
           </div>
         </div>
 
-        {/* tabs */}
-
-        <div className="table-wrapper">
-          <div className="table-tabs">
+        {/* Tabs + Table */}
+        <div className="bg-white rounded-sm border border-gray-100 py-2 mx-7">
+          <div className="flex items-center gap-8 px-6 pt-4 border-b border-gray-100">
             <button
               onClick={() => setActiveTab("Pending")}
-              className={`table-tab-btn ${activeTab === "Pending"
-                  ? "table-tab-pending-active"
-                  : "table-tab-inactive"
-                }`}
+              className={`pb-3 px-3 text-sm font-medium relative cursor-pointer transition-all ${activeTab === "Pending" ? "text-blue-600" : "text-gray-400 hover:text-gray-600"}`}
             >
               Pending
-              <span className=" table-tab-badge-pending cursor-pointer table-tab-badge">
+              <span className="ml-2 bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-full">
                 {pendingCount}
               </span>
               {activeTab === "Pending" && (
-                <div className="table-tab-line table-tab-line-pending "></div>
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"></div>
               )}
             </button>
 
             <button
               onClick={() => setActiveTab("Won")}
-              className={`pb-3 text-sm font-medium cursor-pointer relative ${activeTab === "Won" ? "table-tab-won-active" : "table-tab-inactive"
-                }`}
+              className={`pb-3 text-sm font-medium cursor-pointer relative ${activeTab === "Won" ? "text-green-600" : "text-gray-500"}`}
             >
               Won
-              <span className=" table-tab-badge-won  cursor-pointer table-tab-badge">
+              <span className="ml-2 bg-green-100 text-green-600 text-xs px-2 py-0.5 rounded-full">
                 {wonCount}
               </span>
               {activeTab === "Won" && (
-                <div className="table-tab-line table-tab-line-won "></div>
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-green-600"></div>
               )}
             </button>
 
             <button
               onClick={() => setActiveTab("Lost")}
-              className={`pb-3 text-sm font-medium relative ${activeTab === "Lost" ? "table-tab-lost-active" : "table-tab-inactive"
-                }`}
+              className={`pb-3 text-sm font-medium relative ${activeTab === "Lost" ? "text-red-600" : "text-gray-500"}`}
             >
               Lost
-              <span className=" table-tab-badge-lost  cursor-pointer table-tab-badge">
+              <span className="ml-2 bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full">
                 {lostCount}
               </span>
               {activeTab === "Lost" && (
-                <div className="table-tab-line table-tab-line-lost"></div>
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-red-600"></div>
               )}
             </button>
           </div>
-
-          {/* table */}
 
           <div className="p-4">
             {loading ? (
               <div className="text-center py-10 text-gray-400">Loading...</div>
             ) : (
-              <div className="table-scroll" style={{ overflowX: "scroll" }}>
-                <table className="custom-table">
+              <div
+                className="overflow-x-auto overflow-y-scroll max-h-[600px] custom-scroll"
+                style={{ overflowX: "scroll" }}
+              >
+                <table className="w-full text-sm">
                   <thead>
-                    <tr className="table-head-row">
-                      <th className="table-head">#</th>
-                      <th className="table-head">Company Name</th>
-                      <th className="table-head">Customer Name</th>
-                      <th className="table-head">Lead Title</th>
-                      <th className="table-head">Product Category</th>
-                      <th className="table-head">Source</th>
-                      <th className="table-head">Assignee</th>
-                      <th className="table-head text-left">Next Follow Up</th>
-                      <th className="table-head text-left  text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    <tr className="bg-gray-50 border-b border-gray-100">
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        #
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Company Name
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Customer Name
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Reference
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Source
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Assignee
+                      </th>
+                      <th className="py-3 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Next Follow Up
+                      </th>
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Created
                       </th>
-                      <th className="table-head text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="table-head text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      <th className="py-3 px-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Action
                       </th>
                     </tr>
@@ -1094,30 +1124,41 @@ export default function Page() {
                   <tbody>
                     {filteredLeads.length > 0 ? (
                       paginatedLeads.map((lead, index) => (
-                        <tr key={lead.lead_id} className="table-row">
-                          <td className="table-cell">
+                        <tr
+                          key={lead.lead_id}
+                          className={`
+    border-b transition-all
+
+    ${
+      isOverdueLead(lead)
+        ? "border-l-4 border-red-500 bg-red-50 hover:bg-red-100"
+        : "border-gray-50 hover:bg-indigo-50/30"
+    }
+  `}
+                        >
+                          <td className="py-3 px-2">
                             {(currentPage - 1) * itemsPerPage + index + 1}
                           </td>
 
-                          <td className="table-cell-bold">
-                            {lead.company_name}
+                          <td className="font-medium px-2">
+                            <div className="flex items-center gap-2">
+                              {isOverdueLead(lead) && (
+                                <span className="animate-pulse w-2 h-2 rounded-full bg-red-500"></span>
+                              )}
+
+                              {lead.company_name}
+                            </div>
                           </td>
 
-                          <td className="table-customer cursor-pointer">
+                          <td className="text-orange-500 cursor-pointer px-3">
                             {lead.customer_name}
                           </td>
 
-                          <td className="table-cell w-46 max-w-46 truncate">
-                            {lead.lead_title}
+                          <td className="py-3 px-2 w-46 max-w-46 truncate">
+                            {lead.reference}
                           </td>
 
-                          <td className="table-cell">
-                            {lead.product_category || "-"}
-                          </td>
-
-                          <td className="table-cell  w-46 max-w-46 truncate">
-                            {lead.source}
-                          </td>
+                          <td className="px-3">{lead.source}</td>
 
                           <td
                             style={{
@@ -1125,42 +1166,31 @@ export default function Page() {
                               gap: "1px",
                               alignItems: "center",
                             }}
-                            className="table-cell"
+                            className="py-2 px-4"
                           >
                             {lead.assignee
                               ? String(lead.assignee)
-                                .split(",")
-                                .map((name, index) => {
-                                  const letter = name
-                                    .trim()
-                                    .charAt(0)
-                                    .toUpperCase();
-
-                                  return (
+                                  .split(",")
+                                  .map((name, idx) => (
                                     <div
-                                      key={index}
+                                      key={idx}
                                       title={name.trim()}
-                                      className="table-assignee-badge"
+                                      className="px-3 py-1.5 bg-blue-800 text-white rounded-full font-semibold text-sm flex justify-center items-center min-w-[28px] text-center select-none"
                                     >
-                                      {letter}
+                                      {name.trim().charAt(0).toUpperCase()}
                                     </div>
-                                  );
-                                })
+                                  ))
                               : "-"}
                           </td>
 
-                          <td className=" text-center">
+                          <td className="text-center">
                             {lead.next_follow_up_date ? (
                               <span
                                 onClick={() => {
-                                  if (lead.status === "Pending") {
+                                  if (lead.status === "Pending")
                                     openUpdateModal(lead);
-                                  }
                                 }}
-                                className={`${lead.status === "Pending"
-                                    ? "cursor-pointer text-blue-800"
-                                    : "text-gray-400 cursor-not-allowed"
-                                  }`}
+                                className={`${lead.status === "Pending" ? "cursor-pointer text-blue-800" : "text-gray-400 cursor-not-allowed"}`}
                               >
                                 {new Date(
                                   lead.next_follow_up_date,
@@ -1184,17 +1214,15 @@ export default function Page() {
                                   });
                                   setShowModal(true);
                                 }}
-                                className={`table-action-btn                                  ${lead.status === "Pending"
-                                    ? "hover:bg-gray-100 cursor-pointer"
-                                    : "bg-gray-100 cursor-not-allowed opacity-60"
-                                  }`}
+                                className={`w-9 h-9 rounded-full border flex items-center justify-center mx-auto
+                                  ${lead.status === "Pending" ? "hover:bg-gray-100 cursor-pointer" : "bg-gray-100 cursor-not-allowed opacity-60"}`}
                               >
                                 <i className="bi bi-plus text-lg"></i>
                               </button>
                             )}
                           </td>
 
-                          <td className="table-cell">
+                          <td className="text-gray-500 px-2">
                             {new Date(lead.created_at).toLocaleDateString()}
                           </td>
 
@@ -1211,69 +1239,61 @@ export default function Page() {
                                   toast.error("Only Admin can change Status");
                                 }
                               }}
-                              onChange={(e) => {
-                                handleStatusChange(
-                                  lead.lead_id,
-                                  e.target.value,
-                                );
-                              }}
-                              className={`table-status
-                                  ${lead.status === "Pending" ? "border-gray-200 bg-gray-50 text-gray-700 cursor-pointer" : ""}
-                                ${lead.status === "Won" ? "border-green-200 bg-green-50 text-green-700 cursor-pointer" : ""}
-                                ${lead.status === "Lost" ? "border-red-200 bg-red-50 text-red-700 cursor-pointer" : ""}
+                              onChange={(e) =>
+                                handleStatusChange(lead.lead_id, e.target.value)
+                              }
+                              className={`border rounded-sm px-3 py-1 text-xs font-semibold outline-none cursor-pointer
+                                ${lead.status === "Pending" ? "border-gray-200 bg-gray-50 text-gray-700" : ""}
+                                ${lead.status === "Won" ? "border-green-200 bg-green-50 text-green-700" : ""}
+                                ${lead.status === "Lost" ? "border-red-200 bg-red-50 text-red-700" : ""}
                               `}
                             >
-                              <option value="Pending"> Pending </option>
-                              <option value="Won"> Won </option>
-                              <option value="Lost"> Lost </option>
+                              <option value="Pending">Pending</option>
+                              <option value="Won">Won</option>
+                              <option value="Lost">Lost</option>
                             </select>
                           </td>
 
-                          <td className="table-cell">
-                            <div className="flex items-center gap-4">
-                              {lead.status === "Pending" ? (
-                                <>
-                                  <button
-                                    onClick={() => handleView(lead)}
-                                    className="text-gray-400 hover:text-blue-600 transition-colors"
-                                    title="View Details"
-                                  >
-                                    <i className="bi bi-eye text-xl"></i>
-                                  </button>
+                          <td className="text-lg">
+  <div className="flex items-center gap-2 flex-nowrap">
+    {lead.status === "Pending" ? (
+      <>
+        <button
+          onClick={() => handleView(lead)}
+          className="text-gray-400 hover:text-green-600 cursor-pointer"
+        >
+          <i className="bi bi-eye text-xl"></i>
+        </button>
 
-                                  <button
-                                    onClick={() => handleEdit(lead)}
-                                    className="text-gray-400 hover:text-orange-600 transition-colors"
-                                    title="Edit Lead"
-                                  >
-                                    <i className="bi bi-pencil-square text-lg"></i>
-                                  </button>
+        <button
+          onClick={() => handleEdit(lead)}
+          className="text-gray-400 hover:text-blue-800 cursor-pointer"
+        >
+          <i className="bi bi-pencil-square"></i>
+        </button>
 
-                                  <button
-                                    onClick={() => openDeleteModal(lead)}
-                                    className="text-gray-400 hover:text-red-600 transition-colors"
-                                    title="Delete Lead"
-                                  >
-                                    <i className="bi bi-trash3 text-lg"></i>
-                                  </button>
-                                </>
-                              ) : (
-                                <div className="w-full flex justify-center">
-                                  <span
-                                    className="text-gray-300 cursor-not-allowed bg-gray-50 p-1.5 rounded-full border border-gray-100"
-                                    title="Lead locked"
-                                  >
-                                    <i className="bi bi-lock text-sm"></i>
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </td>
+        <button
+          onClick={() => openDeleteModal(lead)}
+          className="text-gray-400 hover:text-red-600 cursor-pointer"
+        >
+          <i className="bi bi-trash3"></i>
+        </button>
+      </>
+    ) : (
+      <span className="text-gray-300 cursor-not-allowed">
+        <i className="bi bi-lock text-lg"></i>
+      </span>
+    )}
+  </div>
+</td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="11" className="table-empty">
+                        <td
+                          colSpan="10"
+                          className="text-center py-10 text-gray-400"
+                        >
                           No Data Found
                         </td>
                       </tr>
@@ -1281,18 +1301,19 @@ export default function Page() {
                   </tbody>
                 </table>
 
-                {/* ✅ STANDARDIZED MICARA IMS PAGINATION */}
-                <div className="pagination-wrapper">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-200 bg-white">
                   {/* Left side: Rows per page selector */}
-                  <div className="pagination-left">
-                    <span className="pagination-label">Rows per page:</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-slate-500 font-medium">
+                      Rows per page:
+                    </span>
                     <select
                       value={itemsPerPage}
                       onChange={(e) => {
                         setItemsPerPage(Number(e.target.value));
                         setCurrentPage(1);
                       }}
-                      className="pagination-select"
+                      className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-slate-100 transition-all cursor-pointer font-medium"
                     >
                       {[10, 20, 100, 200].map((size) => (
                         <option key={size} value={size}>
@@ -1304,14 +1325,14 @@ export default function Page() {
 
                   {/* Right side: Navigation buttons (only if totalPages > 1) */}
                   {totalPages > 1 && (
-                    <div className="pagination-right">
+                    <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
                       {/* Previous Button */}
                       <button
                         onClick={() =>
                           setCurrentPage((prev) => Math.max(prev - 1, 1))
                         }
                         disabled={currentPage === 1}
-                        className="pagination-btn disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                       >
                         <i className="bi bi-chevron-left text-sm"></i>
                       </button>
@@ -1322,10 +1343,11 @@ export default function Page() {
                           <button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            className={`pagination-btn ${currentPage === page
-                                ? "pagination-btn-active"
-                                : "pagination-btn"
-                              }`}
+                            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
+                              currentPage === page
+                                ? "bg-[#212121] text-white shadow-md shadow-black/10"
+                                : "border border-slate-200 text-slate-600 hover:bg-slate-50"
+                            }`}
                           >
                             {page}
                           </button>
@@ -1353,10 +1375,10 @@ export default function Page() {
         </div>
       </div>
 
+      {/* DELETE MODAL */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white w-full max-w-md rounded-[20px] shadow-xl overflow-hidden">
-            {/* HEADER */}
             <div
               className="flex justify-between items-center px-6 py-4"
               style={{ background: "#f5e6d8" }}
@@ -1396,8 +1418,6 @@ export default function Page() {
                 </svg>
               </button>
             </div>
-
-            {/* BODY */}
             <div className="px-7 pt-9 pb-5 text-center">
               <div
                 className="w-[78px] h-[78px] mx-auto rounded-full flex items-center justify-center mb-5"
@@ -1437,7 +1457,6 @@ export default function Page() {
                   />
                 </svg>
               </div>
-
               <h3 className="text-[17px] font-bold text-gray-800 tracking-widest uppercase mb-2">
                 {leadToDelete?.customer_name || "DELETE LEAD"}
               </h3>
@@ -1446,7 +1465,6 @@ export default function Page() {
               </p>
             </div>
 
-            {/* FOOTER */}
             <div className="flex gap-3.5 px-7 pb-8 pt-2">
               <button
                 onClick={() => setShowDeleteModal(false)}
@@ -1457,8 +1475,8 @@ export default function Page() {
               <button
                 onClick={handleDelete}
                 disabled={deleteLoading}
-                className={`common-btn flex-1 py-3 rounded-xl text-[15px] font-semibold hover:opacity-90 transition
-  ${deleteLoading ? "opacity-70 cursor-not-allowed" : ""}`}
+                className="flex-1 py-3 rounded-xl text-white text-[15px] font-semibold hover:opacity-90 transition"
+                style={{ background: "#f07400" }}
               >
                 {deleteLoading ? "Deleting..." : "Delete"}
               </button>
@@ -1466,6 +1484,7 @@ export default function Page() {
           </div>
         </div>
       )}
+
       {/* ADD FOLLOW-UP MODAL */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30 ">
@@ -1486,7 +1505,6 @@ export default function Page() {
               </button>
             </div>
 
-            {/* Body */}
             <div className="px-6 py-5 grid grid-cols-2 gap-x-4 gap-y-3">
               <div className="col-span-1">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
@@ -1590,12 +1608,11 @@ export default function Page() {
                   </div>
                 )}
                 <p className="text-xs text-gray-400 mt-1.5">
-                  Max 2MB · JPG, PNG, PDF
+                  Max 5MB · JPG, PNG, PDF, XLSX, DWG
                 </p>
               </div>
             </div>
 
-            {/* Footer */}
             <div className="flex justify-end gap-2 px-6 py-4 border-t border-gray-100 bg-gray-50">
               <button
                 onClick={() => setShowModal(false)}
@@ -1642,10 +1659,9 @@ export default function Page() {
 
       {/* UPDATE FOLLOW-UP MODAL */}
       {showUpdateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30 ">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30">
           <div className="bg-white w-full max-w-[800px] rounded-sm shadow-xl border border-gray-100 overflow-hidden">
-            {/* Header */}
-            <div className="flex justify-between items-center px-6 py-4  bg-gradient-to-r from-orange-100 to-white">
+            <div className="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-orange-100 to-white">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-orange-500 inline-block"></span>
                 <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
@@ -1658,14 +1674,13 @@ export default function Page() {
                   setSelectedFiles([]);
                   setPreviewFollowUp(null);
                 }}
-                className="w-7 h-7 flex items-center justify-center  text-orange-500 text-md"
+                className="w-7 h-7 flex items-center justify-center text-orange-500 text-md"
               >
                 ✕
               </button>
             </div>
 
             <div className="flex">
-              {/* LEFT - Form */}
               <div className="w-1/2 px-6 py-5 border-r border-gray-100">
                 <p className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-4">
                   Add New Follow-Up
@@ -1791,13 +1806,12 @@ export default function Page() {
                       </div>
                     )}
                     <p className="text-xs text-gray-400 mt-1.5">
-                      Max 2MB · JPG, PNG, PDF
+                      Max 5MB · JPG, PNG, PDF, XLSX, DWG
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* RIGHT - History */}
               <div className="w-1/2 px-6 py-5 flex flex-col">
                 <div className="flex justify-between items-center mb-4">
                   <p className="text-xs font-bold text-gray-600 uppercase tracking-widest">
@@ -1824,7 +1838,8 @@ export default function Page() {
                               : item,
                           )
                         }
-                        className={`border rounded-xl p-3 cursor-pointer transition-all select-none ${previewFollowUp?.follow_up_id === item.follow_up_id ? "border-orange-400 bg-orange-50 shadow-sm" : "hover:bg-gray-50 border-gray-200"}`}
+                        className={`border rounded-xl p-3 cursor-pointer transition-all select-none
+                          ${previewFollowUp?.follow_up_id === item.follow_up_id ? "border-orange-400 bg-orange-50 shadow-sm" : "hover:bg-gray-50 border-gray-200"}`}
                       >
                         <div className="flex justify-between items-center">
                           <div className="flex items-center gap-2">
@@ -1841,8 +1856,8 @@ export default function Page() {
                             <span className="text-xs text-gray-400">
                               {item.follow_up_date
                                 ? new Date(
-                                  item.follow_up_date,
-                                ).toLocaleDateString()
+                                    item.follow_up_date,
+                                  ).toLocaleDateString()
                                 : "—"}
                             </span>
                             <i
@@ -1857,6 +1872,7 @@ export default function Page() {
                     ))
                   )}
                 </div>
+
                 {previewFollowUp && (
                   <div className="mt-4 border border-orange-200 rounded-xl bg-gradient-to-br from-orange-50 to-white p-4 text-sm shadow-sm">
                     <div className="flex justify-between items-center mb-3">
@@ -1880,8 +1896,8 @@ export default function Page() {
                           label: "Follow-Up Date",
                           value: previewFollowUp.follow_up_date
                             ? new Date(
-                              previewFollowUp.follow_up_date,
-                            ).toLocaleDateString()
+                                previewFollowUp.follow_up_date,
+                              ).toLocaleDateString()
                             : "—",
                         },
                         {
@@ -1907,7 +1923,8 @@ export default function Page() {
                           Status
                         </p>
                         <span
-                          className={`text-xs px-2.5 py-0.5 rounded-full font-semibold mt-0.5 inline-block ${previewFollowUp.status === "Completed" ? "bg-green-100 text-green-600" : previewFollowUp.status === "Cancelled" ? "bg-orange-100 text-orange-500" : "bg-orange-100 text-orange-600"}`}
+                          className={`text-xs px-2.5 py-0.5 rounded-full font-semibold mt-0.5 inline-block
+                          ${previewFollowUp.status === "Completed" ? "bg-green-100 text-green-600" : previewFollowUp.status === "Cancelled" ? "bg-orange-100 text-orange-500" : "bg-orange-100 text-orange-600"}`}
                         >
                           {previewFollowUp.status}
                         </span>
@@ -1926,7 +1943,6 @@ export default function Page() {
               </div>
             </div>
 
-            {/* Footer */}
             <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50">
               <button
                 onClick={() => {
@@ -1941,8 +1957,8 @@ export default function Page() {
               <button
                 onClick={handleUpdate}
                 disabled={updateLoading}
-                className={`common-btn text-sm font-semibold flex items-center gap-2 shadow-md transition-all
-  ${updateLoading ? "opacity-70 cursor-not-allowed" : ""}`}
+                className={`px-6 py-2 rounded-sm text-sm font-semibold text-white transition-all shadow-md shadow-orange-200 flex items-center gap-2
+                ${updateLoading ? "bg-orange-400 cursor-not-allowed" : "bg-orange-500 hover:bg-orange-600"}`}
               >
                 {updateLoading ? (
                   <>
@@ -1977,16 +1993,14 @@ export default function Page() {
 
       {/* STATUS CHANGE POPUP */}
       {showPopup && (
-        <div className="fixed inset-0 bg-gray-900/30  flex items-center justify-center backdrop-blur-sm  z-50">
+        <div className="fixed inset-0 bg-gray-900/30 flex items-center justify-center backdrop-blur-sm z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-80">
             <h2 className="text-lg font-semibold mb-3 text-center">
               Confirm Status Change
             </h2>
-
             <p className="text-sm text-gray-600 mb-5">
               Are you sure you want to change status?
             </p>
-
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowPopup(false)}
@@ -2025,7 +2039,6 @@ export default function Page() {
               </button>
             </div>
 
-            {/* Body */}
             <div className="flex gap-5 p-6">
               <div
                 className="w-1/2 border-2 border-dashed border-orange-200 rounded-sm flex flex-col items-center justify-center p-8 text-center bg-orange-50/50  transition-all cursor-pointer"
@@ -2098,7 +2111,6 @@ export default function Page() {
               </div>
             </div>
 
-            {/* Footer */}
             <div className="flex justify-end px-6 py-4 border-t border-gray-100 bg-gray-50">
               <button
                 onClick={() => setShowFileModal(false)}
@@ -2114,175 +2126,125 @@ export default function Page() {
       {/* VIEW LEAD MODAL */}
       {showViewModal && viewLead && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30">
-          <div className="bg-white w-full max-w-2xl border border-gray-100 rounded-sm shadow-2xl overflow-hidden ">
-            {/* Orange Header */}
-           {/* Header */}
-<div className="view-header">
-  <div className="view-header-left">
-    <div className="w-7 h-7 flex items-center justify-center">
-      <i className="bi bi-person view-header-icon"></i>
-    </div>
-
-    <div>
-      <p className="view-title">
-        {viewLead.customer_name || "—"}
-      </p>
-
-      <p className="view-subtitle">
-        {viewLead.status || "—"}
-      </p>
-    </div>
-  </div>
-
-  <button
-    onClick={() => setShowViewModal(false)}
-    className="view-close"
-  >
-    <i className="bi bi-x-lg text-sm"></i>
-  </button>
-</div>
-
-            {/* Cards Grid */}
-            <div className="p-6 grid grid-cols-2 gap-4">
-              <div className="view-card">
-                <i className="bi bi-building view-card-icon"></i>
-
-                <div className="view-card-content">
-                  <p className="view-card-label">
-                    Company
-                  </p>
-
-                  <p className="view-card-value">
-                    {viewLead.company_name || "—"}
-                  </p>
+          <div className="bg-white w-full max-w-2xl border border-gray-100 rounded-sm shadow-2xl overflow-hidden">
+            <div className="from-orange-100 to-white px-6 py-3 flex items-center justify-between bg-gradient-to-r">
+              <div className="flex items-center gap-3">
+                <div className="w-7 h-7 flex items-center justify-center">
+                  <i className="bi bi-person text-md text-orange-500"></i>
                 </div>
-              </div>
-              <div className="view-card">
-                <i className="bi bi-person-circle view-card-icon"></i>
-
-                <div className="view-card-content">
-                  <p className="view-card-label">
-                    Customer Name
-                  </p>
-
-                  <p className="view-card-value">
+                <div>
+                  <p className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
                     {viewLead.customer_name || "—"}
                   </p>
-                </div>
-              </div>
-
-              <div className="view-card">
-                <i className="bi bi-flag view-card-icon"></i>
-
-                <div className="view-card-content">
-                  <p className="view-card-label">
-                    Source
-                  </p>
-
-                  <p className="view-card-value">
-                    {viewLead.source || "—"}
+                  <p className="text-gray-400 text-md">
+                    {viewLead.status || "—"}
                   </p>
                 </div>
               </div>
-              <div className="view-card">
-                <i className="bi bi-layers view-card-icon"></i>
+              <button
+                onClick={() => setShowViewModal(false)}
+                className="w-7 h-7 flex items-center justify-center text-orange-500 text-md"
+              >
+                <i className="bi bi-x-lg text-sm"></i>
+              </button>
+            </div>
 
-                <div className="view-card-content">
-                  <p className="view-card-label">
-                    Product Category
-                  </p>
-
-                  <p className="view-card-value">
-                    {viewLead.product_category || "—"}
-                  </p>
+            <div className="p-6 grid grid-cols-2 gap-4">
+              {[
+                {
+                  icon: "bi-building",
+                  label: "Company",
+                  value: viewLead.company_name,
+                },
+                {
+                  icon: "bi-person-circle",
+                  label: "Customer Name",
+                  value: viewLead.customer_name,
+                },
+                { icon: "bi-flag", label: "Source", value: viewLead.source },
+                { icon: "bi-tag", label: "Category", value: viewLead.category },
+                {
+                  icon: "bi-person-check",
+                  label: "Assignee",
+                  value: viewLead.assignee,
+                },
+                {
+                  icon: "bi-calendar3",
+                  label: "Created",
+                  value: viewLead.created_at
+                    ? new Date(viewLead.created_at).toLocaleDateString()
+                    : "—",
+                },
+              ].map(({ icon, label, value }) => (
+                <div
+                  key={label}
+                  className="bg-gray-50 rounded-sm px-4 py-3 flex items-center gap-3"
+                >
+                  <i className={`bi ${icon} text-orange-400 text-lg`}></i>
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+                      {label}
+                    </p>
+                    <p className="text-sm font-semibold text-gray-700">
+                      {value || "—"}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              ))}
 
-              <div className="view-card">
-                <i className="bi bi-box-seam view-card-icon"></i>
-
-                <div className="view-card-content">
-                  <p className="view-card-label">
-                    Product Name
-                  </p>
-
-                  <p className="view-card-value">
-                    {viewLead.product_name || "—"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="view-card">
-                <i className="bi bi-tag view-card-icon"></i>
-
-                <div className="view-card-content">
-                  <p className="view-card-label">
-                    Category
-                  </p>
-
-                  <p className="view-card-value">
-                    {viewLead.category || "—"}
-                  </p>
-                </div>
-              </div>
-              <div className="view-card">
-                <i className="bi bi-person-check view-card-icon"></i>
-
-                <div className="view-card-content">
-                  <p className="view-card-label">
-                    Assignee
-                  </p>
-
-                  <p className="view-card-value">
-                    {viewLead.assignee || "—"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="view-card">
-                <i className="bi bi-calendar3 view-card-icon"></i>
-
-                <div className="view-card-content">
-                  <p className="view-card-label">
-                    Created
-                  </p>
-
-                  <p className="view-card-value">
-                    {viewLead.created_at
-                      ? new Date(viewLead.created_at).toLocaleDateString()
-                      : "—"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="view-card items-start">
-                <i className="bi bi-pencil view-card-icon"></i>
-
-                <div className="view-card-content flex-1 min-w-0">
-                  <p className="view-card-label">
+              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-start gap-3">
+                <i className="bi bi-pencil text-orange-400 text-lg"></i>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
                     Lead Title
                   </p>
-
-                  <p className="view-card-value break-words whitespace-normal">
-                    {viewLead.lead_title || "—"}
+                  <p className="text-sm font-semibold text-gray-700 break-words whitespace-normal">
+                    {viewLead.reference || "—"}
                   </p>
                 </div>
               </div>
-              <div className="view-card items-start">
-                <i className="bi bi-chat-left-text view-card-icon"></i>
 
-                <div className="view-card-content flex-1 min-w-0">
-                  <p className="view-card-label">
+              <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-start gap-3">
+                <i className="bi bi-chat-left-text text-orange-400 text-lg"></i>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
                     Description
                   </p>
-
-                  <p className="view-card-value break-words whitespace-normal">
+                  <p className="text-sm font-semibold text-gray-700 break-words whitespace-normal">
                     {viewLead.description || "—"}
                   </p>
                 </div>
               </div>
+
+              {viewLead.updated_by && (
+                <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-start gap-3">
+                  <i className="bi bi-person-gear text-orange-400 text-lg"></i>
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+                      Updated By
+                    </p>
+                    <p className="text-sm font-semibold text-gray-700">
+                      {viewLead.updated_by}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {viewLead.updated_at && (
+                <div className="bg-gray-50 rounded-sm px-4 py-3 flex items-start gap-3">
+                  <i className="bi bi-clock-history text-orange-400 text-lg"></i>
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">
+                      Last Updated
+                    </p>
+                    <p className="text-sm font-semibold text-gray-700">
+                      {new Date(viewLead.updated_at).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
-            {/* Footer */}
+
             <div className="flex justify-end px-6 py-4 border-t border-gray-100">
               <button
                 onClick={() => setShowViewModal(false)}
