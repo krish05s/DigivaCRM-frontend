@@ -5,6 +5,7 @@ export const checkRole = (allowedRoles = []) => {
   const role = localStorage.getItem("role");
 
   if (!role) return false;
+  if (role.toLowerCase() === "super admin") return true;
 
   return allowedRoles
     .map(r => r.toLowerCase())
