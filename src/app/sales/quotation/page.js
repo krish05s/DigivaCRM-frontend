@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import Select from "react-select";
 import { checkRole } from "@/utils/checkRole";
 import useAuth from "@/app/components/useAuth";
+import Image from "next/image";
 
 export default function QuotationPage() {
   const [mounted, setMounted] = useState(false);
@@ -382,7 +383,7 @@ export default function QuotationPage() {
 
     const { items, note } = parseDescriptionForItems(q.description);
     const validItems = items.filter(item => item.product_id !== "");
-    const itemsHtml = validItems.length > 0 
+    const itemsHtml = validItems.length > 0
       ? validItems.map((item, idx) => `
         <tr style="border-bottom: 1px solid #f1f5f9;">
           <td style="padding: 12px 16px; text-align: left; color: #94a3b8; font-weight: 500;">${idx + 1}</td>
@@ -486,14 +487,23 @@ export default function QuotationPage() {
             <div class="header">
               <div>
                 <div class="brand">
-                  <div class="logo-v">G</div>
+                  <img
+                    src="/Logo.png"
+                    alt="DIGIVA"
+                    style="
+                      width:40px;
+                      height:40px;
+                      object-fit:contain;
+                      border-radius:10px;
+                    "
+                  />
                   <div>
-                    <h1 class="brand-name">GURU Tech</h1>
-                    <p class="brand-subtitle">Packaging Solution</p>
+                    <h1 class="brand-name">Digiva Inc</h1>
+                    <p class="brand-subtitle"></p>
                   </div>
                 </div>
                 <div style="font-size: 10px; color: #475569; margin-top: 16px; line-height: 1.5; font-weight: 500;">
-                  <span style="color: #334d77; font-weight: bold;">📍</span> 149, RK Industrial Estate, Bhuvaladi 100 feet Road, Kathwada GIDC, Ahmedabad - 382430, Gujarat, India<br>
+                  <span style="color: #334d77; font-weight: bold;">📍</span>Ahmedabad, Gujarat, India<br>
                   <span style="color: #334d77; font-weight: bold;">📞</span> Phone: +91 96620 74346 / +91 95376 74346  |  <span style="color: #334d77; font-weight: bold;">✉</span> Email: sales@gurutechpackaging.com
                 </div>
               </div>
@@ -626,9 +636,9 @@ export default function QuotationPage() {
       });
 
       const data = (res.data?.result || []).map((item) => {
-        const isExpired = item.quotation_expiry_date && 
-          item.quotation_status !== "Approved" && 
-          item.quotation_status !== "Won" && 
+        const isExpired = item.quotation_expiry_date &&
+          item.quotation_status !== "Approved" &&
+          item.quotation_status !== "Won" &&
           new Date(item.quotation_expiry_date).setHours(23, 59, 59, 999) < new Date();
         const finalStatus = isExpired
           ? "Expired"
@@ -661,8 +671,8 @@ export default function QuotationPage() {
             : [];
           const lAssignees = q.lead_assignee
             ? q.lead_assignee
-                .split(",")
-                .map((name) => name.trim().toLowerCase())
+              .split(",")
+              .map((name) => name.trim().toLowerCase())
             : [];
           const hasBeenAssigned =
             qAssignees.some((name) => name.includes(userFirstName)) ||
@@ -681,7 +691,7 @@ export default function QuotationPage() {
                   (log.new_assignee &&
                     log.new_assignee.toLowerCase().includes(userFirstName)),
               );
-            } catch {}
+            } catch { }
           }
           return hasBeenAssigned || inLog;
         });
@@ -692,8 +702,8 @@ export default function QuotationPage() {
             : [];
           const lAssignees = q.lead_assignee
             ? q.lead_assignee
-                .split(",")
-                .map((name) => name.trim().toLowerCase())
+              .split(",")
+              .map((name) => name.trim().toLowerCase())
             : [];
 
           const matchesQuotation = qAssignees.some((name) =>
@@ -920,9 +930,9 @@ export default function QuotationPage() {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       const data = (res.data?.data || []).map((item) => {
-        const isExpired = item.quotation_expiry_date && 
-          item.quotation_status !== "Approved" && 
-          item.quotation_status !== "Won" && 
+        const isExpired = item.quotation_expiry_date &&
+          item.quotation_status !== "Approved" &&
+          item.quotation_status !== "Won" &&
           new Date(item.quotation_expiry_date).setHours(23, 59, 59, 999) < new Date();
         const finalStatus = isExpired
           ? "Expired"
@@ -955,8 +965,8 @@ export default function QuotationPage() {
             : [];
           const lAssignees = q.lead_assignee
             ? q.lead_assignee
-                .split(",")
-                .map((name) => name.trim().toLowerCase())
+              .split(",")
+              .map((name) => name.trim().toLowerCase())
             : [];
           const hasBeenAssigned =
             qAssignees.some((name) => name.includes(userFirstName)) ||
@@ -975,7 +985,7 @@ export default function QuotationPage() {
                   (log.new_assignee &&
                     log.new_assignee.toLowerCase().includes(userFirstName)),
               );
-            } catch {}
+            } catch { }
           }
           return hasBeenAssigned || inLog;
         });
@@ -986,8 +996,8 @@ export default function QuotationPage() {
             : [];
           const lAssignees = q.lead_assignee
             ? q.lead_assignee
-                .split(",")
-                .map((name) => name.trim().toLowerCase())
+              .split(",")
+              .map((name) => name.trim().toLowerCase())
             : [];
 
           const matchesQuotation = qAssignees.some((name) =>
@@ -1198,14 +1208,14 @@ export default function QuotationPage() {
   const handleItemChange = (index, field, val) => {
     const updated = [...quoteItems];
     const row = { ...updated[index], [field]: val };
-    
+
     if (field === "product_id") {
       const prod = productsList.find((p) => String(p.id) === String(val));
       if (prod) {
         row.product_name = prod.product_name;
         row.unit = prod.unit || "Unit";
         row.price = prod.sales_price || 0;
-        
+
         // UPDATE (Stock Validation): Check stock limit for the new product
         const stock = parseFloat(prod.current_stocks) || 0;
         if (parseFloat(row.qty || 0) > stock) {
@@ -1240,7 +1250,7 @@ export default function QuotationPage() {
         }
       }
     }
-    
+
     row.amount = (parseFloat(row.price) || 0) * (parseFloat(row.qty) || 0);
     updated[index] = row;
     setQuoteItems(updated);
@@ -1613,7 +1623,7 @@ export default function QuotationPage() {
   const handleFileDownload = async (e, filePath, originalName) => {
     e.preventDefault();
     if (!filePath) return;
-    
+
     // Ensure all Cloudinary URLs are accessed securely via HTTPS
     let secureFilePath = filePath;
     if (filePath.startsWith("http://")) {
@@ -1621,7 +1631,7 @@ export default function QuotationPage() {
     }
 
     const ext = originalName.split(".").pop().toLowerCase();
-    
+
     const isNativePreview = ["pdf", "jpg", "jpeg", "png"].includes(ext);
     if (isNativePreview) {
       window.open(secureFilePath, "_blank");
@@ -1729,7 +1739,7 @@ export default function QuotationPage() {
       const historyWithFiles = await Promise.all(
         historyData.map(async (hist) => {
           const hf = await axios.get(
-              `${API_BASE}/api/quotation/files/${hist.id}`,
+            `${API_BASE}/api/quotation/files/${hist.id}`,
           );
           return { ...hist, files: hf.data?.files || [] };
         }),
@@ -1803,8 +1813,8 @@ export default function QuotationPage() {
   const filteredQuotations = hasActiveFilters
     ? quotations
     : quotations.filter((q) => {
-        return q.displayStatus === activeTab;
-      });
+      return q.displayStatus === activeTab;
+    });
 
   const pendingCount = quotations.filter(
     (q) => q.displayStatus === "Pending",
@@ -1915,7 +1925,7 @@ export default function QuotationPage() {
   const isKhushaliEstimation =
     isEstimation &&
     (localStorage.getItem("username") || "").split(" ")[0].toLowerCase() ===
-      "khushali";
+    "khushali";
 
   const piGrandTotal = selectedPIQuotation
     ? Number(selectedPIQuotation.grand_total) || 0
@@ -1965,9 +1975,9 @@ export default function QuotationPage() {
     setNewAssigneeValue(
       q.assignee
         ? {
-            value: q.assignee.split(",")[0].trim(),
-            label: q.assignee.split(",")[0].trim(),
-          }
+          value: q.assignee.split(",")[0].trim(),
+          label: q.assignee.split(",")[0].trim(),
+        }
         : null,
     );
     setAssigneeLog([]);
@@ -1988,7 +1998,8 @@ export default function QuotationPage() {
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @media print {
           body.printing-mode {
             background-color: white !important;
@@ -2092,7 +2103,7 @@ export default function QuotationPage() {
               </Link>
             </p>
           </div>
- 
+
           {/* Export Dropdown */}
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             <div className="relative w-full sm:w-auto" ref={exportRef}>
@@ -2128,7 +2139,7 @@ export default function QuotationPage() {
             </div>
           </div>
         </div>
- 
+
         {/* Filter Section - Mobile Toggle */}
         <div className="mx-6 md:hidden mt-3 relative z-40">
           <button
@@ -2143,7 +2154,7 @@ export default function QuotationPage() {
             ></i>
           </button>
         </div>
- 
+
         <div
           className={`
           ${showMobileFilters ? "absolute left-6 right-6 top-50 bg-white p-5 shadow-2xl border border-gray-100 z-50 rounded-lg grid grid-cols-2 gap-3 mt-1" : "hidden"} 
@@ -2171,7 +2182,7 @@ export default function QuotationPage() {
             placeholder="Reference"
             className="p-2 w-full md:w-48 bg-white border border-slate-300 md:border rounded-sm focus:outline-none focus:border-[#334d77] focus:ring-1 focus:ring-[#334d77]/20 text-gray-600 text-sm transition-all"
           />
- 
+
           <select
             name="quotation_status"
             value={filters.quotation_status}
@@ -2183,7 +2194,7 @@ export default function QuotationPage() {
             <option value="Won">Won</option>
             <option value="Lost">Lost</option>
           </select>
- 
+
           <div className="flex p-1 items-center px-2 border bg-white border-slate-300 rounded-sm w-full md:w-58 outline-none text-gray-400 text-sm col-span-2 md:col-span-1 focus-within:border-[#334d77] focus-within:ring-1 focus-within:ring-[#334d77]/20 transition-all">
             <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
               From Date
@@ -2196,7 +2207,7 @@ export default function QuotationPage() {
               className="p-1 w-full md:w-35 outline-none bg-transparent"
             />
           </div>
- 
+
           <div className="flex p-1 items-center px-2 border bg-white border-slate-300 rounded-sm w-full md:w-53 outline-none text-gray-400 text-sm col-span-2 md:col-span-1 focus-within:border-[#334d77] focus-within:ring-1 focus-within:ring-[#334d77]/20 transition-all">
             <span className="mx-1 p-1 text-gray-400 whitespace-nowrap">
               To Date
@@ -2209,7 +2220,7 @@ export default function QuotationPage() {
               className="p-1 w-full md:w-35 outline-none bg-transparent"
             />
           </div>
- 
+
           <div className="flex gap-2 col-span-2">
             <button
               onClick={() => {
@@ -2237,7 +2248,7 @@ export default function QuotationPage() {
               className={`pb-3 px-1 sm:px-0 text-sm font-medium relative transition-all whitespace-nowrap ${activeTab === "Pending" ? "text-blue-600" : "text-gray-400 hover:text-gray-600"}`}
             >
               <span className="inline-flex items-center gap-1">
-                
+
                 <span className="text-xs sm:text-sm">Pending </span>
                 <span className="ml-0 sm:ml-2 bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-full">
                   {pendingCount}
@@ -2343,8 +2354,8 @@ export default function QuotationPage() {
                         if (q.displayStatus === "Revision") {
                           const assignees = q.assignee
                             ? q.assignee
-                                .split(",")
-                                .map((name) => name.trim().toLowerCase())
+                              .split(",")
+                              .map((name) => name.trim().toLowerCase())
                             : [];
                           const hasKhushali = assignees.includes("khushali");
                           const hasDarshil = assignees.includes("darshil");
@@ -2422,12 +2433,12 @@ export default function QuotationPage() {
                             <td className="px-3 text-gray-500">
                               {q.quotation_date
                                 ? new Date(
-                                    q.quotation_date,
-                                  ).toLocaleDateString()
+                                  q.quotation_date,
+                                ).toLocaleDateString()
                                 : q.quotation_created_at
                                   ? new Date(
-                                      q.quotation_created_at,
-                                    ).toLocaleDateString()
+                                    q.quotation_created_at,
+                                  ).toLocaleDateString()
                                   : "-"}
                             </td>
                             <td className="px-3 font-semibold text-gray-700">
@@ -2704,7 +2715,7 @@ export default function QuotationPage() {
       {showUpdateModal && (
         // BUG FIX #6: Full modal is scrollable with overflow-y-auto on inner container
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30 p-4">
-<div className="bg-white w-full max-w-[820px] rounded-sm shadow-xl border border-gray-100 overflow-hidden flex flex-col max-h-[70vh]">
+          <div className="bg-white w-full max-w-[820px] rounded-sm shadow-xl border border-gray-100 overflow-hidden flex flex-col max-h-[70vh]">
             {/* Header */}
             <div className="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-orange-100 to-white flex-shrink-0">
               <div className="flex items-center gap-2">
@@ -2726,7 +2737,7 @@ export default function QuotationPage() {
                 ✕
               </button>
             </div>
-            
+
 
             {/* Tabs */}
             <div className="flex border-b border-gray-200 flex-shrink-0">
@@ -2735,11 +2746,10 @@ export default function QuotationPage() {
                   setFollowUpTab("lead");
                   setPreviewFollowUp(null);
                 }}
-                className={`px-6 py-3 text-sm font-semibold transition-all ${
-                  followUpTab === "lead"
-                    ? "text-orange-500 border-b-2 border-orange-500 bg-orange-50"
-                    : "text-gray-500"
-                }`}
+                className={`px-6 py-3 text-sm font-semibold transition-all ${followUpTab === "lead"
+                  ? "text-orange-500 border-b-2 border-orange-500 bg-orange-50"
+                  : "text-gray-500"
+                  }`}
               >
                 Lead
               </button>
@@ -2749,11 +2759,10 @@ export default function QuotationPage() {
                   setFollowUpTab("quotation");
                   setPreviewFollowUp(null);
                 }}
-                className={`px-6 py-3 text-sm font-semibold transition-all ${
-                  followUpTab === "quotation"
-                    ? "text-orange-500 border-b-2 border-orange-500 bg-orange-50"
-                    : "text-gray-500"
-                }`}
+                className={`px-6 py-3 text-sm font-semibold transition-all ${followUpTab === "quotation"
+                  ? "text-orange-500 border-b-2 border-orange-500 bg-orange-50"
+                  : "text-gray-500"
+                  }`}
               >
                 Quotation
               </button>
@@ -2761,17 +2770,17 @@ export default function QuotationPage() {
 
             {/* Body — scrollable */}
             {/* BUG FIX #6: overflow-y-auto on this body div makes modal content scroll */}
-<div className="flex flex-row flex-1 overflow-hidden">
-                {/* LEFT: Form */}
-<div className="w-1/2 px-3 sm:px-6 py-3 sm:py-5 border-r border-gray-100 overflow-y-auto">
+            <div className="flex flex-row flex-1 overflow-hidden">
+              {/* LEFT: Form */}
+              <div className="w-1/2 px-3 sm:px-6 py-3 sm:py-5 border-r border-gray-100 overflow-y-auto">
                 {followUpTab === "lead" && (
-<p className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2 sm:mb-4">
+                  <p className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2 sm:mb-4">
                     Lead Follow-Up
                   </p>
                 )}
 
                 {followUpTab === "quotation" && (
-<p className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2 sm:mb-4">
+                  <p className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2 sm:mb-4">
                     Quotation Follow-Up
                   </p>
                 )}
@@ -2779,12 +2788,12 @@ export default function QuotationPage() {
                 {/* LEAD TAB: Read-only notice */}
                 {followUpTab === "lead" && (
                   <div className="flex flex-col gap-3">
-<div className="flex items-start gap-2 sm:gap-3 bg-blue-50 border border-blue-200 rounded-xl px-2 sm:px-4 py-2 sm:py-3">
-<div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div className="flex items-start gap-2 sm:gap-3 bg-blue-50 border border-blue-200 rounded-xl px-2 sm:px-4 py-2 sm:py-3">
+                      <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                         <i className="bi bi-info-circle-fill text-blue-500 text-sm"></i>
                       </div>
                       <div>
-<p className="text-xs sm:text-sm font-semibold text-blue-700">
+                        <p className="text-xs sm:text-sm font-semibold text-blue-700">
                           Lead Follow-Up History
                         </p>
                         <p className="text-xs text-blue-600 mt-0.5">
@@ -2795,7 +2804,7 @@ export default function QuotationPage() {
                     </div>
 
                     {selectedLead && (
-<div className="bg-gray-50 border border-gray-100 rounded-xl p-2 sm:p-4 space-y-1.5 sm:space-y-2">
+                      <div className="bg-gray-50 border border-gray-100 rounded-xl p-2 sm:p-4 space-y-1.5 sm:space-y-2">
                         <div className="flex justify-between text-xs">
                           <span className="text-gray-400 font-medium">
                             Company
@@ -2840,7 +2849,7 @@ export default function QuotationPage() {
 
                 {/* QUOTATION TAB: Editable Form */}
                 {followUpTab === "quotation" && (
-<div className="grid grid-cols-2 gap-x-2 sm:gap-x-4 gap-y-2 sm:gap-y-3">
+                  <div className="grid grid-cols-2 gap-x-2 sm:gap-x-4 gap-y-2 sm:gap-y-3">
                     <div>
                       <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                         Follow-Up Date
@@ -2850,7 +2859,7 @@ export default function QuotationPage() {
                         name="follow_up_date"
                         value={updateForm.follow_up_date}
                         onChange={handleInputChange}
-className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm outline-none bg-gray-50"
+                        className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm outline-none bg-gray-50"
                       />
                     </div>
                     <div>
@@ -2861,7 +2870,7 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                         name="activity_type"
                         value={updateForm.activity_type}
                         onChange={handleInputChange}
-className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm outline-none bg-gray-50"
+                        className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm outline-none bg-gray-50"
                       >
                         <option value="">-- Select --</option>
                         <option>Call</option>
@@ -2895,7 +2904,7 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                         name="contact_person"
                         value={updateForm.contact_person}
                         onChange={handleInputChange}
-className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm outline-none bg-gray-50"
+                        className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm outline-none bg-gray-50"
                       />
                     </div>
 
@@ -2913,12 +2922,11 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                           !!selectedQuotation?.quotation_no ||
                           !!selectedLead?.quotation_no
                         }
-                        className={`w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 ${
-                          selectedQuotation?.quotation_no ||
+                        className={`w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 ${selectedQuotation?.quotation_no ||
                           selectedLead?.quotation_no
-                            ? "opacity-75 cursor-not-allowed"
-                            : ""
-                        }`}
+                          ? "opacity-75 cursor-not-allowed"
+                          : ""
+                          }`}
                       />
                     </div>
 
@@ -2930,7 +2938,7 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                         name="description"
                         value={updateForm.description}
                         onChange={handleInputChange}
-className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm outline-none bg-gray-50 h-16 sm:h-20 resize-none"
+                        className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm outline-none bg-gray-50 h-16 sm:h-20 resize-none"
                       />
                     </div>
                     {/* <div className="col-span-2 border-2 border-dashed border-orange-300 rounded-xl p-3 text-center bg-orange-50/40">
@@ -2968,13 +2976,13 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
 
               {/* RIGHT: History Panel */}
               {/* BUG FIX #5 & #6: Proper overflow-y-auto, aligned layout */}
-<div className="w-1/2 px-2 sm:px-6 py-3 sm:py-5 flex flex-col overflow-hidden">
+              <div className="w-1/2 px-2 sm:px-6 py-3 sm:py-5 flex flex-col overflow-hidden">
                 {followUpTab === "lead" && (
-<div className="flex flex-wrap justify-between items-center gap-1 mb-2 sm:mb-4 flex-shrink-0">
-<p className="text-[10px] sm:text-xs font-bold text-gray-600 uppercase tracking-widest leading-tight">
+                  <div className="flex flex-wrap justify-between items-center gap-1 mb-2 sm:mb-4 flex-shrink-0">
+                    <p className="text-[10px] sm:text-xs font-bold text-gray-600 uppercase tracking-widest leading-tight">
                       Lead Follow-Up History
                     </p>
-<span className="text-[10px] sm:text-xs bg-blue-50 text-blue-500 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-semibold border border-blue-100">
+                    <span className="text-[10px] sm:text-xs bg-blue-50 text-blue-500 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-semibold border border-blue-100">
                       {
                         followUpHistory.filter((h) => h.module_type === "sales")
                           .length
@@ -2985,11 +2993,11 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                 )}
 
                 {followUpTab === "quotation" && (
-<div className="flex flex-wrap justify-between items-center gap-1 mb-2 sm:mb-4 flex-shrink-0">
-<p className="text-[10px] sm:text-xs font-bold text-gray-600 uppercase tracking-widest leading-tight">
+                  <div className="flex flex-wrap justify-between items-center gap-1 mb-2 sm:mb-4 flex-shrink-0">
+                    <p className="text-[10px] sm:text-xs font-bold text-gray-600 uppercase tracking-widest leading-tight">
                       Quotation Follow-Up History
                     </p>
-<span className="text-[10px] sm:text-xs bg-orange-50 text-orange-500 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-lg font-semibold border border-orange-100">
+                    <span className="text-[10px] sm:text-xs bg-orange-50 text-orange-500 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-lg font-semibold border border-orange-100">
                       {
                         followUpHistory.filter(
                           (h) => h.module_type === "quotation",
@@ -3030,11 +3038,10 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                             onClick={() =>
                               setPreviewFollowUp(isActive ? null : item)
                             }
-                         className={`border rounded-xl p-2 sm:p-3 cursor-pointer transition-all select-none ${
-                              isActive
-                                ? "border-orange-400 bg-orange-50 shadow-sm"
-                                : "hover:bg-gray-50 border-gray-200"
-                            }`}
+                            className={`border rounded-xl p-2 sm:p-3 cursor-pointer transition-all select-none ${isActive
+                              ? "border-orange-400 bg-orange-50 shadow-sm"
+                              : "hover:bg-gray-50 border-gray-200"
+                              }`}
                           >
                             <div className="flex justify-between items-center">
                               <div className="flex items-center gap-2">
@@ -3048,11 +3055,10 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                                     {item.activity_type}
                                   </p>
                                   <p
-                                    className={`text-[10px] uppercase font-semibold ${
-                                      followUpTab === "lead"
-                                        ? "text-blue-400"
-                                        : "text-orange-400"
-                                    }`}
+                                    className={`text-[10px] uppercase font-semibold ${followUpTab === "lead"
+                                      ? "text-blue-400"
+                                      : "text-orange-400"
+                                      }`}
                                   >
                                     {followUpTab === "lead"
                                       ? "Lead"
@@ -3064,8 +3070,8 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                                 <span className="text-xs text-gray-400">
                                   {item.follow_up_date
                                     ? new Date(
-                                        item.follow_up_date,
-                                      ).toLocaleDateString()
+                                      item.follow_up_date,
+                                    ).toLocaleDateString()
                                     : "—"}
                                 </span>
                                 <i
@@ -3102,8 +3108,8 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                                     label: "Follow-Up Date",
                                     value: previewFollowUp.follow_up_date
                                       ? new Date(
-                                          previewFollowUp.follow_up_date,
-                                        ).toLocaleDateString()
+                                        previewFollowUp.follow_up_date,
+                                      ).toLocaleDateString()
                                       : "—",
                                   },
                                   {
@@ -3129,13 +3135,12 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                                     Status
                                   </p>
                                   <span
-                                    className={`text-xs px-2.5 py-0.5 rounded-full font-semibold mt-0.5 inline-block ${
-                                      previewFollowUp.status === "Completed"
-                                        ? "bg-green-100 text-green-600"
-                                        : previewFollowUp.status === "Cancelled"
-                                          ? "bg-orange-100 text-orange-500"
-                                          : "bg-orange-100 text-orange-600"
-                                    }`}
+                                    className={`text-xs px-2.5 py-0.5 rounded-full font-semibold mt-0.5 inline-block ${previewFollowUp.status === "Completed"
+                                      ? "bg-green-100 text-green-600"
+                                      : previewFollowUp.status === "Cancelled"
+                                        ? "bg-orange-100 text-orange-500"
+                                        : "bg-orange-100 text-orange-600"
+                                      }`}
                                   >
                                     {previewFollowUp.status || "—"}
                                   </span>
@@ -3198,7 +3203,7 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
             </div>
 
             {/* Footer Buttons */}
-<div className="flex justify-end gap-2 sm:gap-3 px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-100 bg-gray-50 flex-shrink-0">
+            <div className="flex justify-end gap-2 sm:gap-3 px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-100 bg-gray-50 flex-shrink-0">
               <button
                 onClick={() => {
                   setShowUpdateModal(false);
@@ -3206,7 +3211,7 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                   setPreviewFollowUp(null);
                   setFollowUpTab("quotation");
                 }}
- className="px-3 sm:px-5 py-1.5 sm:py-2 rounded-sm text-xs sm:text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-100 transition-all"              >
+                className="px-3 sm:px-5 py-1.5 sm:py-2 rounded-sm text-xs sm:text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-100 transition-all"              >
                 Cancel
               </button>
 
@@ -3218,13 +3223,12 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                     ? "Lead follow-ups cannot be added here"
                     : ""
                 }
-                 className={`px-3 sm:px-6 py-1.5 sm:py-2 rounded-sm text-xs sm:text-sm font-semibold text-white transition-all shadow-md flex items-center gap-2  ${
-                  followUpTab === "lead"
-                    ? "bg-gray-300 cursor-not-allowed shadow-none"
-                    : updateLoading
-                      ? "bg-orange-400 cursor-not-allowed shadow-orange-200"
-                      : "bg-orange-500 hover:bg-orange-600 shadow-orange-200"
-                }`}
+                className={`px-3 sm:px-6 py-1.5 sm:py-2 rounded-sm text-xs sm:text-sm font-semibold text-white transition-all shadow-md flex items-center gap-2  ${followUpTab === "lead"
+                  ? "bg-gray-300 cursor-not-allowed shadow-none"
+                  : updateLoading
+                    ? "bg-orange-400 cursor-not-allowed shadow-orange-200"
+                    : "bg-orange-500 hover:bg-orange-600 shadow-orange-200"
+                  }`}
               >
                 {updateLoading ? (
                   <>
@@ -3298,42 +3302,38 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
               <div className="w-7/12 min-w-[320px] bg-white border-r border-gray-100 flex flex-col relative z-10 overflow-y-auto">
                 {isModalLocked && (
                   <div
-                    className={`mx-4 mt-4 flex items-start gap-3 border rounded-xl px-4 py-3 shadow-sm ${
-                      isWonOrLostLocked
-                        ? selectedLead?.displayStatus === "Won"
-                          ? "bg-green-50 border-green-200"
-                          : "bg-red-50 border-red-200"
-                        : "bg-green-50 border-green-200"
-                    }`}
+                    className={`mx-4 mt-4 flex items-start gap-3 border rounded-xl px-4 py-3 shadow-sm ${isWonOrLostLocked
+                      ? selectedLead?.displayStatus === "Won"
+                        ? "bg-green-50 border-green-200"
+                        : "bg-red-50 border-red-200"
+                      : "bg-green-50 border-green-200"
+                      }`}
                   >
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                        isWonOrLostLocked
-                          ? selectedLead?.displayStatus === "Won"
-                            ? "bg-green-100"
-                            : "bg-red-100"
-                          : "bg-green-100"
-                      }`}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${isWonOrLostLocked
+                        ? selectedLead?.displayStatus === "Won"
+                          ? "bg-green-100"
+                          : "bg-red-100"
+                        : "bg-green-100"
+                        }`}
                     >
                       <i
-                        className={`bi bi-lock-fill text-sm ${
-                          isWonOrLostLocked
-                            ? selectedLead?.displayStatus === "Won"
-                              ? "text-green-600"
-                              : "text-red-600"
-                            : "text-green-600"
-                        }`}
+                        className={`bi bi-lock-fill text-sm ${isWonOrLostLocked
+                          ? selectedLead?.displayStatus === "Won"
+                            ? "text-green-600"
+                            : "text-red-600"
+                          : "text-green-600"
+                          }`}
                       ></i>
                     </div>
                     <div>
                       <p
-                        className={`text-sm font-bold ${
-                          isWonOrLostLocked
-                            ? selectedLead?.displayStatus === "Won"
-                              ? "text-green-700"
-                              : "text-red-700"
-                            : "text-green-700"
-                        }`}
+                        className={`text-sm font-bold ${isWonOrLostLocked
+                          ? selectedLead?.displayStatus === "Won"
+                            ? "text-green-700"
+                            : "text-red-700"
+                          : "text-green-700"
+                          }`}
                       >
                         {isWonOrLostLocked
                           ? selectedLead?.displayStatus === "Won"
@@ -3342,13 +3342,12 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                           : "Quotation Approved"}
                       </p>
                       <p
-                        className={`text-xs mt-0.5 ${
-                          isWonOrLostLocked
-                            ? selectedLead?.displayStatus === "Won"
-                              ? "text-green-600"
-                              : "text-red-600"
-                            : "text-green-600"
-                        }`}
+                        className={`text-xs mt-0.5 ${isWonOrLostLocked
+                          ? selectedLead?.displayStatus === "Won"
+                            ? "text-green-600"
+                            : "text-red-600"
+                          : "text-green-600"
+                          }`}
                       >
                         {isWonOrLostLocked
                           ? `This lead is marked as ${selectedLead?.displayStatus}. No further quotation updates are permitted.`
@@ -3428,11 +3427,10 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                         value={form.quotation_no}
                         onChange={handleChange}
                         disabled={isQuotationNoLocked}
-                        className={`w-full mt-1 border border-slate-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 focus:border-[#334d77] focus:ring-1 focus:ring-[#334d77]/20 transition-all ${
-                          isQuotationNoLocked
-                            ? "opacity-75 cursor-not-allowed"
-                            : ""
-                        }`}
+                        className={`w-full mt-1 border border-slate-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 focus:border-[#334d77] focus:ring-1 focus:ring-[#334d77]/20 transition-all ${isQuotationNoLocked
+                          ? "opacity-75 cursor-not-allowed"
+                          : ""
+                          }`}
                       />
                     </div>
                     <div className="flex items-end">
@@ -3690,9 +3688,8 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                         return (
                           <div key={item.id} className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col gap-4 relative overflow-hidden text-left">
                             {/* Left colored border indicating status */}
-                            <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${
-                              isApproved ? "bg-emerald-500" : isDeclined ? "bg-rose-500" : "bg-[#334d77]"
-                            }`} />
+                            <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${isApproved ? "bg-emerald-500" : isDeclined ? "bg-rose-500" : "bg-[#334d77]"
+                              }`} />
 
                             {/* Card Header */}
                             <div className="flex justify-between items-start pl-2">
@@ -4176,15 +4173,14 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
 
               {piGrandTotal > 0 && (
                 <div
-                  className={`rounded-sm p-3 border transition-all ${
-                    piIsOver
-                      ? "bg-red-50 border-red-200"
-                      : piEnteredPct === 100
+                  className={`rounded-sm p-3 border transition-all ${piIsOver
+                    ? "bg-red-50 border-red-200"
+                    : piEnteredPct === 100
+                      ? "bg-green-50 border-green-200"
+                      : piEnteredPct > 0
                         ? "bg-green-50 border-green-200"
-                        : piEnteredPct > 0
-                          ? "bg-green-50 border-green-200"
-                          : "bg-blue-50 border-blue-100"
-                  }`}
+                        : "bg-blue-50 border-blue-100"
+                    }`}
                 >
                   <p className="text-xs font-bold uppercase tracking-wider mb-2 text-gray-500">
                     {piEnteredPct > 0
@@ -4221,13 +4217,12 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                   <div className="mt-3">
                     <div className="w-full bg-white rounded-full h-2 border border-gray-200 overflow-hidden">
                       <div
-                        className={`h-2 rounded-full transition-all duration-300 ${
-                          piIsOver
-                            ? "bg-red-500"
-                            : piEnteredPct >= 100
-                              ? "bg-green-500"
-                              : "bg-green-400"
-                        }`}
+                        className={`h-2 rounded-full transition-all duration-300 ${piIsOver
+                          ? "bg-red-500"
+                          : piEnteredPct >= 100
+                            ? "bg-green-500"
+                            : "bg-green-400"
+                          }`}
                         style={{ width: `${Math.min(piEnteredPct, 100)}%` }}
                       ></div>
                     </div>
@@ -4269,14 +4264,13 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                   Number(piPercentage) <= 0 ||
                   Number(piPercentage) > 100
                 }
-                className={`flex-1 bg-green-500 hover:bg-green-600 text-white rounded-sm py-2.5 text-sm font-semibold shadow-md shadow-green-200 transition-all flex justify-center items-center gap-2 ${
-                  isCreatingPI ||
+                className={`flex-1 bg-green-500 hover:bg-green-600 text-white rounded-sm py-2.5 text-sm font-semibold shadow-md shadow-green-200 transition-all flex justify-center items-center gap-2 ${isCreatingPI ||
                   !piPercentage ||
                   Number(piPercentage) <= 0 ||
                   Number(piPercentage) > 100
-                    ? "opacity-60 cursor-not-allowed"
-                    : ""
-                }`}
+                  ? "opacity-60 cursor-not-allowed"
+                  : ""
+                  }`}
               >
                 {isCreatingPI ? (
                   <>
@@ -4584,11 +4578,10 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
               <button
                 onClick={handleAssigneeUpdate}
                 disabled={isUpdatingAssignee || !newAssigneeValue}
-                className={`flex-[2] py-2.5 rounded-lg text-xs text-white font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                  isUpdatingAssignee || !newAssigneeValue
-                    ? "bg-orange-300 cursor-not-allowed"
-                    : "bg-orange-500 hover:bg-orange-600 shadow-md shadow-orange-100"
-                }`}
+                className={`flex-[2] py-2.5 rounded-lg text-xs text-white font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${isUpdatingAssignee || !newAssigneeValue
+                  ? "bg-orange-300 cursor-not-allowed"
+                  : "bg-orange-500 hover:bg-orange-600 shadow-md shadow-orange-100"
+                  }`}
               >
                 {isUpdatingAssignee ? (
                   <>
@@ -4708,7 +4701,8 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                   <p className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
                     {viewQuotation.company_name || "—"}
                   </p>
-                  <p className="text-gray-400 text-xs">Quotation Document Format</p>
+                  <p className="text-gray-400 text-xs">Quotation Document Format
+                  </p>
                 </div>
               </div>
               <button
@@ -4723,178 +4717,181 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
             <div className="p-6 overflow-y-auto bg-gray-50 flex-1">
               <div id="quotation-print-area" className="bg-slate-50 border border-slate-200 shadow-xl rounded-xl overflow-hidden max-w-[800px] mx-auto flex flex-col justify-between text-slate-800 font-sans">
                 {/* Premium Header Accent */}
-                  {/* Premium Header Accent */}
-                  <div className="bg-gradient-to-r from-[#eef2f7] to-white p-6 text-[#1e293b] flex justify-between items-start border-b-4 border-[#334d77] flex-shrink-0 text-left">
-                    <div>
-                      <div className="flex items-center gap-2.5">
-                        <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#334d77] to-[#1e2e4c] flex items-center justify-center text-white font-black text-xl shadow-lg border border-[#334d77]/20">
-                          G
+                {/* Premium Header Accent */}
+                <div className="bg-gradient-to-r from-[#eef2f7] to-white p-6 text-[#1e293b] flex justify-between items-start border-b-4 border-[#334d77] flex-shrink-0 text-left">
+                  <div>
+                    <div className="flex items-center gap-2.5">
+                      {/* <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#334d77] to-[#1e2e4c] flex items-center justify-center text-white font-black text-xl shadow-lg border border-[#334d77]/20">
+
+                      </span> */}
+                      <div>
+                        <span className="">
+                          <img src="/Logo.png" alt="DIGIVA" className="w-35"/>
                         </span>
-                        <div>
-                          <h1 className="text-[20px] font-black text-[#334d77] tracking-wider leading-none m-0">GURU Tech</h1>
-                          <p className="text-[8px] text-[#475569] uppercase tracking-[0.25em] font-bold mt-1 m-0">Packaging Solution</p>
-                        </div>
-                      </div>
-                      <div className="text-[10px] text-[#475569] mt-4 space-y-0.5 font-medium leading-relaxed">
-                        <p className="flex items-center gap-1"><span className="text-[#334d77] font-bold">📍</span> 149, RK Industrial Estate, Bhuvaladi 100 feet Road, Kathwada GIDC, Ahmedabad - 382430, Gujarat, India</p>
-                        <p className="flex items-center gap-1">
-                          <span className="text-[#334d77] font-bold">📞</span> Phone: +91 96620 74346 | +91 95376 74346 | <span className="text-[#334d77] font-bold ml-1">✉</span> Email: sales@gurutechpackaging.com
-                        </p>
+                        {/* <h1 className="text-[20px] font-black text-[#334d77] tracking-wider leading-none m-0">Digiva Inc</h1> */}
+                        {/* <p className="text-[8px] text-[#475569] uppercase tracking-[0.25em] font-bold mt-1 m-0">Packaging Solution</p> */}
                       </div>
                     </div>
-                    <div className="text-right">
-                      <h2 className="text-[22px] font-black text-[#334d77] tracking-wider m-0">QUOTATION</h2>
-                      <div className="mt-4 bg-[#334d77]/5 rounded-[10px] p-3 border border-[#334d77]/15 text-[11px] inline-grid grid-cols-[auto_auto] gap-x-4 gap-y-2 text-left">
-                        <span className="font-semibold text-[#64748b]">Quote No:</span>
-                        <span className="font-bold text-[#334d77] text-right">{viewQuotation.quotation_no || "—"}</span>
-                        <span className="font-semibold text-[#64748b]">Date:</span>
-                        <span className="font-bold text-[#334d77] text-right">
-                          {viewQuotation.quotation_date
-                            ? new Date(viewQuotation.quotation_date).toLocaleDateString()
-                            : viewQuotation.created_at
-                              ? new Date(viewQuotation.created_at).toLocaleDateString()
-                              : "—"}
-                        </span>
-                      </div>
+                    <div className="text-[10px] text-[#475569] mt-4 space-y-0.5 font-medium leading-relaxed">
+                      <p className="flex items-center gap-1"><span className="text-[#334d77] font-bold">📍</span> A-1208, Ratnakar Nine Square, Opp Keshavbaug , Ahmedabad</p>
+                      <p className="flex items-center gap-1">
+                        <span className="text-[#334d77] font-bold">📞</span> Phone: +91 98986 69662 | +91 79841 69446 | <span className="text-[#334d77] font-bold ml-1">✉</span> Email: info@digiva.com
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <h2 className="text-[22px] font-black text-[#334d77] tracking-wider m-0">QUOTATION</h2>
+                    <div className="mt-4 bg-[#334d77]/5 rounded-[10px] p-3 border border-[#334d77]/15 text-[11px] inline-grid grid-cols-[auto_auto] gap-x-4 gap-y-2 text-left">
+                      <span className="font-semibold text-[#64748b]">Quote No:</span>
+                      <span className="font-bold text-[#334d77] text-right">{viewQuotation.quotation_no || "—"}</span>
+                      <span className="font-semibold text-[#64748b]">Date:</span>
+                      <span className="font-bold text-[#334d77] text-right">
+                        {viewQuotation.quotation_date
+                          ? new Date(viewQuotation.quotation_date).toLocaleDateString()
+                          : viewQuotation.created_at
+                            ? new Date(viewQuotation.created_at).toLocaleDateString()
+                            : "—"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6 flex-1 flex flex-col justify-between">
+                  {/* Client info & details */}
+                  <div className="flex flex-row justify-between gap-5 mb-6 text-xs flex-shrink-0 text-left">
+                    <div className="w-[48%] bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-4">
+                      <p className="text-[10px] text-[#64748b] uppercase tracking-[0.1em] font-extrabold mb-2.5 flex items-center gap-1.5">
+                        <span className="text-[#334d77]">🏢</span> Client Details
+                      </p>
+                      <p className="text-[14px] font-extrabold text-[#1e293b] m-0">{viewQuotation.company_name || "—"}</p>
+                      {viewQuotation.customer_name && (
+                        <p className="text-[#475569] font-medium text-[12px] mt-1.5 m-0"><span className="text-[#94a3b8] font-normal">Attn:</span> {viewQuotation.customer_name}</p>
+                      )}
+                    </div>
+                    <div className="w-[48%] bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-4 text-right">
+                      <p className="text-[10px] text-[#64748b] uppercase tracking-[0.1em] font-extrabold mb-2.5 flex items-center gap-1.5 justify-end">
+                        <span className="text-[#312e81]">ℹ</span> Reference Details
+                      </p>
+                      <p className="text-[#334155] font-bold italic text-[14px] m-0 truncate">{viewQuotation.reference || "—"}</p>
                     </div>
                   </div>
 
-                  <div className="p-6 flex-1 flex flex-col justify-between">
-                    {/* Client info & details */}
-                    <div className="flex flex-row justify-between gap-5 mb-6 text-xs flex-shrink-0 text-left">
-                      <div className="w-[48%] bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-4">
-                        <p className="text-[10px] text-[#64748b] uppercase tracking-[0.1em] font-extrabold mb-2.5 flex items-center gap-1.5">
-                          <span className="text-[#334d77]">🏢</span> Client Details
-                        </p>
-                        <p className="text-[14px] font-extrabold text-[#1e293b] m-0">{viewQuotation.company_name || "—"}</p>
-                        {viewQuotation.customer_name && (
-                          <p className="text-[#475569] font-medium text-[12px] mt-1.5 m-0"><span className="text-[#94a3b8] font-normal">Attn:</span> {viewQuotation.customer_name}</p>
-                        )}
-                      </div>
-                      <div className="w-[48%] bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-4 text-right">
-                        <p className="text-[10px] text-[#64748b] uppercase tracking-[0.1em] font-extrabold mb-2.5 flex items-center gap-1.5 justify-end">
-                          <span className="text-[#312e81]">ℹ</span> Reference Details
-                        </p>
-                        <p className="text-[#334155] font-bold italic text-[14px] m-0 truncate">{viewQuotation.reference || "—"}</p>
-                      </div>
-                    </div>
-
-                    {/* Items table */}
-                    <div className="flex-1 overflow-x-auto bg-white rounded-lg border border-[#e2e8f0] mt-3">
-                      <table className="w-full text-[12px] border-collapse">
-                        <thead>
-                          <tr className="border-b-2 border-[#1e2e4c] bg-[#334d77] text-white font-bold uppercase text-[10px] tracking-[0.05em]">
-                            <th className="py-3 px-3 text-left w-8">#</th>
-                            <th className="py-3 px-2 text-left">Product Description</th>
-                            <th className="py-3 px-2 text-center w-16">Unit</th>
-                            <th className="py-3 px-2 text-right w-24">Price (₹)</th>
-                            <th className="py-3 px-2 text-center w-16">Qty</th>
-                            <th className="py-3 px-3 text-right w-24">Total (₹)</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {(() => {
-                            const { items } = parseDescriptionForItems(viewQuotation.description);
-                            const validItems = items.filter(item => item.product_id !== "");
-                            if (validItems.length === 0) {
-                              return (
-                                <tr>
-                                  <td colSpan="6" className="py-5 text-center text-[#94a3b8] italic border-b border-[#f1f5f9]">
-                                    No products selected.
-                                  </td>
-                                </tr>
-                              );
-                            }
-                            return validItems.map((item, index) => (
-                              <tr key={index} className="border-b border-[#f1f5f9] text-[#334155]">
-                                <td className="py-3 px-3 text-left">{index + 1}</td>
-                                <td className="py-3 px-2 text-left">{item.product_name}</td>
-                                <td className="py-3 px-2 text-center">{item.unit || "—"}</td>
-                                <td className="py-3 px-2 text-right">
-                                  {item.price ? Number(item.price).toLocaleString('en-IN', { minimumFractionDigits: 2 }) : "0.00"}
-                                </td>
-                                <td className="py-3 px-2 text-center font-bold">{item.qty || 1}</td>
-                                <td className="py-3 px-3 text-right font-bold">
-                                  {item.amount ? Number(item.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 }) : "0.00"}
+                  {/* Items table */}
+                  <div className="flex-1 overflow-x-auto bg-white rounded-lg border border-[#e2e8f0] mt-3">
+                    <table className="w-full text-[12px] border-collapse">
+                      <thead>
+                        <tr className="border-b-2 border-[#1e2e4c] bg-[#334d77] text-white font-bold uppercase text-[10px] tracking-[0.05em]">
+                          <th className="py-3 px-3 text-left w-8">#</th>
+                          <th className="py-3 px-2 text-left">Product Description</th>
+                          <th className="py-3 px-2 text-center w-16">Unit</th>
+                          <th className="py-3 px-2 text-right w-24">Price (₹)</th>
+                          <th className="py-3 px-2 text-center w-16">Qty</th>
+                          <th className="py-3 px-3 text-right w-24">Total (₹)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(() => {
+                          const { items } = parseDescriptionForItems(viewQuotation.description);
+                          const validItems = items.filter(item => item.product_id !== "");
+                          if (validItems.length === 0) {
+                            return (
+                              <tr>
+                                <td colSpan="6" className="py-5 text-center text-[#94a3b8] italic border-b border-[#f1f5f9]">
+                                  No products selected.
                                 </td>
                               </tr>
-                            ));
-                          })()}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Financial breakdown */}
-                    {(() => {
-                      const subTotalVal = Number(viewQuotation.amount || 0);
-                      const discountPercentVal = Number(viewQuotation.discount || 0);
-                      const discountRsVal = viewQuotation.discount_rs ? Number(viewQuotation.discount_rs) : ((subTotalVal * discountPercentVal) / 100);
-                      const taxPercentVal = Number(viewQuotation.tax || 0);
-                      const taxRsVal = ((subTotalVal - discountRsVal) * taxPercentVal) / 100;
-                      return (
-                        <div className="mt-6 flex justify-end text-[12px] flex-shrink-0">
-                          <div className="w-[300px] bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-4 text-left">
-                            <div className="flex justify-between text-[#475569] font-semibold mb-2.5">
-                              <span>Subtotal:</span>
-                              <span>
-                                ₹ {subTotalVal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                              </span>
-                            </div>
-                            {discountPercentVal > 0 && (
-                              <div className="flex justify-between text-[#059669] font-semibold mb-2.5">
-                                <span>Discount ({discountPercentVal}%):</span>
-                                <span>
-                                  -₹ {discountRsVal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                </span>
-                              </div>
-                            )}
-                            {taxPercentVal > 0 && (
-                              <div className="flex justify-between text-[#475569] font-semibold mb-2.5">
-                                <span>Tax ({taxPercentVal}%):</span>
-                                <span>
-                                  ₹ {taxRsVal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                </span>
-                              </div>
-                            )}
-                            <div className="flex justify-between items-center text-[#1e293b] font-black mt-3 pt-3 border-t border-dashed border-[#cbd5e1]">
-                              <span className="uppercase">Grand Total:</span>
-                              <span className="text-[18px] text-[#334d77]">
-                                ₹ {Number(viewQuotation.grand_total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-
-                    {/* Terms & signature footer */}
-                    <div className="border-t border-[#e2e8f0] pt-6 mt-6 flex flex-row justify-between gap-6 flex-shrink-0 text-left">
-                      <div className="w-[60%] text-left">
-                        {(() => {
-                          const { note } = parseDescriptionForItems(viewQuotation.description);
-                          if (note) {
-                            return (
-                              <>
-                                <p className="text-[10px] text-[#64748b] uppercase font-extrabold mb-2 flex items-center gap-1.5">
-                                  <span className="text-[#334d77]">●</span> Terms & Conditions
-                                </p>
-                                <div className="text-[10px] text-[#475569] bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-3 min-h-[60px] font-medium whitespace-pre-wrap leading-relaxed">
-                                  {note}
-                                </div>
-                              </>
                             );
                           }
-                          return null;
+                          return validItems.map((item, index) => (
+                            <tr key={index} className="border-b border-[#f1f5f9] text-[#334155]">
+                              <td className="py-3 px-3 text-left">{index + 1}</td>
+                              <td className="py-3 px-2 text-left">{item.product_name}</td>
+                              <td className="py-3 px-2 text-center">{item.unit || "—"}</td>
+                              <td className="py-3 px-2 text-right">
+                                {item.price ? Number(item.price).toLocaleString('en-IN', { minimumFractionDigits: 2 }) : "0.00"}
+                              </td>
+                              <td className="py-3 px-2 text-center font-bold">{item.qty || 1}</td>
+                              <td className="py-3 px-3 text-right font-bold">
+                                {item.amount ? Number(item.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 }) : "0.00"}
+                              </td>
+                            </tr>
+                          ));
                         })()}
-                      </div>
-                      <div className="w-[35%] flex flex-col items-end justify-end text-right">
-                        <div className="w-full border-b border-[#cbd5e1] h-[50px] mb-2 flex items-end justify-center pb-2 text-[10px] italic text-[#94a3b8] opacity-60">
-                          Signature / Stamp
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Financial breakdown */}
+                  {(() => {
+                    const subTotalVal = Number(viewQuotation.amount || 0);
+                    const discountPercentVal = Number(viewQuotation.discount || 0);
+                    const discountRsVal = viewQuotation.discount_rs ? Number(viewQuotation.discount_rs) : ((subTotalVal * discountPercentVal) / 100);
+                    const taxPercentVal = Number(viewQuotation.tax || 0);
+                    const taxRsVal = ((subTotalVal - discountRsVal) * taxPercentVal) / 100;
+                    return (
+                      <div className="mt-6 flex justify-end text-[12px] flex-shrink-0">
+                        <div className="w-[300px] bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-4 text-left">
+                          <div className="flex justify-between text-[#475569] font-semibold mb-2.5">
+                            <span>Subtotal:</span>
+                            <span>
+                              ₹ {subTotalVal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                          {discountPercentVal > 0 && (
+                            <div className="flex justify-between text-[#059669] font-semibold mb-2.5">
+                              <span>Discount ({discountPercentVal}%):</span>
+                              <span>
+                                -₹ {discountRsVal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </span>
+                            </div>
+                          )}
+                          {taxPercentVal > 0 && (
+                            <div className="flex justify-between text-[#475569] font-semibold mb-2.5">
+                              <span>Tax ({taxPercentVal}%):</span>
+                              <span>
+                                ₹ {taxRsVal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </span>
+                            </div>
+                          )}
+                          <div className="flex justify-between items-center text-[#1e293b] font-black mt-3 pt-3 border-t border-dashed border-[#cbd5e1]">
+                            <span className="uppercase">Grand Total:</span>
+                            <span className="text-[18px] text-[#334d77]">
+                              ₹ {Number(viewQuotation.grand_total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </span>
+                          </div>
                         </div>
-                        <p className="text-[10px] font-extrabold text-[#1e293b] uppercase tracking-[0.05em] m-0">Authorized Signatory</p>
-                        <p className="text-[9px] text-[#64748b] mt-0.5 font-semibold m-0">Guru Tech Packaging Solution</p>
                       </div>
+                    );
+                  })()}
+
+                  {/* Terms & signature footer */}
+                  <div className="border-t border-[#e2e8f0] pt-6 mt-6 flex flex-row justify-between gap-6 flex-shrink-0 text-left">
+                    <div className="w-[60%] text-left">
+                      {(() => {
+                        const { note } = parseDescriptionForItems(viewQuotation.description);
+                        if (note) {
+                          return (
+                            <>
+                              <p className="text-[10px] text-[#64748b] uppercase font-extrabold mb-2 flex items-center gap-1.5">
+                                <span className="text-[#334d77]">●</span> Terms & Conditions
+                              </p>
+                              <div className="text-[10px] text-[#475569] bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-3 min-h-[60px] font-medium whitespace-pre-wrap leading-relaxed">
+                                {note}
+                              </div>
+                            </>
+                          );
+                        }
+                        return null;
+                      })()}
                     </div>
+                    <div className="w-[35%] flex flex-col items-end justify-end text-right">
+                      <div className="w-full border-b border-[#cbd5e1] h-[50px] mb-2 flex items-end justify-center pb-2 text-[10px] italic text-[#94a3b8] opacity-60">
+                        Signature / Stamp
+                      </div>
+                      <p className="text-[10px] font-extrabold text-[#1e293b] uppercase tracking-[0.05em] m-0">Authorized Signatory</p>
+                      <p className="text-[9px] text-[#64748b] mt-0.5 font-semibold m-0">Digiva Inc</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -5014,11 +5011,10 @@ className="w-full mt-1 sm:mt-1.5 border border-orange-300 rounded-sm px-2 sm:px-
                               type="button"
                               onClick={() => removeQuoteItemRow(idx)}
                               disabled={quoteItems.length === 1}
-                              className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors shadow-sm ${
-                                quoteItems.length === 1
-                                  ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                                  : "bg-rose-500 text-white hover:bg-rose-600"
-                              }`}
+                              className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors shadow-sm ${quoteItems.length === 1
+                                ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                                : "bg-rose-500 text-white hover:bg-rose-600"
+                                }`}
                               title="Delete row"
                             >
                               ✕
