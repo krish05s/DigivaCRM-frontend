@@ -389,7 +389,7 @@ export default function ProformaPage() {
       await new Promise((resolve) => {
         logo.onload = resolve;
       });
-      doc.addImage(logo, "PNG", 14, 6, 38, 18);
+      doc.addImage(logo, "PNG", 9, 6, 35, 15);
 
       doc.setTextColor(...orange);
       doc.setFont("helvetica", "bold");
@@ -708,13 +708,13 @@ export default function ProformaPage() {
       doc.setTextColor(...white);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(8.5);
-      doc.text("Guru Tech Packaging Solution", 8, pageH - 4.5);
+      doc.text("Digiva Inc", 8, pageH - 4.5);
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(7);
       doc.setTextColor(200, 200, 200);
       doc.text(
-        `© ${new Date().getFullYear()} Guru Tech Packaging Solution — All rights reserved.   |   Generated: ${new Date().toLocaleDateString("en-IN")}`,
+        `© ${new Date().getFullYear()} Digiva Inc — All rights reserved.   |   Generated: ${new Date().toLocaleDateString("en-IN")}`,
         pageW - 14,
         pageH - 4.5,
         { align: "right" },
