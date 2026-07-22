@@ -277,8 +277,6 @@ export default function Page() {
 
             </div>
           </form>
-<<<<<<< Updated upstream
-=======
 
           {/* ===================== VIEW ORGANIZATION MODAL ===================== */}
           {viewOrg && (
@@ -663,7 +661,6 @@ export default function Page() {
               </div>
             </div>
           )}
->>>>>>> Stashed changes
         </div>
       </CheckPermission>
     </>
