@@ -3,7 +3,8 @@ import Header from "@/app/components/header";
 import Link from "next/link";
 import axios from "redaxios";
 import React, { useEffect, useState } from "react";
-import { ChevronUpIcon, ChevronDownIcon } from "lucide-react";
+import { ChevronUpIcon, ChevronDownIcon, Eye, Pencil, Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
 import useAuth from "@/app/components/useAuth";
 import CheckPermission from "@/app/components/CheckPermission";
 
@@ -18,7 +19,59 @@ export default function Page() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const [sortConfig, setSortConfig] = useState({ column: null, direction: null });
-  const [scrollOffsets, setScrollOffsets] = useState({}); 
+  const [scrollOffsets, setScrollOffsets] = useState({});
+
+  // ---- View / Edit / Delete popup states ----
+  const emptyOrgForm = {
+    organization_name: "",
+    industry: "",
+    email: "",
+    address_1: "",
+    address_2: "",
+    country: "",
+    state: "",
+    city: "",
+    pincode: "",
+    gst_number: "",
+    contact_1: "",
+    contact_2: "",
+    benificiary_name: "",
+    bank_name: "",
+    account_no: "",
+    account_type: "",
+    ifsc_code: "",
+    micr_code: "",
+  };
+
+  const [viewOrg, setViewOrg] = useState(null);        // item currently shown in View popup
+  const [editId, setEditId] = useState(null);          // id of item currently shown in Edit popup
+  const [editFormData, setEditFormData] = useState(emptyOrgForm);
+  const [deleteOrg, setDeleteOrg] = useState(null);    // item currently shown in Delete confirm popup
+
+  // ✅ NEW: Add Organization Modal states
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addActiveTab, setAddActiveTab] = useState("organization");
+  const [addIsSubmitting, setAddIsSubmitting] = useState(false);
+  const [addFormData, setAddFormData] = useState({
+    organization_name: "",
+    industry: "",
+    email: "",
+    address_1: "",
+    address_2: "",
+    country: "",
+    state: "",
+    city: "",
+    pincode: "",
+    gst_number: "",
+    contact_1: "",
+    contact_2: "",
+    benificiary_name: "",
+    bank_name: "",
+    account_no: "",
+    account_type: "",
+    ifsc_code: "",
+    micr_code: "",
+  });
 
   // Fetch table data (fetching all for client-side pagination)
   const fetchData = async (sort = sortConfig) => {
@@ -41,6 +94,131 @@ export default function Page() {
   useEffect(() => {
     fetchData();
   }, []);
+
+// ✅ NEW: ADD ORGANIZATION (modal) handlers
+  const handleAddChange = (e) => {
+    setAddFormData({ ...addFormData, [e.target.name]: e.target.value });
+  };
+
+  const resetAddForm = () => {
+    setAddFormData({
+      organization_name: "",
+      industry: "",
+      email: "",
+      address_1: "",
+      address_2: "",
+      country: "",
+      state: "",
+      city: "",
+      pincode: "",
+      gst_number: "",
+      contact_1: "",
+      contact_2: "",
+      benificiary_name: "",
+      bank_name: "",
+      account_no: "",
+      account_type: "",
+      ifsc_code: "",
+      micr_code: "",
+    });
+    setAddActiveTab("organization");
+  };
+
+  const handleAddSubmit = async (e) => {
+    e.preventDefault();
+    if (addIsSubmitting) return;
+
+    if (!addFormData.organization_name.trim()) {
+      toast.error("Organization Name is required!");
+      setAddActiveTab("organization");
+      return;
+    }
+
+    setAddIsSubmitting(true);
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(`${API_BASE}/api/organizations/add`, addFormData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Organization added successfully!");
+      resetAddForm();
+      setShowAddModal(false);
+      fetchData();
+    } catch (error) {
+      console.error("Error inserting data:", error);
+      toast.error("Failed to add organization!");
+    } finally {
+      setAddIsSubmitting(false);
+    }
+  };
+
+  // Open View popup
+  const handleView = (item) => {
+    setViewOrg(item);
+  };
+
+  // Open Edit popup, form ma existing data bhari devanu
+  const handleEditOpen = (item) => {
+    setEditId(item.id);
+    setEditFormData({
+      organization_name: item.organization_name || "",
+      industry: item.industry || "",
+      email: item.email || "",
+      address_1: item.address_1 || "",
+      address_2: item.address_2 || "",
+      country: item.country || "",
+      state: item.state || "",
+      city: item.city || "",
+      pincode: item.pincode || "",
+      gst_number: item.gst_number || "",
+      contact_1: item.contact_1 || "",
+      contact_2: item.contact_2 || "",
+      benificiary_name: item.benificiary_name || "",
+      bank_name: item.bank_name || "",
+      account_no: item.account_no || "",
+      account_type: item.account_type || "",
+      ifsc_code: item.ifsc_code || "",
+      micr_code: item.micr_code || "",
+    });
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Edit popup no Save button -> update API call
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(`${API_BASE}/api/organizations/update/${editId}`, editFormData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Organization updated successfully!");
+      setEditId(null);
+      fetchData();
+    } catch (err) {
+      console.error("Error updating organization:", err);
+      toast.error("Failed to update organization!");
+    }
+  };
+
+  // Delete popup no Delete button -> delete API call
+  const handleDeleteConfirm = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API_BASE}/api/organizations/delete/${deleteOrg.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Organization deleted successfully!");
+      setDeleteOrg(null);
+      fetchData();
+    } catch (err) {
+      console.error("Error deleting organization:", err);
+      toast.error("Failed to delete organization!");
+    }
+  };
 
   // Reset page when items per page changes
   useEffect(() => {
@@ -149,18 +327,21 @@ export default function Page() {
             </div>
 
             <div className="w-full sm:w-auto">
-              <Link href="/setup/org-master/add-table" className="block text-center bg-blue-800 hover:bg-blue-900 text-white px-5 py-2 rounded-sm font-bold text-sm w-full sm:w-auto">
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="block text-center bg-blue-800 hover:bg-blue-900 text-white px-5 py-2 rounded-sm font-bold text-sm w-full sm:w-auto"
+              >
                 + ADD ORGANIZATION
-              </Link>
+              </button>
             </div>
           </div>
 
           {/* Table Section */}
           <form className="p-2 w-full">
             <div className="bg-white shadow rounded-2xl p-4 md:p-6">
-              <div className="overflow-x-auto">
-                <table className="min-w-full border border-gray-200 text-sm text-left">
-                  <thead className="bg-gray-50 text-gray-700 border-b border-gray-200">
+              <div className="custom-scroll overflow-x-auto overflow-y-scroll max-h-[260px] border border-gray-200 rounded-lg">
+                <table className="min-w-full text-sm text-left">
+                  <thead className="bg-gray-50 text-gray-700 border-b border-gray-200 sticky top-0 z-10">
                     <tr>
                       <th className="px-3 py-2 text-center">#</th>
                       <th className="px-4 py-2">
@@ -178,6 +359,11 @@ export default function Page() {
                       <th className="px-4 py-2">
                         State <ColumnScroll columnKey="state" />
                       </th>
+
+                      <th className="px-4 py-2">
+                        action<ColumnScroll columnKey="action" />
+                      </th>
+
                     </tr>
                   </thead>
 
@@ -193,6 +379,32 @@ export default function Page() {
                           <td className="p-3 text-gray-600">{item.address_1}</td>
                           <td className="p-3 text-gray-600">{item.country}</td>
                           <td className="p-3 text-gray-600">{item.state}</td>
+                     <td className="p-3 text-gray-600 whitespace-nowrap">
+                            <div className="flex items-center gap-3">
+                            <button
+                                    type="button"
+                                    onClick={() => handleView(item)}
+                                    className="text-gray-400 hover:text-green-600 cursor-pointer"
+                                  >
+                                    <i className="bi bi-eye text-xl"></i>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEditOpen(item)}
+                                    className="text-gray-400 hover:text-blue-800 cursor-pointer"
+                                  >
+                                    <i className="bi bi-pencil-square text-xl"></i>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => setDeleteOrg(item)}
+                                    className="text-gray-400 hover:text-red-600 cursor-pointer"
+                                  >
+                                    <i className="bi bi-trash3 text-xl"></i>
+                                  </button>                            </div>
+                          </td>
                         </tr>
                       ))
                     ) : (
@@ -251,11 +463,10 @@ export default function Page() {
                           type="button"
                           key={page}
                           onClick={() => setCurrentPage(page)}
-                          className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
-                            currentPage === page
+                          className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${currentPage === page
                               ? "bg-[#212121] text-white shadow-md shadow-black/10"
                               : "border border-slate-200 text-slate-600 hover:bg-slate-50"
-                          }`}
+                            }`}
                         >
                           {page}
                         </button>
@@ -277,6 +488,386 @@ export default function Page() {
 
             </div>
           </form>
+
+          {/* ===================== VIEW ORGANIZATION MODAL ===================== */}
+          {viewOrg && (
+            <div className="fixed inset-0 bg-gray-900/40 z-50 flex justify-center items-center overflow-y-auto">
+              <div className="bg-white rounded-xl shadow-lg p-6 w-[800px] relative my-10 max-h-[85vh] overflow-y-auto">
+                <button type="button" onClick={() => setViewOrg(null)} className="absolute top-5 right-4 text-xl text-gray-500 hover:text-gray-800">
+                  ✕
+                </button>
+
+                <h3 className="text-lg mb-3 text-black">
+                  View Organization
+                  <hr className="mt-3 mb-5 text-gray-300" />
+                </h3>
+
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Organization Name</label>
+                    <input type="text" value={viewOrg.organization_name || ""} disabled className="w-full border rounded p-2 bg-gray-100 cursor-not-allowed" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Industry</label>
+                    <input type="text" value={viewOrg.industry || ""} disabled className="w-full border rounded p-2 bg-gray-100 cursor-not-allowed" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Email</label>
+                    <input type="text" value={viewOrg.email || ""} disabled className="w-full border rounded p-2 bg-gray-100 cursor-not-allowed" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Address Line 1</label>
+                    <input type="text" value={viewOrg.address_1 || ""} disabled className="w-full border rounded p-2 bg-gray-100 cursor-not-allowed" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Address Line 2</label>
+                    <input type="text" value={viewOrg.address_2 || ""} disabled className="w-full border rounded p-2 bg-gray-100 cursor-not-allowed" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Country</label>
+                    <input type="text" value={viewOrg.country || ""} disabled className="w-full border rounded p-2 bg-gray-100 cursor-not-allowed" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">State</label>
+                    <input type="text" value={viewOrg.state || ""} disabled className="w-full border rounded p-2 bg-gray-100 cursor-not-allowed" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">City</label>
+                    <input type="text" value={viewOrg.city || ""} disabled className="w-full border rounded p-2 bg-gray-100 cursor-not-allowed" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Pin Code</label>
+                    <input type="text" value={viewOrg.pincode || ""} disabled className="w-full border rounded p-2 bg-gray-100 cursor-not-allowed" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Contact 1</label>
+                    <input type="text" value={viewOrg.contact_1 || ""} disabled className="w-full border rounded p-2 bg-gray-100 cursor-not-allowed" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Contact 2</label>
+                    <input type="text" value={viewOrg.contact_2 || ""} disabled className="w-full border rounded p-2 bg-gray-100 cursor-not-allowed" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Bank Name</label>
+                    <input type="text" value={viewOrg.bank_name || ""} disabled className="w-full border rounded p-2 bg-gray-100 cursor-not-allowed" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Account No.</label>
+                    <input type="text" value={viewOrg.account_no || ""} disabled className="w-full border rounded p-2 bg-gray-100 cursor-not-allowed" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">IFSC Code</label>
+                    <input type="text" value={viewOrg.ifsc_code || ""} disabled className="w-full border rounded p-2 bg-gray-100 cursor-not-allowed" />
+                  </div>
+                </div>
+
+                <div className="flex justify-end mt-4">
+                  <button type="button" onClick={() => setViewOrg(null)} className="px-4 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900">
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ===================== EDIT ORGANIZATION MODAL ===================== */}
+          {editId && (
+            <div className="fixed inset-0 bg-gray-900/40 z-50 flex justify-center items-center overflow-y-auto">
+              <div className="bg-white rounded-xl shadow-lg p-6 w-[800px] relative my-10 max-h-[85vh] overflow-y-auto">
+                <button type="button" onClick={() => setEditId(null)} className="absolute top-5 right-4 text-xl text-gray-500 hover:text-gray-800">
+                  ✕
+                </button>
+
+                <h3 className="text-lg mb-3 text-black">
+                  Edit Organization
+                  <hr className="mt-3 mb-5 text-gray-300" />
+                </h3>
+
+                <form onSubmit={handleEditSubmit}>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Organization Name *</label>
+                      <input type="text" name="organization_name" value={editFormData.organization_name} onChange={handleEditChange} className="w-full border rounded p-2" required />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Industry *</label>
+                      <input type="text" name="industry" value={editFormData.industry} onChange={handleEditChange} className="w-full border rounded p-2" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Email *</label>
+                      <input type="text" name="email" value={editFormData.email} onChange={handleEditChange} className="w-full border rounded p-2" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Address Line 1 *</label>
+                      <input type="text" name="address_1" value={editFormData.address_1} onChange={handleEditChange} className="w-full border rounded p-2" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Address Line 2</label>
+                      <input type="text" name="address_2" value={editFormData.address_2} onChange={handleEditChange} className="w-full border rounded p-2" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Country</label>
+                      <input type="text" name="country" value={editFormData.country} onChange={handleEditChange} className="w-full border rounded p-2" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">State</label>
+                      <input type="text" name="state" value={editFormData.state} onChange={handleEditChange} className="w-full border rounded p-2" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">City</label>
+                      <input type="text" name="city" value={editFormData.city} onChange={handleEditChange} className="w-full border rounded p-2" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Pin Code</label>
+                      <input type="text" name="pincode" value={editFormData.pincode} onChange={handleEditChange} className="w-full border rounded p-2" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Contact 1</label>
+                      <input type="text" name="contact_1" value={editFormData.contact_1} onChange={handleEditChange} className="w-full border rounded p-2" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Contact 2</label>
+                      <input type="text" name="contact_2" value={editFormData.contact_2} onChange={handleEditChange} className="w-full border rounded p-2" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Bank Name</label>
+                      <input type="text" name="bank_name" value={editFormData.bank_name} onChange={handleEditChange} className="w-full border rounded p-2" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Account No.</label>
+                      <input type="text" name="account_no" value={editFormData.account_no} onChange={handleEditChange} className="w-full border rounded p-2" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">IFSC Code</label>
+                      <input type="text" name="ifsc_code" value={editFormData.ifsc_code} onChange={handleEditChange} className="w-full border rounded p-2" />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 mt-2">
+                    <button type="button" onClick={() => setEditId(null)} className="px-4 py-2 bg-gray-200 rounded-lg">
+                      Cancel
+                    </button>
+                    <button type="submit" className="bg-blue-800 text-white px-4 py-1.5 rounded-lg">
+                      Save
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* ===================== DELETE CONFIRM MODAL ===================== */}
+         {/* ===================== DELETE CONFIRM MODAL ===================== */}
+          {deleteOrg && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30">
+              <div className="bg-white rounded-sm shadow-xl w-full max-w-sm border border-gray-100 overflow-hidden">
+                <div className="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-blue-100 to-white">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-700 inline-block"></span>
+                    <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                      Delete Organization
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setDeleteOrg(null)}
+                    className="w-7 h-7 flex items-center justify-center text-blue-700 text-md"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="p-6 text-center">
+                  <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                      <path d="M10 11v6M14 11v6" />
+                      <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+                    </svg>
+                  </div>
+                  <p className="font-semibold text-gray-800 text-base mb-1">{deleteOrg.organization_name}</p>
+                  <p className="text-sm text-gray-400">This action cannot be undone. Are you sure?</p>
+                </div>
+                <div className="flex gap-3 px-5 pb-5">
+                  <button
+                    onClick={() => setDeleteOrg(null)}
+                    className="flex-1 px-4 py-2 text-sm text-gray-500 border border-gray-200 rounded-sm hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                 <button
+                    onClick={handleDeleteConfirm}
+                    className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-blue-800 hover:bg-blue-900 rounded-sm transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ===================== ✅ NEW: ADD ORGANIZATION MODAL ===================== */}
+          {showAddModal && (
+            <div className="fixed inset-0 bg-gray-900/40 z-50 flex justify-center items-center overflow-y-auto">
+              <div className="bg-white rounded-xl shadow-lg w-[900px] relative my-10 max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center px-6 pt-5">
+                  <h3 className="text-lg text-black">Add Organization</h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddModal(false);
+                      resetAddForm();
+                    }}
+                    className="text-xl text-gray-500 hover:text-gray-800"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <hr className="mt-3 mb-4 text-gray-300 mx-6" />
+
+                <form onSubmit={handleAddSubmit} className="px-6 pb-6">
+                  {/* Tab Header */}
+                  <div className="flex flex-wrap mb-4 border-b border-gray-200">
+                    <button
+                      type="button"
+                      onClick={() => setAddActiveTab("organization")}
+                      className={`px-4 py-2 font-medium ${addActiveTab === "organization" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-600"}`}
+                    >
+                      Organization Setup
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAddActiveTab("bank")}
+                      className={`px-4 py-2 font-medium ${addActiveTab === "bank" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-600"}`}
+                    >
+                      Bank Details
+                    </button>
+                  </div>
+
+                  {/* Section 1 */}
+                  {addActiveTab === "organization" && (
+                    <div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Organization Name *</label>
+                          <input type="text" name="organization_name" value={addFormData.organization_name} onChange={handleAddChange} className="w-full border rounded p-2" required />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Industry *</label>
+                          <input type="text" name="industry" value={addFormData.industry} onChange={handleAddChange} className="w-full border rounded p-2" required />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Email *</label>
+                          <input type="text" name="email" value={addFormData.email} onChange={handleAddChange} className="w-full border rounded p-2" required />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Address Line 1 *</label>
+                          <input type="text" name="address_1" value={addFormData.address_1} onChange={handleAddChange} className="w-full border rounded p-2" required />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Address Line 2 *</label>
+                          <input type="text" name="address_2" value={addFormData.address_2} onChange={handleAddChange} className="w-full border rounded p-2" required />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Country Name *</label>
+                          <input type="text" name="country" value={addFormData.country} onChange={handleAddChange} className="w-full border rounded p-2" required />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">State *</label>
+                          <input type="text" name="state" value={addFormData.state} onChange={handleAddChange} className="w-full border rounded p-2" required />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">City *</label>
+                          <input type="text" name="city" value={addFormData.city} onChange={handleAddChange} className="w-full border rounded p-2" required />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Pin Code *</label>
+                          <input type="text" name="pincode" value={addFormData.pincode} onChange={handleAddChange} className="w-full border rounded p-2" required />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Contact 1 *</label>
+                          <input type="text" name="contact_1" value={addFormData.contact_1} onChange={handleAddChange} className="w-full border rounded p-2" required />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Contact 2 *</label>
+                          <input type="text" name="contact_2" value={addFormData.contact_2} onChange={handleAddChange} className="w-full border rounded p-2" required />
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row sm:justify-end gap-3 sm:gap-4 mt-6">
+                        <button type="submit" disabled={addIsSubmitting} className="w-full sm:w-auto bg-blue-800 text-white px-6 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
+                          {addIsSubmitting ? "Saving..." : "Save"}
+                        </button>
+                        <button type="button" onClick={() => setAddActiveTab("bank")} className="w-full sm:w-auto bg-gray-700 text-white px-6 py-2 rounded">
+                          Next
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowAddModal(false);
+                            resetAddForm();
+                          }}
+                          className="w-full sm:w-auto border hover:bg-gray-200 px-4 py-2 rounded"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Section 2 */}
+                  {addActiveTab === "bank" && (
+                    <div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Beneficiary Name</label>
+                          <input type="text" name="benificiary_name" value={addFormData.benificiary_name} onChange={handleAddChange} className="w-full border rounded p-2" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Bank Name</label>
+                          <input type="text" name="bank_name" value={addFormData.bank_name} onChange={handleAddChange} className="w-full border rounded p-2" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Account No.</label>
+                          <input type="text" name="account_no" value={addFormData.account_no} onChange={handleAddChange} className="w-full border rounded p-2" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Account Type</label>
+                          <input type="text" name="account_type" value={addFormData.account_type} onChange={handleAddChange} className="w-full border rounded p-2" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">IFSC Code</label>
+                          <input type="text" name="ifsc_code" value={addFormData.ifsc_code} onChange={handleAddChange} className="w-full border rounded p-2" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">MICR Code</label>
+                          <input type="text" name="micr_code" value={addFormData.micr_code} onChange={handleAddChange} className="w-full border rounded p-2" />
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row sm:justify-end gap-3 sm:gap-4 mt-6">
+                        <button type="button" onClick={() => setAddActiveTab("organization")} className="w-full sm:w-auto border hover:bg-gray-200 px-4 py-2 rounded">
+                          Previous
+                        </button>
+                        <button type="submit" disabled={addIsSubmitting} className="w-full sm:w-auto bg-blue-800 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
+                          {addIsSubmitting ? "Saving..." : "Save"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowAddModal(false);
+                            resetAddForm();
+                          }}
+                          className="w-full sm:w-auto border hover:bg-gray-200 px-4 py-2 rounded"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </form>
+              </div>
+            </div>
+          )}
         </div>
       </CheckPermission>
     </>

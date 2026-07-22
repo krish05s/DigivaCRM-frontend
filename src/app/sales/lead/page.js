@@ -57,6 +57,38 @@ export default function Page() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewLead, setViewLead] = useState(null);
 
+  // ✅ NEW: Add Lead Modal states
+  const [showAddLeadModal, setShowAddLeadModal] = useState(false);
+  const [addLeadSubmitting, setAddLeadSubmitting] = useState(false);
+  const [addLeadErrors, setAddLeadErrors] = useState({});
+  const [addLeadForm, setAddLeadForm] = useState({
+    company_name: "",
+    customer_name: "",
+    reference: "",
+    source: "",
+    status: "Qualified",
+    priority: "",
+    assignee: "",
+    category: "",
+    description: "",
+  });
+
+  // ✅ NEW: Edit Lead Modal states
+  const [showEditLeadModal, setShowEditLeadModal] = useState(false);
+  const [editLeadSubmitting, setEditLeadSubmitting] = useState(false);
+  const [editLeadForm, setEditLeadForm] = useState({
+    lead_id: "",
+    company_name: "",
+    customer_name: "",
+    reference: "",
+    source: "",
+    status: "",
+    priority: "",
+    assignee: "",
+    category: "",
+    description: "",
+  });
+
   const [updateForm, setUpdateForm] = useState({
     follow_up_date: "",
     activity_type: "",
@@ -463,7 +495,7 @@ export default function Page() {
   // ===================================================
   // EDIT LEAD
   // ===================================================
-  const handleEdit = async (lead) => {
+ const handleEdit = async (lead) => {
     try {
       const res = await axios.get(
         `${API_BASE}/api/lead/sales/leads/view-leads/${lead.lead_id}`,
@@ -472,26 +504,78 @@ export default function Page() {
 
       const leadData = res.data.lead;
 
-      sessionStorage.setItem(
-        "editLead",
-        JSON.stringify({
-          lead_id: leadData.lead_id,
-          company_name: leadData.company_name,
-          customer_name: leadData.customer_name,
-          reference: leadData.reference,
-          source: leadData.source,
-          status: leadData.status,
-          product_name: leadData.product_name,
-          priority: leadData.priority,
-          assignee: leadData.assignee,
-          category: leadData.category,
-          description: leadData.description,
-        }),
-      );
-
-      router.push("/sales/lead/update-lead");
+      setEditLeadForm({
+        lead_id: leadData.lead_id || "",
+        company_name: leadData.company_id || leadData.company_name || "",
+        customer_name: leadData.customer_name || "",
+        reference: leadData.reference || "",
+        source: leadData.source_id || leadData.source || "",
+        status: leadData.status || "",
+        priority: leadData.priority || "",
+        assignee: leadData.assignee || "",
+        category: leadData.category_id || leadData.category || "",
+        description: leadData.description || "",
+      });
+      setShowEditLeadModal(true);
     } catch (error) {
       console.log(error);
+      toast.error("Failed to load lead details");
+    }
+  };
+
+  // ✅ NEW: EDIT LEAD (modal) handlers
+  const handleEditLeadChange = (e) => {
+    const { name, value } = e.target;
+    setEditLeadForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditLeadSubmit = async (e) => {
+    e.preventDefault();
+    if (!editLeadForm.lead_id) {
+      toast.error("Lead ID missing. Cannot update.");
+      return;
+    }
+    try {
+      setEditLeadSubmitting(true);
+      const response = await fetch(
+        `${API_BASE}/api/lead/update/${editLeadForm.lead_id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify({
+            company_name: editLeadForm.company_name,
+            customer_name: editLeadForm.customer_name,
+            reference: editLeadForm.reference,
+            source: editLeadForm.source,
+            status: editLeadForm.status,
+            priority: editLeadForm.priority,
+            assignee: editLeadForm.assignee,
+            category: editLeadForm.category,
+            description: editLeadForm.description,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success("Lead Updated Successfully");
+        setShowEditLeadModal(false);
+        if (editLeadForm.status === "Won") {
+          setActiveTab("Won");
+        }
+        fetchLeads();
+      } else {
+        toast.error(data.message || "Update Failed");
+      }
+    } catch (error) {
+      console.error("Update error:", error);
+      toast.error("Something went wrong");
+    } finally {
+      setEditLeadSubmitting(false);
     }
   };
 
@@ -548,6 +632,71 @@ export default function Page() {
     } catch (err) {
       console.log(err);
       toast.error("Failed to update status");
+    }
+  };
+
+  // ✅ NEW: ADD LEAD (modal) handlers
+  const handleAddLeadChange = (e) => {
+    const { name, value } = e.target;
+    setAddLeadForm((prev) => ({ ...prev, [name]: value }));
+    if (addLeadErrors[name]) setAddLeadErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const validateAddLead = () => {
+    const newErrors = {};
+    if (!addLeadForm.customer_name.trim()) newErrors.customer_name = "Customer Name is required";
+    if (!addLeadForm.reference.trim()) newErrors.reference = "Lead Title is required";
+    if (!addLeadForm.source) newErrors.source = "Source is required";
+    return newErrors;
+  };
+
+  const resetAddLeadForm = () => {
+    setAddLeadForm({
+      company_name: "",
+      customer_name: "",
+      reference: "",
+      source: "",
+      status: "Qualified",
+      priority: "",
+      assignee: "",
+      category: "",
+      description: "",
+    });
+    setAddLeadErrors({});
+  };
+
+  const handleAddLeadSubmit = async (e) => {
+    e.preventDefault();
+    const newErrors = validateAddLead();
+    setAddLeadErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+    try {
+      setAddLeadSubmitting(true);
+      const payload = {
+        ...addLeadForm,
+        source: addLeadForm.source || null,
+        priority: addLeadForm.priority || null,
+        category: addLeadForm.category || null,
+      };
+      const res = await axios.post(`${API_BASE}/api/lead/insert`, payload, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (res.data && res.data.success) {
+        toast.success("Lead added successfully!");
+        resetAddLeadForm();
+        setShowAddLeadModal(false);
+        fetchLeads();
+      } else {
+        toast.error(res.data?.message || "Failed to add lead");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to add lead. Please try again.");
+    } finally {
+      setAddLeadSubmitting(false);
     }
   };
 
@@ -642,24 +791,24 @@ export default function Page() {
   // OVERDUE LEAD HIGHLIGHT
   // ===================================================
 
- const isOverdueLead = (lead) => {
-   // Won / Lost no highlight
-   if (lead.status !== "Pending") {
-     return false;
-   }
+  const isOverdueLead = (lead) => {
+    // Won / Lost no highlight
+    if (lead.status !== "Pending") {
+      return false;
+    }
 
-   // server current time
-   const serverNow = new Date(lead.server_time);
+    // server current time
+    const serverNow = new Date(lead.server_time);
 
-   // last activity time
-   const lastActivity = new Date(lead.updated_at || lead.created_at);
+    // last activity time
+    const lastActivity = new Date(lead.updated_at || lead.created_at);
 
-   // time difference
-   const diffHours = (serverNow - lastActivity) / (1000 * 60 * 60);
+    // time difference
+    const diffHours = (serverNow - lastActivity) / (1000 * 60 * 60);
 
-   // 24+ hours
-   return diffHours >= 24;
- };
+    // 24+ hours
+    return diffHours >= 24;
+  };
 
   // ===================================================
   // TAB + FILTER MERGE
@@ -669,10 +818,10 @@ export default function Page() {
   const filteredLeads = hasActiveFilters
     ? leads
     : leads.filter((l) => {
-        if (activeTab === "Pending")
-          return l.status !== "Won" && l.status !== "Lost";
-        return l.status === activeTab;
-      });
+      if (activeTab === "Pending")
+        return l.status !== "Won" && l.status !== "Lost";
+      return l.status === activeTab;
+    });
 
   const pendingCount = leads.filter((l) => l.status === "Pending").length;
   const wonCount = leads.filter((l) => l.status === "Won").length;
@@ -755,7 +904,7 @@ export default function Page() {
           },
         );
         setLeadSource(res.data);
-      } catch {}
+      } catch { }
     };
     fetchSource();
   }, []);
@@ -770,7 +919,7 @@ export default function Page() {
           },
         );
         setLeadCategory(res.data);
-      } catch {}
+      } catch { }
     };
     fetchCategory();
   }, []);
@@ -782,7 +931,7 @@ export default function Page() {
           params: { status: 1 },
         });
         setCategory(res.data);
-      } catch {}
+      } catch { }
     };
     fetchProductCategory();
   }, []);
@@ -859,12 +1008,12 @@ export default function Page() {
               )}
             </div>
 
-            <Link
-              href="/sales/lead/add-lead"
+           <button
+              onClick={() => setShowAddLeadModal(true)}
               className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-sm text-sm font-semibold shadow-md transition-all"
             >
               + ADD LEAD
-            </Link>
+            </button>
           </div>
         </div>
 
@@ -1129,11 +1278,10 @@ export default function Page() {
                           className={`
     border-b transition-all
 
-    ${
-      isOverdueLead(lead)
-        ? "border-l-4 border-red-500 bg-red-50 hover:bg-red-100"
-        : "border-gray-50 hover:bg-indigo-50/30"
-    }
+    ${isOverdueLead(lead)
+                              ? "border-l-4 border-red-500 bg-red-50 hover:bg-red-100"
+                              : "border-gray-50 hover:bg-indigo-50/30"
+                            }
   `}
                         >
                           <td className="py-3 px-2">
@@ -1170,16 +1318,16 @@ export default function Page() {
                           >
                             {lead.assignee
                               ? String(lead.assignee)
-                                  .split(",")
-                                  .map((name, idx) => (
-                                    <div
-                                      key={idx}
-                                      title={name.trim()}
-                                      className="px-3 py-1.5 bg-blue-800 text-white rounded-full font-semibold text-sm flex justify-center items-center min-w-[28px] text-center select-none"
-                                    >
-                                      {name.trim().charAt(0).toUpperCase()}
-                                    </div>
-                                  ))
+                                .split(",")
+                                .map((name, idx) => (
+                                  <div
+                                    key={idx}
+                                    title={name.trim()}
+                                    className="px-3 py-1.5 bg-blue-800 text-white rounded-full font-semibold text-sm flex justify-center items-center min-w-[28px] text-center select-none"
+                                  >
+                                    {name.trim().charAt(0).toUpperCase()}
+                                  </div>
+                                ))
                               : "-"}
                           </td>
 
@@ -1255,37 +1403,37 @@ export default function Page() {
                           </td>
 
                           <td className="text-lg">
-  <div className="flex items-center gap-2 flex-nowrap">
-    {lead.status === "Pending" ? (
-      <>
-        <button
-          onClick={() => handleView(lead)}
-          className="text-gray-400 hover:text-green-600 cursor-pointer"
-        >
-          <i className="bi bi-eye text-xl"></i>
-        </button>
+                            <div className="flex items-center gap-2 flex-nowrap">
+                              {lead.status === "Pending" ? (
+                                <>
+                                  <button
+                                    onClick={() => handleView(lead)}
+                                    className="text-gray-400 hover:text-green-600 cursor-pointer"
+                                  >
+                                    <i className="bi bi-eye text-xl"></i>
+                                  </button>
 
-        <button
-          onClick={() => handleEdit(lead)}
-          className="text-gray-400 hover:text-blue-800 cursor-pointer"
-        >
-          <i className="bi bi-pencil-square"></i>
-        </button>
+                                  <button
+                                    onClick={() => handleEdit(lead)}
+                                    className="text-gray-400 hover:text-blue-800 cursor-pointer"
+                                  >
+                                    <i className="bi bi-pencil-square"></i>
+                                  </button>
 
-        <button
-          onClick={() => openDeleteModal(lead)}
-          className="text-gray-400 hover:text-red-600 cursor-pointer"
-        >
-          <i className="bi bi-trash3"></i>
-        </button>
-      </>
-    ) : (
-      <span className="text-gray-300 cursor-not-allowed">
-        <i className="bi bi-lock text-lg"></i>
-      </span>
-    )}
-  </div>
-</td>
+                                  <button
+                                    onClick={() => openDeleteModal(lead)}
+                                    className="text-gray-400 hover:text-red-600 cursor-pointer"
+                                  >
+                                    <i className="bi bi-trash3"></i>
+                                  </button>
+                                </>
+                              ) : (
+                                <span className="text-gray-300 cursor-not-allowed">
+                                  <i className="bi bi-lock text-lg"></i>
+                                </span>
+                              )}
+                            </div>
+                          </td>
                         </tr>
                       ))
                     ) : (
@@ -1343,11 +1491,10 @@ export default function Page() {
                           <button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
-                              currentPage === page
+                            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${currentPage === page
                                 ? "bg-[#212121] text-white shadow-md shadow-black/10"
                                 : "border border-slate-200 text-slate-600 hover:bg-slate-50"
-                            }`}
+                              }`}
                           >
                             {page}
                           </button>
@@ -1376,17 +1523,19 @@ export default function Page() {
       </div>
 
       {/* DELETE MODAL */}
+
+      {/* DELETE MODAL */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white w-full max-w-md rounded-[20px] shadow-xl overflow-hidden">
             <div
               className="flex justify-between items-center px-6 py-4"
-              style={{ background: "#f5e6d8" }}
+              style={{ background: "#dbe7f7" }}
             >
               <div className="flex items-center gap-2">
                 <span
                   className="w-2.5 h-2.5 rounded-full"
-                  style={{ background: "#f07400" }}
+                  style={{ background: "#1e40af" }}
                 ></span>
                 <h2 className="text-[13px] font-bold text-gray-600 tracking-widest uppercase">
                   Delete Lead
@@ -1394,7 +1543,7 @@ export default function Page() {
               </div>
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="text-[#f07400] hover:text-orange-600"
+                className="text-[#1e40af] hover:text-blue-800"
               >
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                   <line
@@ -1402,7 +1551,7 @@ export default function Page() {
                     y1="2"
                     x2="16"
                     y2="16"
-                    stroke="#f07400"
+                    stroke="#1e40af"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
@@ -1411,7 +1560,7 @@ export default function Page() {
                     y1="2"
                     x2="2"
                     y2="16"
-                    stroke="#f07400"
+                    stroke="#1e40af"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
@@ -1421,37 +1570,37 @@ export default function Page() {
             <div className="px-7 pt-9 pb-5 text-center">
               <div
                 className="w-[78px] h-[78px] mx-auto rounded-full flex items-center justify-center mb-5"
-                style={{ background: "#f5e0c6" }}
+                style={{ background: "#dbe7f7" }}
               >
                 <svg width="32" height="34" viewBox="0 0 32 34" fill="none">
                   <path
                     d="M3 8H29"
-                    stroke="#f07400"
+                    stroke="#1e40af"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M12 8V5C12 4.448 12.448 4 13 4H19C19.552 4 20 4.448 20 5V8"
-                    stroke="#f07400"
+                    stroke="#1e40af"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M5 8L6.5 29C6.5 29.552 6.948 30 7.5 30H24.5C25.052 30 25.5 29.552 25.5 29L27 8"
-                    stroke="#f07400"
+                    stroke="#1e40af"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                   <path
                     d="M12 14V24"
-                    stroke="#f07400"
+                    stroke="#1e40af"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M20 14V24"
-                    stroke="#f07400"
+                    stroke="#1e40af"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
@@ -1476,7 +1625,7 @@ export default function Page() {
                 onClick={handleDelete}
                 disabled={deleteLoading}
                 className="flex-1 py-3 rounded-xl text-white text-[15px] font-semibold hover:opacity-90 transition"
-                style={{ background: "#f07400" }}
+                style={{ background: "#1e40af" }}
               >
                 {deleteLoading ? "Deleting..." : "Delete"}
               </button>
@@ -1856,8 +2005,8 @@ export default function Page() {
                             <span className="text-xs text-gray-400">
                               {item.follow_up_date
                                 ? new Date(
-                                    item.follow_up_date,
-                                  ).toLocaleDateString()
+                                  item.follow_up_date,
+                                ).toLocaleDateString()
                                 : "—"}
                             </span>
                             <i
@@ -1896,8 +2045,8 @@ export default function Page() {
                           label: "Follow-Up Date",
                           value: previewFollowUp.follow_up_date
                             ? new Date(
-                                previewFollowUp.follow_up_date,
-                              ).toLocaleDateString()
+                              previewFollowUp.follow_up_date,
+                            ).toLocaleDateString()
                             : "—",
                         },
                         {
@@ -2245,7 +2394,7 @@ export default function Page() {
               )}
             </div>
 
-            <div className="flex justify-end px-6 py-4 border-t border-gray-100">
+           <div className="flex justify-end px-6 py-4 border-t border-gray-100">
               <button
                 onClick={() => setShowViewModal(false)}
                 className="px-6 py-2 text-sm font-medium border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-100 transition-all"
@@ -2253,6 +2402,371 @@ export default function Page() {
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ NEW: ADD LEAD MODAL */}
+      {showAddLeadModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30 p-4">
+          <div className="bg-white w-full max-w-3xl rounded-sm shadow-xl overflow-hidden max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-orange-50 to-white">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-orange-500 inline-block"></span>
+                <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                  Add Lead
+                </h2>
+              </div>
+              <button
+                onClick={() => {
+                  setShowAddLeadModal(false);
+                  resetAddLeadForm();
+                }}
+                className="w-7 h-7 flex items-center justify-center rounded-full text-orange-500 transition-all"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleAddLeadSubmit} className="px-6 py-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Company Name
+                  </label>
+                  <input
+                    name="company_name"
+                    value={addLeadForm.company_name}
+                    placeholder="Company Name"
+                    onChange={handleAddLeadChange}
+                    className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Customer Name <span className="text-orange-500">*</span>
+                  </label>
+                  <input
+                    name="customer_name"
+                    value={addLeadForm.customer_name}
+                    placeholder="Customer Name"
+                    onChange={handleAddLeadChange}
+                    className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50"
+                  />
+                  {addLeadErrors.customer_name && (
+                    <p className="text-red-500 text-xs mt-1">{addLeadErrors.customer_name}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Source <span className="text-orange-500">*</span>
+                  </label>
+                  <select
+                    name="source"
+                    value={addLeadForm.source}
+                    onChange={handleAddLeadChange}
+                    className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50"
+                  >
+                    <option value="">-- Select --</option>
+                    {leadSource.map((item) => (
+                      <option key={item.id} value={item.id}>{item.name}</option>
+                    ))}
+                  </select>
+                  {addLeadErrors.source && (
+                    <p className="text-red-500 text-xs mt-1">{addLeadErrors.source}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Reference
+                  </label>
+                  <input
+                    type="text"
+                    name="reference"
+                    value={addLeadForm.reference}
+                    placeholder="Reference"
+                    onChange={handleAddLeadChange}
+                    className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50"
+                  />
+                  {addLeadErrors.reference && (
+                    <p className="text-red-500 text-xs mt-1">{addLeadErrors.reference}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Status
+                  </label>
+                  <select
+                    name="status"
+                    value={addLeadForm.status}
+                    disabled
+                    className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm bg-gray-100 text-gray-400 cursor-not-allowed"
+                  >
+                    <option>Qualified</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Priority
+                  </label>
+                  <select
+                    name="priority"
+                    value={addLeadForm.priority}
+                    onChange={handleAddLeadChange}
+                    className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50"
+                  >
+                    <option value="">-- Select --</option>
+                    <option>High</option>
+                    <option>Medium</option>
+                    <option>Low</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Category
+                  </label>
+                  <select
+                    name="category"
+                    value={addLeadForm.category}
+                    onChange={handleAddLeadChange}
+                    className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50"
+                  >
+                    <option value="">-- Select --</option>
+                    {leadCategory.map((item) => (
+                      <option key={item.id} value={item.id}>{item.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-3">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  rows="2"
+                  value={addLeadForm.description}
+                  onChange={handleAddLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 mt-5 border-t border-gray-100 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddLeadModal(false);
+                    resetAddLeadForm();
+                  }}
+                  className="px-5 py-2 text-sm font-medium border border-gray-200 rounded-sm text-gray-600 hover:bg-gray-100 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={addLeadSubmitting}
+                  className={`px-6 py-2 text-sm font-semibold text-white rounded-sm transition-all shadow-md shadow-orange-200 flex items-center gap-2
+                    ${addLeadSubmitting ? "bg-orange-400 cursor-not-allowed" : "bg-orange-500 hover:bg-orange-600"}`}
+                >
+                 {addLeadSubmitting ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="4" opacity="0.25" />
+                        <path fill="white" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                      </svg>
+                      Saving...
+                    </>
+                  ) : (
+                    "Save"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ NEW: EDIT LEAD MODAL */}
+      {showEditLeadModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30 p-4">
+          <div className="bg-white w-full max-w-3xl rounded-sm shadow-xl overflow-hidden max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-orange-50 to-white">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-orange-500 inline-block"></span>
+                <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                  Edit Lead
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowEditLeadModal(false)}
+                className="w-7 h-7 flex items-center justify-center rounded-full text-orange-500 transition-all"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleEditLeadSubmit} className="px-6 py-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Company Name
+                  </label>
+                  <input
+                    name="company_name"
+                    value={editLeadForm.company_name}
+                    placeholder="Company Name"
+                    onChange={handleEditLeadChange}
+                    className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Customer Name <span className="text-orange-500">*</span>
+                  </label>
+                  <input
+                    name="customer_name"
+                    value={editLeadForm.customer_name}
+                    placeholder="Customer Name"
+                    onChange={handleEditLeadChange}
+                    className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Source <span className="text-orange-500">*</span>
+                  </label>
+                  <select
+                    name="source"
+                    value={editLeadForm.source}
+                    onChange={handleEditLeadChange}
+                    className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50"
+                  >
+                    <option value="">-- Select --</option>
+                    {leadSource.map((item) => (
+                      <option key={item.id} value={item.id}>{item.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Reference
+                  </label>
+                  <input
+                    type="text"
+                    name="reference"
+                    value={editLeadForm.reference}
+                    onChange={handleEditLeadChange}
+                    className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Status
+                  </label>
+                  <select
+                    name="status"
+                    value={editLeadForm.status}
+                    onChange={handleEditLeadChange}
+                    className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50"
+                  >
+                    <option value="">-- Select --</option>
+                    <option>Qualified</option>
+                    <option>Pending</option>
+                    <option>Won</option>
+                    <option>Lost</option>
+                    <option>Quotation Send</option>
+                    <option>Technical Discussion</option>
+                    <option>Call Initiated</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Priority
+                  </label>
+                  <select
+                    name="priority"
+                    value={editLeadForm.priority}
+                    onChange={handleEditLeadChange}
+                    className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50"
+                  >
+                    <option value="">-- Select --</option>
+                    <option>High</option>
+                    <option>Medium</option>
+                    <option>Low</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Category
+                  </label>
+                  <select
+                    name="category"
+                    value={editLeadForm.category}
+                    onChange={handleEditLeadChange}
+                    className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50"
+                  >
+                    <option value="">-- Select --</option>
+                    {leadCategory.map((item) => (
+                      <option key={item.id} value={item.id}>{item.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-3">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  rows="2"
+                  value={editLeadForm.description}
+                  onChange={handleEditLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 mt-5 border-t border-gray-100 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowEditLeadModal(false)}
+                  className="px-5 py-2 text-sm font-medium border border-gray-200 rounded-sm text-gray-600 hover:bg-gray-100 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editLeadSubmitting}
+                  className={`px-6 py-2 text-sm font-semibold text-white rounded-sm transition-all shadow-md shadow-orange-200 flex items-center gap-2
+                    ${editLeadSubmitting ? "bg-orange-400 cursor-not-allowed" : "bg-orange-500 hover:bg-orange-600"}`}
+                >
+                  {editLeadSubmitting ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="4" opacity="0.25" />
+                        <path fill="white" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                      </svg>
+                      Saving...
+                    </>
+                  ) : (
+                    "Save"
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
