@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import useAuth from "../components/useAuth";
 
-export default function AddCustomer() {
+export default function AddCustomer({ onClose }) {
   const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const [activeTab, setActiveTab] = useState("customer");
@@ -125,12 +125,9 @@ export default function AddCustomer() {
         },
       });
 
-      toast.success("Customer added successfully");
+     toast.success("Customer added successfully");
       console.log("DATA SENT TO BACKEND:", dataToSend);
       console.log("Response:", res.data);
-
-      // Redirect to customer list page
-      router.push("/customer-list");
 
       setFormData({
         customer_type: "",
@@ -152,8 +149,23 @@ export default function AddCustomer() {
         contact_email: "",
         contact_designation: "",
       });
+
+      if (onClose) {
+        onClose();
+      } else {
+        router.push("/customer-list");
+      }
     } catch (err) {
-      const status = err?.response?.status || err?.status;
+      console.error("ADD CUSTOMER ERROR:", err);
+      const backendMessage =
+        err?.data?.message ||
+        err?.data?.error ||
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message;
+      toast.error(backendMessage || "Failed to add customer. Please check all fields.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -209,37 +221,56 @@ export default function AddCustomer() {
     fetchCompanyName();
   }, []);
 
-  return (
+ return (
     <>
-      <Header />
-      <div className="min-h-screen bg-gray-100 pb-6">
-        {/* Header */}
-        <div className="bg-white w-full shadow-lg p-3 mt-1 mb-5">
-          <div className="flex items-center text-gray-700 w-full">
-            <p className="flex items-center flex-wrap gap-y-2 text-sm sm:text-base">
-              <Link
-                href="/dashboard"
-                className="mr-2 sm:mx-2 text-xl text-gray-400 hover:text-indigo-600"
-              >
-                <i className="bi bi-house"></i>
-              </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>
-              <Link
-                href="/customer-list"
-                className="mx-2 text-sm sm:text-md text-gray-700 hover:text-orange-500 font-semibold"
-              >
-                Customer List
-              </Link>
-              <i className="bi bi-chevron-right text-[10px]"></i>
-              <Link
-                href="/customer"
-                className="mx-2 text-sm sm:text-md text-gray-700 hover:text-orange-500 font-semibold"
-              >
-                Add Customer
-              </Link>
-            </p>
+      {!onClose && <Header />}
+      <div className={onClose ? "bg-white rounded-lg" : "min-h-screen bg-gray-100 pb-6"}>
+        {/* Breadcrumb — sirf standalone page mode ma (modal ma nahi) */}
+        {!onClose && (
+          <div className="bg-white w-full shadow-lg p-3 mt-1 mb-5">
+            <div className="flex items-center text-gray-700 w-full">
+              <p className="flex items-center flex-wrap gap-y-2 text-sm sm:text-base">
+                <Link
+                  href="/dashboard"
+                  className="mr-2 sm:mx-2 text-xl text-gray-400 hover:text-indigo-600"
+                >
+                  <i className="bi bi-house"></i>
+                </Link>
+                <i className="bi bi-chevron-right text-[10px]"></i>
+                <Link
+                  href="/customer-list"
+                  className="mx-2 text-sm sm:text-md text-gray-700 hover:text-orange-500 font-semibold"
+                >
+                  Customer List
+                </Link>
+                <i className="bi bi-chevron-right text-[10px]"></i>
+                <Link
+                  href="/customer"
+                  className="mx-2 text-sm sm:text-md text-gray-700 hover:text-orange-500 font-semibold"
+                >
+                  Add Customer
+                </Link>
+              </p>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Modal title bar — sirf modal mode ma (Image 3 "Add Task" jevu) */}
+        {onClose && (
+          <div className="flex items-center justify-between px-6 py-4 border-b">
+            <h2 className="text-2xl font-semibold text-[#31569b]">
+              Add Customer
+            </h2>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-3xl text-[#31569b] hover:text-red-500 leading-none"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="w-full max-w-6xl mx-auto px-3 sm:px-5 lg:px-6">
           {/* Tab Header */}
           <div className="flex mb-4 overflow-x-auto border-b border-gray-200">
@@ -543,9 +574,15 @@ export default function AddCustomer() {
                 >
                   Next
                 </button>
-                <button
+               <button
                   type="button"
-                  onClick={() => router.push("/customer-list")}
+                  onClick={() => {
+                    if (onClose) {
+                      onClose();
+                    } else {
+                      router.push("/customer-list");
+                    }
+                  }}
                   className="w-full sm:w-auto px-6 py-2.5 text-sm text-gray-500 border border-gray-200 rounded-sm hover:bg-gray-50 cursor-pointer transition-all"
                 >
                   Cancel
@@ -635,7 +672,13 @@ export default function AddCustomer() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => router.push("/customer-list")}
+                  onClick={() => {
+                    if (onClose) {
+                      onClose();
+                    } else {
+                      router.push("/customer-list");
+                    }
+                  }}
                   className="w-full sm:w-auto px-6 py-2.5 text-sm text-gray-500 border border-gray-200 rounded-sm hover:bg-gray-50 cursor-pointer transition-all"
                 >
                   Cancel
@@ -649,3 +692,4 @@ export default function AddCustomer() {
     </>
   );
 }
+                

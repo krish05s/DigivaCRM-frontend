@@ -3,7 +3,8 @@ import Header from "@/app/components/header";
 import Link from "next/link";
 import axios from "redaxios";
 import React, { useEffect, useState } from "react";
-import { ChevronUpIcon, ChevronDownIcon } from "lucide-react";
+import { ChevronUpIcon, ChevronDownIcon, Eye, Pencil, Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
 import useAuth from "@/app/components/useAuth";
 import CheckPermission from "@/app/components/CheckPermission";
 
@@ -18,7 +19,59 @@ export default function Page() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const [sortConfig, setSortConfig] = useState({ column: null, direction: null });
-  const [scrollOffsets, setScrollOffsets] = useState({}); 
+  const [scrollOffsets, setScrollOffsets] = useState({});
+
+  // ---- View / Edit / Delete popup states ----
+  const emptyOrgForm = {
+    organization_name: "",
+    industry: "",
+    email: "",
+    address_1: "",
+    address_2: "",
+    country: "",
+    state: "",
+    city: "",
+    pincode: "",
+    gst_number: "",
+    contact_1: "",
+    contact_2: "",
+    benificiary_name: "",
+    bank_name: "",
+    account_no: "",
+    account_type: "",
+    ifsc_code: "",
+    micr_code: "",
+  };
+
+  const [viewOrg, setViewOrg] = useState(null);        // item currently shown in View popup
+  const [editId, setEditId] = useState(null);          // id of item currently shown in Edit popup
+  const [editFormData, setEditFormData] = useState(emptyOrgForm);
+  const [deleteOrg, setDeleteOrg] = useState(null);    // item currently shown in Delete confirm popup
+
+  // ✅ NEW: Add Organization Modal states
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addActiveTab, setAddActiveTab] = useState("organization");
+  const [addIsSubmitting, setAddIsSubmitting] = useState(false);
+  const [addFormData, setAddFormData] = useState({
+    organization_name: "",
+    industry: "",
+    email: "",
+    address_1: "",
+    address_2: "",
+    country: "",
+    state: "",
+    city: "",
+    pincode: "",
+    gst_number: "",
+    contact_1: "",
+    contact_2: "",
+    benificiary_name: "",
+    bank_name: "",
+    account_no: "",
+    account_type: "",
+    ifsc_code: "",
+    micr_code: "",
+  });
 
   // Fetch table data (fetching all for client-side pagination)
   const fetchData = async (sort = sortConfig) => {
@@ -41,6 +94,131 @@ export default function Page() {
   useEffect(() => {
     fetchData();
   }, []);
+
+// ✅ NEW: ADD ORGANIZATION (modal) handlers
+  const handleAddChange = (e) => {
+    setAddFormData({ ...addFormData, [e.target.name]: e.target.value });
+  };
+
+  const resetAddForm = () => {
+    setAddFormData({
+      organization_name: "",
+      industry: "",
+      email: "",
+      address_1: "",
+      address_2: "",
+      country: "",
+      state: "",
+      city: "",
+      pincode: "",
+      gst_number: "",
+      contact_1: "",
+      contact_2: "",
+      benificiary_name: "",
+      bank_name: "",
+      account_no: "",
+      account_type: "",
+      ifsc_code: "",
+      micr_code: "",
+    });
+    setAddActiveTab("organization");
+  };
+
+  const handleAddSubmit = async (e) => {
+    e.preventDefault();
+    if (addIsSubmitting) return;
+
+    if (!addFormData.organization_name.trim()) {
+      toast.error("Organization Name is required!");
+      setAddActiveTab("organization");
+      return;
+    }
+
+    setAddIsSubmitting(true);
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(`${API_BASE}/api/organizations/add`, addFormData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Organization added successfully!");
+      resetAddForm();
+      setShowAddModal(false);
+      fetchData();
+    } catch (error) {
+      console.error("Error inserting data:", error);
+      toast.error("Failed to add organization!");
+    } finally {
+      setAddIsSubmitting(false);
+    }
+  };
+
+  // Open View popup
+  const handleView = (item) => {
+    setViewOrg(item);
+  };
+
+  // Open Edit popup, form ma existing data bhari devanu
+  const handleEditOpen = (item) => {
+    setEditId(item.id);
+    setEditFormData({
+      organization_name: item.organization_name || "",
+      industry: item.industry || "",
+      email: item.email || "",
+      address_1: item.address_1 || "",
+      address_2: item.address_2 || "",
+      country: item.country || "",
+      state: item.state || "",
+      city: item.city || "",
+      pincode: item.pincode || "",
+      gst_number: item.gst_number || "",
+      contact_1: item.contact_1 || "",
+      contact_2: item.contact_2 || "",
+      benificiary_name: item.benificiary_name || "",
+      bank_name: item.bank_name || "",
+      account_no: item.account_no || "",
+      account_type: item.account_type || "",
+      ifsc_code: item.ifsc_code || "",
+      micr_code: item.micr_code || "",
+    });
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Edit popup no Save button -> update API call
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(`${API_BASE}/api/organizations/update/${editId}`, editFormData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Organization updated successfully!");
+      setEditId(null);
+      fetchData();
+    } catch (err) {
+      console.error("Error updating organization:", err);
+      toast.error("Failed to update organization!");
+    }
+  };
+
+  // Delete popup no Delete button -> delete API call
+  const handleDeleteConfirm = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API_BASE}/api/organizations/delete/${deleteOrg.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Organization deleted successfully!");
+      setDeleteOrg(null);
+      fetchData();
+    } catch (err) {
+      console.error("Error deleting organization:", err);
+      toast.error("Failed to delete organization!");
+    }
+  };
 
   // Reset page when items per page changes
   useEffect(() => {
@@ -149,18 +327,21 @@ export default function Page() {
             </div>
 
             <div className="w-full sm:w-auto">
-              <Link href="/setup/org-master/add-table" className="block text-center bg-blue-800 hover:bg-blue-900 text-white px-5 py-2 rounded-sm font-bold text-sm w-full sm:w-auto">
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="block text-center bg-blue-800 hover:bg-blue-900 text-white px-5 py-2 rounded-sm font-bold text-sm w-full sm:w-auto"
+              >
                 + ADD ORGANIZATION
-              </Link>
+              </button>
             </div>
           </div>
 
           {/* Table Section */}
           <form className="p-2 w-full">
             <div className="bg-white shadow rounded-2xl p-4 md:p-6">
-              <div className="overflow-x-auto">
-                <table className="min-w-full border border-gray-200 text-sm text-left">
-                  <thead className="bg-gray-50 text-gray-700 border-b border-gray-200">
+              <div className="custom-scroll overflow-x-auto overflow-y-scroll max-h-[260px] border border-gray-200 rounded-lg">
+                <table className="min-w-full text-sm text-left">
+                  <thead className="bg-gray-50 text-gray-700 border-b border-gray-200 sticky top-0 z-10">
                     <tr>
                       <th className="px-3 py-2 text-center">#</th>
                       <th className="px-4 py-2">
@@ -178,6 +359,11 @@ export default function Page() {
                       <th className="px-4 py-2">
                         State <ColumnScroll columnKey="state" />
                       </th>
+
+                      <th className="px-4 py-2">
+                        action<ColumnScroll columnKey="action" />
+                      </th>
+
                     </tr>
                   </thead>
 
@@ -193,6 +379,32 @@ export default function Page() {
                           <td className="p-3 text-gray-600">{item.address_1}</td>
                           <td className="p-3 text-gray-600">{item.country}</td>
                           <td className="p-3 text-gray-600">{item.state}</td>
+                     <td className="p-3 text-gray-600 whitespace-nowrap">
+                            <div className="flex items-center gap-3">
+                            <button
+                                    type="button"
+                                    onClick={() => handleView(item)}
+                                    className="text-gray-400 hover:text-green-600 cursor-pointer"
+                                  >
+                                    <i className="bi bi-eye text-xl"></i>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEditOpen(item)}
+                                    className="text-gray-400 hover:text-blue-800 cursor-pointer"
+                                  >
+                                    <i className="bi bi-pencil-square text-xl"></i>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => setDeleteOrg(item)}
+                                    className="text-gray-400 hover:text-red-600 cursor-pointer"
+                                  >
+                                    <i className="bi bi-trash3 text-xl"></i>
+                                  </button>                            </div>
+                          </td>
                         </tr>
                       ))
                     ) : (
@@ -251,11 +463,10 @@ export default function Page() {
                           type="button"
                           key={page}
                           onClick={() => setCurrentPage(page)}
-                          className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${
-                            currentPage === page
+                          className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all ${currentPage === page
                               ? "bg-[#212121] text-white shadow-md shadow-black/10"
                               : "border border-slate-200 text-slate-600 hover:bg-slate-50"
-                          }`}
+                            }`}
                         >
                           {page}
                         </button>
@@ -277,8 +488,6 @@ export default function Page() {
 
             </div>
           </form>
-<<<<<<< Updated upstream
-=======
 
           {/* ===================== VIEW ORGANIZATION MODAL ===================== */}
           {viewOrg && (
@@ -588,13 +797,9 @@ export default function Page() {
                         <button type="submit" disabled={addIsSubmitting} className="w-full sm:w-auto bg-blue-800 text-white px-6 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
                           {addIsSubmitting ? "Saving..." : "Save"}
                         </button>
-                       <button
-  type="button"
-  onClick={() => setAddActiveTab("bank")}
-  className="w-full sm:w-auto bg-blue-800 hover:bg-blue-900 text-white px-6 py-2 rounded"
->
-  Next
-</button>
+                        <button type="button" onClick={() => setAddActiveTab("bank")} className="w-full sm:w-auto bg-gray-700 text-white px-6 py-2 rounded">
+                          Next
+                        </button>
                         <button
                           type="button"
                           onClick={() => {
@@ -663,7 +868,6 @@ export default function Page() {
               </div>
             </div>
           )}
->>>>>>> Stashed changes
         </div>
       </CheckPermission>
     </>
