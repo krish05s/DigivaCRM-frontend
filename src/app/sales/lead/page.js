@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from "react";
 import axios from "redaxios";
 import Link from "next/link";
 import Header from "@/app/components/header";
-import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { checkRole } from "@/utils/checkRole";
 import useAuth from "@/app/components/useAuth";
@@ -38,8 +37,6 @@ export default function Page() {
 
   const [selectedLead, setSelectedLead] = useState(null);
 
-  const router = useRouter();
-
   const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const [showModal, setShowModal] = useState(false);
@@ -56,6 +53,29 @@ export default function Page() {
 
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewLead, setViewLead] = useState(null);
+
+  // ===================================================
+  // ADD LEAD / EDIT LEAD MODAL STATE
+  // ===================================================
+  const emptyLeadForm = {
+    company_name: "",
+    customer_name: "",
+    reference: "",
+    source: "",
+    category: "",
+    assignee: "",
+    priority: "",
+    description: "",
+  };
+
+  const [showAddLeadModal, setShowAddLeadModal] = useState(false);
+  const [addLeadForm, setAddLeadForm] = useState(emptyLeadForm);
+  const [addLeadLoading, setAddLeadLoading] = useState(false);
+
+  const [showEditLeadModal, setShowEditLeadModal] = useState(false);
+  const [editLeadForm, setEditLeadForm] = useState(emptyLeadForm);
+  const [editLeadId, setEditLeadId] = useState(null);
+  const [editLeadLoading, setEditLeadLoading] = useState(false);
 
   const [updateForm, setUpdateForm] = useState({
     follow_up_date: "",
@@ -137,6 +157,11 @@ export default function Page() {
         Status: lead.status || "",
       }));
 
+      if (exportData.length === 0) {
+        toast.error("No data to export");
+        return;
+      }
+
       const worksheet = XLSX.utils.json_to_sheet(exportData);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
@@ -165,6 +190,11 @@ export default function Page() {
   // ===================================================
   const exportToPDF = async () => {
     try {
+      if (filteredLeads.length === 0) {
+        toast.error("No data to export");
+        return;
+      }
+
       const { default: jsPDF } = await import("jspdf");
       const { default: autoTable } = await import("jspdf-autotable");
 
@@ -204,7 +234,6 @@ export default function Page() {
             "Company",
             "Customer",
             "Lead Title",
-            "Product Cat.",
             "Source",
             "Assignee",
             "Next Follow Up",
@@ -225,13 +254,13 @@ export default function Page() {
         columnStyles: {
           0: { cellWidth: 8 },
           3: { cellWidth: 35 },
-          9: { cellWidth: 20 },
+          8: { cellWidth: 20 },
         },
       });
 
       const now = new Date();
       const date = now.toISOString().split("T")[0];
-      const time = now.toTimeString().slice(0, 5).replace("_", "-");
+      const time = now.toTimeString().slice(0, 5).replace(":", "-");
       const fileName = `Leads_${activeTab}_(${date})_${time}.pdf`;
 
       doc.save(fileName);
@@ -258,8 +287,8 @@ export default function Page() {
   const MAX_FILES = 5;
   const IMAGE_EXT = ["jpg", "jpeg", "png"];
   const DOC_EXT = ["pdf", "xlsx", "dwg"];
-  const MAX_IMG_SIZE = 5 * 1024 * 1024;
-  const MAX_DOC_SIZE = 5 * 1024 * 1024;
+  const MAX_IMG_SIZE = 5 * 1024 * 1024; // 5MB
+  const MAX_DOC_SIZE = 5 * 1024 * 1024; // 5MB
 
   const handleSelect = (e) => {
     const files = Array.from(e.target.files);
@@ -286,15 +315,15 @@ export default function Page() {
         continue;
       }
       if (![...IMAGE_EXT, ...DOC_EXT].includes(ext)) {
-        toast.error("Unsupported File");
+        toast.error("Unsupported file type");
         continue;
       }
       if (IMAGE_EXT.includes(ext) && file.size > MAX_IMG_SIZE) {
-        toast.error("Image must be under 2MB");
+        toast.error("Image must be under 5MB");
         continue;
       }
       if (DOC_EXT.includes(ext) && file.size > MAX_DOC_SIZE) {
-        toast.error("Document must be under 15MB");
+        toast.error("Document must be under 5MB");
         continue;
       }
       updatedFiles.push(file);
@@ -310,6 +339,10 @@ export default function Page() {
   // ===================================================
   const handleSubmit = async () => {
     try {
+      if (!selectedLead?.lead_id) {
+        toast.error("No lead selected");
+        return;
+      }
       if (!form.activity_type || !form.contact_person || !form.description) {
         toast.error("Please fill all required fields");
         return;
@@ -366,6 +399,7 @@ export default function Page() {
     try {
       const res = await axios.get(
         `${API_BASE}/api/lead-follow-up/history/${lead.lead_id}`,
+        { headers: { Authorization: `Bearer ${getToken()}` } },
       );
       setFollowUpHistory(res.data?.result || []);
     } catch (err) {
@@ -378,6 +412,10 @@ export default function Page() {
   // ===================================================
   const handleUpdate = async () => {
     try {
+      if (!selectedLead?.lead_id) {
+        toast.error("No lead selected");
+        return;
+      }
       if (
         !updateForm.activity_type ||
         !updateForm.contact_person ||
@@ -411,6 +449,7 @@ export default function Page() {
 
       const res = await axios.get(
         `${API_BASE}/api/lead-follow-up/history/${selectedLead.lead_id}`,
+        { headers: { Authorization: `Bearer ${getToken()}` } },
       );
       setFollowUpHistory(res.data?.result || []);
       setPreviewFollowUp(null);
@@ -461,7 +500,50 @@ export default function Page() {
   };
 
   // ===================================================
-  // EDIT LEAD
+  // ADD LEAD (in-page modal)
+  // ===================================================
+  const openAddLeadModal = () => {
+    setAddLeadForm(emptyLeadForm);
+    setShowAddLeadModal(true);
+  };
+
+  const handleAddLeadChange = (e) => {
+    const { name, value } = e.target;
+    setAddLeadForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddLeadSubmit = async () => {
+    try {
+      if (
+        !addLeadForm.company_name ||
+        !addLeadForm.customer_name ||
+        !addLeadForm.reference
+      ) {
+        toast.error("Please fill all required fields");
+        return;
+      }
+
+      setAddLeadLoading(true);
+
+      // NOTE: adjust this endpoint to match your actual "create lead" API route
+      await axios.post(`${API_BASE}/api/lead/insert`, addLeadForm, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+
+      toast.success("Lead created successfully");
+      setShowAddLeadModal(false);
+      setAddLeadForm(emptyLeadForm);
+      fetchLeads();
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to create lead");
+    } finally {
+      setAddLeadLoading(false);
+    }
+  };
+
+  // ===================================================
+  // EDIT LEAD (in-page modal)
   // ===================================================
   const handleEdit = async (lead) => {
     try {
@@ -472,26 +554,59 @@ export default function Page() {
 
       const leadData = res.data.lead;
 
-      sessionStorage.setItem(
-        "editLead",
-        JSON.stringify({
-          lead_id: leadData.lead_id,
-          company_name: leadData.company_name,
-          customer_name: leadData.customer_name,
-          reference: leadData.reference,
-          source: leadData.source,
-          status: leadData.status,
-          product_name: leadData.product_name,
-          priority: leadData.priority,
-          assignee: leadData.assignee,
-          category: leadData.category,
-          description: leadData.description,
-        }),
-      );
-
-      router.push("/sales/lead/update-lead");
+      setEditLeadId(leadData.lead_id);
+      setEditLeadForm({
+        company_name: leadData.company_name || "",
+        customer_name: leadData.customer_name || "",
+        reference: leadData.reference || "",
+        source: leadData.source || "",
+        category: leadData.category || "",
+        assignee: leadData.assignee || "",
+        priority: leadData.priority || "",
+        description: leadData.description || "",
+      });
+      setShowEditLeadModal(true);
     } catch (error) {
       console.log(error);
+      toast.error("Failed to load lead for editing");
+    }
+  };
+
+  const handleEditLeadChange = (e) => {
+    const { name, value } = e.target;
+    setEditLeadForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditLeadSubmit = async () => {
+    try {
+      if (!editLeadId) return;
+      if (
+        !editLeadForm.company_name ||
+        !editLeadForm.customer_name ||
+        !editLeadForm.reference
+      ) {
+        toast.error("Please fill all required fields");
+        return;
+      }
+
+      setEditLeadLoading(true);
+
+      // NOTE: adjust this endpoint to match your actual "update lead" API route
+      await axios.put(
+        `${API_BASE}/api/lead/update/${editLeadId}`,
+        editLeadForm,
+        { headers: { Authorization: `Bearer ${getToken()}` } },
+      );
+
+      toast.success("Lead updated successfully");
+      setShowEditLeadModal(false);
+      setEditLeadId(null);
+      fetchLeads();
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to update lead");
+    } finally {
+      setEditLeadLoading(false);
     }
   };
 
@@ -584,7 +699,7 @@ export default function Page() {
       const res = await axios.get(`${API_BASE}/api/lead/sales/leads/filter`, {
         params,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${getToken()}`,
         },
       });
 
@@ -616,6 +731,7 @@ export default function Page() {
     }, 200);
 
     return () => clearTimeout(debounceRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   const resetFilters = () => {
@@ -634,32 +750,33 @@ export default function Page() {
     });
     fetchLeads();
   };
-  // ===================================================
-  // OVERDUE LEAD HIGHLIGHT
-  // ===================================================
 
   // ===================================================
   // OVERDUE LEAD HIGHLIGHT
   // ===================================================
+  const isOverdueLead = (lead) => {
+    // Won / Lost never get highlighted
+    if (lead.status !== "Pending") {
+      return false;
+    }
 
- const isOverdueLead = (lead) => {
-   // Won / Lost no highlight
-   if (lead.status !== "Pending") {
-     return false;
-   }
+    // Prefer server time (avoids client clock skew); fall back to local time
+    // if the API doesn't send it so the feature still works.
+    const serverNow = lead.server_time ? new Date(lead.server_time) : new Date();
 
-   // server current time
-   const serverNow = new Date(lead.server_time);
+    // last activity time
+    const lastActivity = new Date(lead.updated_at || lead.created_at);
 
-   // last activity time
-   const lastActivity = new Date(lead.updated_at || lead.created_at);
+    if (isNaN(serverNow.getTime()) || isNaN(lastActivity.getTime())) {
+      return false;
+    }
 
-   // time difference
-   const diffHours = (serverNow - lastActivity) / (1000 * 60 * 60);
+    // time difference in hours
+    const diffHours = (serverNow - lastActivity) / (1000 * 60 * 60);
 
-   // 24+ hours
-   return diffHours >= 24;
- };
+    // 24+ hours
+    return diffHours >= 24;
+  };
 
   // ===================================================
   // TAB + FILTER MERGE
@@ -681,8 +798,6 @@ export default function Page() {
   // ===================================================
   // PAGINATION
   // ===================================================
-  // ================= PAGINATION =================
-
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -727,7 +842,7 @@ export default function Page() {
   useEffect(() => {
     const fetchAssignee = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = getToken();
         const res = await axios.get(`${API_BASE}/api/manage-user/asignee`, {
           params: { status: 1 },
           headers: { Authorization: `Bearer ${token}` },
@@ -750,12 +865,13 @@ export default function Page() {
       try {
         const res = await axios.get(
           `${API_BASE}/api/inquiry-lead-source/read`,
-          {
-            params: { status: 1 },
-          },
+          { params: { status: 1 } },
         );
-        setLeadSource(res.data);
-      } catch {}
+        setLeadSource(res.data?.result || res.data || []);
+      } catch (err) {
+        console.log(err);
+        setLeadSource([]);
+      }
     };
     fetchSource();
   }, []);
@@ -765,12 +881,13 @@ export default function Page() {
       try {
         const res = await axios.get(
           `${API_BASE}/api/inquiry-lead-category/read`,
-          {
-            params: { status: 1 },
-          },
+          { params: { status: 1 } },
         );
-        setLeadCategory(res.data);
-      } catch {}
+        setLeadCategory(res.data?.result || res.data || []);
+      } catch (err) {
+        console.log(err);
+        setLeadCategory([]);
+      }
     };
     fetchCategory();
   }, []);
@@ -781,8 +898,11 @@ export default function Page() {
         const res = await axios.get(`${API_BASE}/api/product-category/read`, {
           params: { status: 1 },
         });
-        setCategory(res.data);
-      } catch {}
+        setCategory(res.data?.result || res.data || []);
+      } catch (err) {
+        console.log(err);
+        setCategory([]);
+      }
     };
     fetchProductCategory();
   }, []);
@@ -859,12 +979,13 @@ export default function Page() {
               )}
             </div>
 
-            <Link
-              href="/sales/lead/add-lead"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-sm text-sm font-semibold shadow-md transition-all"
+            {/* ✅ FIXED: opens the in-page Add Lead modal */}
+            <button
+              onClick={openAddLeadModal}
+              className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-sm text-sm font-semibold shadow-md transition-all cursor-pointer"
             >
               + ADD LEAD
-            </Link>
+            </button>
           </div>
         </div>
 
@@ -913,16 +1034,6 @@ export default function Page() {
             placeholder="Enter Reference"
             className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-45  outline-none  text-gray-600 text-sm"
           />
-
-          {/* <select
-            name="product_category"
-            value={filters.product_category}
-            onChange={handleFilterChange}
-            className="border bg-white border-orange-300 rounded-sm px-2 py-2 w-full md:w-48  outline-none  text-gray-400 text-sm"
-          >
-            <option value="">Select Product Category</option>
-            {category.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-          </select> */}
 
           <select
             name="source"
@@ -1065,7 +1176,7 @@ export default function Page() {
 
             <button
               onClick={() => setActiveTab("Lost")}
-              className={`pb-3 text-sm font-medium relative ${activeTab === "Lost" ? "text-red-600" : "text-gray-500"}`}
+              className={`pb-3 text-sm font-medium relative cursor-pointer ${activeTab === "Lost" ? "text-red-600" : "text-gray-500"}`}
             >
               Lost
               <span className="ml-2 bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full">
@@ -1076,8 +1187,6 @@ export default function Page() {
               )}
             </button>
           </div>
-
-
 
           <div className="p-4">
             {loading ? (
@@ -1241,9 +1350,17 @@ export default function Page() {
                                   toast.error("Only Admin can change Status");
                                 }
                               }}
-                              onChange={(e) =>
-                                handleStatusChange(lead.lead_id, e.target.value)
-                              }
+                              onChange={(e) => {
+                                if (
+                                  !isAdmin &&
+                                  (lead.status === "Won" ||
+                                    lead.status === "Lost")
+                                ) {
+                                  // ✅ safety net in case onMouseDown didn't block the change
+                                  return;
+                                }
+                                handleStatusChange(lead.lead_id, e.target.value);
+                              }}
                               className={`border rounded-sm px-3 py-1 text-xs font-semibold outline-none cursor-pointer
                                 ${lead.status === "Pending" ? "border-gray-200 bg-gray-50 text-gray-700" : ""}
                                 ${lead.status === "Won" ? "border-green-200 bg-green-50 text-green-700" : ""}
@@ -1257,37 +1374,37 @@ export default function Page() {
                           </td>
 
                           <td className="text-lg">
-  <div className="flex items-center gap-2 flex-nowrap">
-    {lead.status === "Pending" ? (
-      <>
-        <button
-          onClick={() => handleView(lead)}
-          className="text-gray-400 hover:text-green-600 cursor-pointer"
-        >
-          <i className="bi bi-eye text-xl"></i>
-        </button>
+                            <div className="flex items-center gap-2 flex-nowrap">
+                              {lead.status === "Pending" ? (
+                                <>
+                                  <button
+                                    onClick={() => handleView(lead)}
+                                    className="text-gray-400 hover:text-green-600 cursor-pointer"
+                                  >
+                                    <i className="bi bi-eye text-xl"></i>
+                                  </button>
 
-        <button
-          onClick={() => handleEdit(lead)}
-          className="text-gray-400 hover:text-blue-800 cursor-pointer"
-        >
-          <i className="bi bi-pencil-square"></i>
-        </button>
+                                  <button
+                                    onClick={() => handleEdit(lead)}
+                                    className="text-gray-400 hover:text-blue-800 cursor-pointer"
+                                  >
+                                    <i className="bi bi-pencil-square"></i>
+                                  </button>
 
-        <button
-          onClick={() => openDeleteModal(lead)}
-          className="text-gray-400 hover:text-red-600 cursor-pointer"
-        >
-          <i className="bi bi-trash3"></i>
-        </button>
-      </>
-    ) : (
-      <span className="text-gray-300 cursor-not-allowed">
-        <i className="bi bi-lock text-lg"></i>
-      </span>
-    )}
-  </div>
-</td>
+                                  <button
+                                    onClick={() => openDeleteModal(lead)}
+                                    className="text-gray-400 hover:text-red-600 cursor-pointer"
+                                  >
+                                    <i className="bi bi-trash3"></i>
+                                  </button>
+                                </>
+                              ) : (
+                                <span className="text-gray-300 cursor-not-allowed">
+                                  <i className="bi bi-lock text-lg"></i>
+                                </span>
+                              )}
+                            </div>
+                          </td>
                         </tr>
                       ))
                     ) : (
@@ -2060,8 +2177,9 @@ export default function Page() {
                     browse
                   </span>
                 </p>
+                {/* ✅ FIXED: message now matches the real 5MB / file-type limits */}
                 <p className="text-xs text-gray-400 mt-3 bg-white border border-gray-100 rounded-lg px-3 py-1">
-                  JPG · PNG · PDF · Max 2MB
+                  JPG · PNG · PDF · XLSX · DWG · Max 5MB
                 </p>
                 <input
                   id="fileInput"
@@ -2253,6 +2371,366 @@ export default function Page() {
                 className="px-6 py-2 text-sm font-medium border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-100 transition-all"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADD LEAD MODAL */}
+      {showAddLeadModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30">
+          <div className="bg-white w-[560px] rounded-sm shadow-xl overflow-hidden">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-orange-50 to-white">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-orange-500 inline-block"></span>
+                <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                  Add Lead
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowAddLeadModal(false)}
+                className="w-7 h-7 flex items-center justify-center rounded-full text-orange-500 transition-all"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="px-6 py-5 grid grid-cols-2 gap-x-4 gap-y-3">
+              <div className="col-span-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Company Name <span className="text-orange-500">*</span>
+                </label>
+                <input
+                  name="company_name"
+                  value={addLeadForm.company_name}
+                  onChange={handleAddLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 transition-all"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Customer Name <span className="text-orange-500">*</span>
+                </label>
+                <input
+                  name="customer_name"
+                  value={addLeadForm.customer_name}
+                  onChange={handleAddLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 transition-all"
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Lead Title / Reference <span className="text-orange-500">*</span>
+                </label>
+                <input
+                  name="reference"
+                  value={addLeadForm.reference}
+                  onChange={handleAddLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 transition-all"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Source
+                </label>
+                <select
+                  name="source"
+                  value={addLeadForm.source}
+                  onChange={handleAddLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 transition-all"
+                >
+                  <option value="">-- Select --</option>
+                  {leadSource.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-span-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Product Category
+                </label>
+                <select
+                  name="category"
+                  value={addLeadForm.category}
+                  onChange={handleAddLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 transition-all"
+                >
+                  <option value="">-- Select --</option>
+                  {category.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-span-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Assignee
+                </label>
+                <select
+                  name="assignee"
+                  value={addLeadForm.assignee}
+                  onChange={handleAddLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 transition-all"
+                >
+                  <option value="">Select User</option>
+                  {assignee.map((item) => (
+                    <option key={item.id} value={item.name}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-span-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Priority
+                </label>
+                <select
+                  name="priority"
+                  value={addLeadForm.priority}
+                  onChange={handleAddLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 transition-all"
+                >
+                  <option value="">-- Select --</option>
+                  <option>Low</option>
+                  <option>Medium</option>
+                  <option>High</option>
+                </select>
+              </div>
+              <div className="col-span-2">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={addLeadForm.description}
+                  onChange={handleAddLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 h-20 resize-none transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 px-6 py-4 border-t border-gray-100 bg-gray-50">
+              <button
+                onClick={() => setShowAddLeadModal(false)}
+                className="px-5 py-2 text-sm font-medium border border-gray-200 rounded-sm text-gray-600 hover:bg-gray-100 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddLeadSubmit}
+                disabled={addLeadLoading}
+                className={`px-6 py-2 text-sm font-semibold text-white rounded-sm transition-all shadow-md shadow-orange-200 flex items-center gap-2
+  ${addLeadLoading ? "bg-orange-400 cursor-not-allowed" : "bg-orange-500 hover:bg-orange-600"}`}
+              >
+                {addLeadLoading ? (
+                  <>
+                    <svg
+                      className="animate-spin h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="white"
+                        strokeWidth="4"
+                        opacity="0.25"
+                      />
+                      <path
+                        fill="white"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      />
+                    </svg>
+                    Saving...
+                  </>
+                ) : (
+                  "Save Lead"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT LEAD MODAL */}
+      {showEditLeadModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30">
+          <div className="bg-white w-[560px] rounded-sm shadow-xl overflow-hidden">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-orange-50 to-white">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-orange-500 inline-block"></span>
+                <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                  Edit Lead
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowEditLeadModal(false)}
+                className="w-7 h-7 flex items-center justify-center rounded-full text-orange-500 transition-all"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="px-6 py-5 grid grid-cols-2 gap-x-4 gap-y-3">
+              <div className="col-span-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Company Name <span className="text-orange-500">*</span>
+                </label>
+                <input
+                  name="company_name"
+                  value={editLeadForm.company_name}
+                  onChange={handleEditLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 transition-all"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Customer Name <span className="text-orange-500">*</span>
+                </label>
+                <input
+                  name="customer_name"
+                  value={editLeadForm.customer_name}
+                  onChange={handleEditLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 transition-all"
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Lead Title / Reference <span className="text-orange-500">*</span>
+                </label>
+                <input
+                  name="reference"
+                  value={editLeadForm.reference}
+                  onChange={handleEditLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 transition-all"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Source
+                </label>
+                <select
+                  name="source"
+                  value={editLeadForm.source}
+                  onChange={handleEditLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 transition-all"
+                >
+                  <option value="">-- Select --</option>
+                  {leadSource.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-span-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Product Category
+                </label>
+                <select
+                  name="category"
+                  value={editLeadForm.category}
+                  onChange={handleEditLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 transition-all"
+                >
+                  <option value="">-- Select --</option>
+                  {category.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-span-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Assignee
+                </label>
+                <select
+                  name="assignee"
+                  value={editLeadForm.assignee}
+                  onChange={handleEditLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 transition-all"
+                >
+                  <option value="">Select User</option>
+                  {assignee.map((item) => (
+                    <option key={item.id} value={item.name}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-span-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Priority
+                </label>
+                <select
+                  name="priority"
+                  value={editLeadForm.priority}
+                  onChange={handleEditLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 transition-all"
+                >
+                  <option value="">-- Select --</option>
+                  <option>Low</option>
+                  <option>Medium</option>
+                  <option>High</option>
+                </select>
+              </div>
+              <div className="col-span-2">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={editLeadForm.description}
+                  onChange={handleEditLeadChange}
+                  className="w-full mt-1.5 border border-orange-300 rounded-sm px-3 py-2 text-sm outline-none bg-gray-50 h-20 resize-none transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 px-6 py-4 border-t border-gray-100 bg-gray-50">
+              <button
+                onClick={() => setShowEditLeadModal(false)}
+                className="px-5 py-2 text-sm font-medium border border-gray-200 rounded-sm text-gray-600 hover:bg-gray-100 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditLeadSubmit}
+                disabled={editLeadLoading}
+                className={`px-6 py-2 text-sm font-semibold text-white rounded-sm transition-all shadow-md shadow-orange-200 flex items-center gap-2
+  ${editLeadLoading ? "bg-orange-400 cursor-not-allowed" : "bg-orange-500 hover:bg-orange-600"}`}
+              >
+                {editLeadLoading ? (
+                  <>
+                    <svg
+                      className="animate-spin h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="white"
+                        strokeWidth="4"
+                        opacity="0.25"
+                      />
+                      <path
+                        fill="white"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      />
+                    </svg>
+                    Updating...
+                  </>
+                ) : (
+                  "Update Lead"
+                )}
               </button>
             </div>
           </div>
